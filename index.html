@@ -1,15 +1,111 @@
-<html>
+<!DOCTYPE html>
+<html lang="th">
 <head>
-<title>
-  นางสาววรพัทธยา สมผุย
-</title>
- <style>
-   .bigfont{
-    font-size : 67px;
-   }
- </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>แนะนำตัว - เจได</title>
+    <style>
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+            font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body{
+            background: linear-gradient(135deg, #4f46e5, #06b6d4);
+            min-height:100vh;
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            padding:20px;
+        }
+
+        .card{
+            background:#fff;
+            max-width:500px;
+            width:100%;
+            border-radius:20px;
+            padding:40px;
+            text-align:center;
+            box-shadow:0 15px 40px rgba(0,0,0,0.2);
+        }
+
+        .profile-img{
+            width:150px;
+            height:150px;
+            border-radius:50%;
+            object-fit:cover;
+            border:5px solid #4f46e5;
+            margin-bottom:20px;
+        }
+
+        h1{
+            color:#333;
+            margin-bottom:10px;
+        }
+
+        .job{
+            color:#4f46e5;
+            font-size:18px;
+            font-weight:bold;
+            margin-bottom:20px;
+        }
+
+        p{
+            color:#555;
+            line-height:1.8;
+            margin-bottom:20px;
+        }
+
+        .skills{
+            display:flex;
+            justify-content:center;
+            flex-wrap:wrap;
+            gap:10px;
+        }
+
+        .skill{
+            background:#eef2ff;
+            color:#4f46e5;
+            padding:8px 15px;
+            border-radius:20px;
+            font-size:14px;
+        }
+
+        .footer{
+            margin-top:25px;
+            color:#888;
+            font-size:14px;
+        }
+    </style>
 </head>
 <body>
-  <div class="bigfont">รักพี่ออม พี่ออมสวยสุดในคอก</div>
+
+    <div class="card">
+        <img src="https://via.placeholder.com/150" alt="รูปโปรไฟล์" class="profile-img">
+
+        <h1>สวัสดีครับ ผมชื่อ เจได</h1>
+        <div class="job">นักเรียน | ผู้สนใจด้านเทคโนโลยี</div>
+
+        <p>
+            ยินดีต้อนรับสู่เว็บไซต์แนะนำตัวของผมครับ
+            ผมชื่นชอบการเรียนรู้สิ่งใหม่ ๆ โดยเฉพาะด้านเทคโนโลยี
+            การเขียนโปรแกรม และการพัฒนาเว็บไซต์
+            เป้าหมายของผมคือพัฒนาทักษะให้เก่งขึ้นในทุก ๆ วัน
+        </p>
+
+        <div class="skills">
+            <div class="skill">HTML</div>
+            <div class="skill">CSS</div>
+            <div class="skill">JavaScript</div>
+            <div class="skill">Web Design</div>
+        </div>
+
+        <div class="footer">
+            ขอบคุณที่เข้ามาเยี่ยมชมเว็บไซต์ของผม ❤️
+        </div>
+    </div>
+
 </body>
-</html> 
+</html>
