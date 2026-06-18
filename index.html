@@ -1,99 +1,274 @@
 <!DOCTYPE html>
+
 <html lang="th">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ระบบสแกน QR ผลิตภัณฑ์ยา</title>
 
-<script src="https://unpkg.com/html5-qrcode"></script>
+<title>SkinCare Scanner 🌸</title>
+
+<script src="https://unpkg.com/tesseract.js@5/dist/tesseract.min.js"></script>
+
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap" rel="stylesheet">
 
 <style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Kanit',sans-serif;
+}
+
 body{
-    font-family: Arial,sans-serif;
-    background:#f5f7fa;
-    text-align:center;
-    padding:20px;
+background:linear-gradient(135deg,#ffd6e7,#d8f3ff);
+min-height:100vh;
+padding:20px;
 }
 
-#reader{
-    width:350px;
-    margin:auto;
+.container{
+max-width:800px;
+margin:auto;
 }
 
-.result{
-    margin-top:20px;
-    padding:20px;
-    background:white;
-    border-radius:10px;
-    box-shadow:0 0 10px rgba(0,0,0,.1);
+.header{
+text-align:center;
+margin-bottom:25px;
 }
+
+.header h1{
+color:#ff4f87;
+font-size:2.3rem;
+}
+
+.header p{
+color:#666;
+}
+
+.card{
+background:white;
+border-radius:25px;
+padding:20px;
+box-shadow:0 10px 30px rgba(0,0,0,.08);
+margin-bottom:20px;
+}
+
+video{
+width:100%;
+border-radius:20px;
+border:4px solid #ffe4ef;
+}
+
+button{
+width:100%;
+padding:15px;
+border:none;
+border-radius:15px;
+background:linear-gradient(90deg,#ff78a8,#7bcfff);
+color:white;
+font-size:18px;
+font-weight:bold;
+cursor:pointer;
+margin-top:15px;
+transition:.3s;
+}
+
+button:hover{
+transform:translateY(-2px);
+}
+
+.result-card{
+background:#fff8fc;
+border-left:6px solid #ff79a9;
+padding:15px;
+margin-top:15px;
+border-radius:12px;
+}
+
+.ingredient{
+padding:12px;
+margin:10px 0;
+background:white;
+border-radius:12px;
+box-shadow:0 3px 8px rgba(0,0,0,.05);
+}
+
+.ingredient h3{
+color:#ff4f87;
+}
+
+.loading{
+text-align:center;
+color:#666;
+}
+
+.footer{
+text-align:center;
+margin-top:20px;
+color:#777;
+font-size:14px;
+}
+
 </style>
+
 </head>
 <body>
 
-<h1>สแกน QR Code ผลิตภัณฑ์ยา</h1>
+<div class="container">
 
-<div id="reader"></div>
+<div class="header">
+<h1>🌸 SkinCare Scanner</h1>
+<p>สแกนส่วนผสมสกินแคร์และดูสรรพคุณทันที</p>
+</div>
 
-<div class="result" id="result">
-    รอสแกน QR Code...
+<div class="card">
+
+<video id="video" autoplay playsinline></video>
+
+<button onclick="captureImage()">
+📸 ถ่ายภาพและวิเคราะห์
+</button>
+
+<canvas id="canvas" style="display:none;"></canvas>
+
+</div>
+
+<div class="card">
+
+<h2>💖 ผลการวิเคราะห์</h2>
+
+<div id="result">
+กรุณาถ่ายรูปฉลากส่วนผสมก่อน
+</div>
+
+</div>
+
+<div class="footer">
+Made with ❤️ for SkinCare Lovers
+</div>
+
 </div>
 
 <script>
 
-// ฐานข้อมูลตัวอย่าง
-const medicineDB = {
+const ingredientsDB={
 
-    "PARA500":{
-        name:"Paracetamol 500mg",
-        use:"บรรเทาอาการปวด ลดไข้",
-        dosage:"ครั้งละ 1-2 เม็ด ทุก 4-6 ชั่วโมง",
-        warning:"ไม่ควรเกิน 8 เม็ดต่อวัน"
-    },
+"niacinamide":{
+benefit:"✨ ลดรอยดำ กระชับรูขุมขน ลดความมัน"
+},
 
-    "AMOX500":{
-        name:"Amoxicillin 500mg",
-        use:"ยาปฏิชีวนะรักษาการติดเชื้อแบคทีเรีย",
-        dosage:"ตามแพทย์สั่ง",
-        warning:"ควรใช้ตามคำแนะนำของแพทย์"
-    }
+"hyaluronic acid":{
+benefit:"💧 เพิ่มความชุ่มชื้น อุ้มน้ำให้ผิว"
+},
+
+"retinol":{
+benefit:"🌟 ลดริ้วรอย กระตุ้นคอลลาเจน"
+},
+
+"vitamin c":{
+benefit:"🍊 ผิวกระจ่างใส ลดจุดด่างดำ"
+},
+
+"salicylic acid":{
+benefit:"🧼 ลดสิวอุดตัน ผลัดเซลล์ผิว"
+},
+
+"ceramide":{
+benefit:"🛡️ เสริมเกราะป้องกันผิว"
+},
+
+"centella":{
+benefit:"🌿 ปลอบประโลมผิว ลดการระคายเคือง"
+},
+
+"alpha arbutin":{
+benefit:"✨ ลดฝ้า กระ จุดด่างดำ"
+},
+
+"panthenol":{
+benefit:"💙 เพิ่มความชุ่มชื้น ฟื้นฟูผิว"
+},
+
+"peptide":{
+benefit:"💎 ช่วยให้ผิวกระชับและยืดหยุ่น"
+}
 
 };
 
-function onScanSuccess(decodedText){
+navigator.mediaDevices.getUserMedia({
+video:{
+facingMode:"environment"
+}
+})
+.then(stream=>{
+document.getElementById("video").srcObject=stream;
+});
 
-    let resultDiv=document.getElementById("result");
+async function captureImage(){
 
-    if(medicineDB[decodedText]){
+const result=document.getElementById("result");
 
-        let med=medicineDB[decodedText];
+result.innerHTML=
+'<div class="loading">🔍 กำลังวิเคราะห์...</div>';
 
-        resultDiv.innerHTML=`
-        <h2>${med.name}</h2>
-        <p><b>สรรพคุณ:</b> ${med.use}</p>
-        <p><b>วิธีใช้:</b> ${med.dosage}</p>
-        <p><b>คำเตือน:</b> ${med.warning}</p>
-        `;
+const video=document.getElementById("video");
+const canvas=document.getElementById("canvas");
 
-    }else{
+canvas.width=video.videoWidth;
+canvas.height=video.videoHeight;
 
-        resultDiv.innerHTML=`
-        <h2>ไม่พบข้อมูลยา</h2>
-        <p>QR: ${decodedText}</p>
-        `;
-    }
+const ctx=canvas.getContext("2d");
+ctx.drawImage(video,0,0);
+
+const ocr=await Tesseract.recognize(
+canvas,
+'eng'
+);
+
+const text=ocr.data.text.toLowerCase();
+
+let found=[];
+
+for(let ingredient in ingredientsDB){
+
+if(text.includes(ingredient)){
+found.push({
+name:ingredient,
+benefit:ingredientsDB[ingredient].benefit
+});
 }
 
-const html5QrCode = new Html5Qrcode("reader");
+}
 
-html5QrCode.start(
-    { facingMode: "environment" },
-    {
-        fps: 10,
-        qrbox: 250
-    },
-    onScanSuccess
-);
+if(found.length===0){
+
+result.innerHTML=`
+<div class="result-card">
+❌ ไม่พบส่วนผสมในฐานข้อมูล
+<br><br>
+ลองถ่ายภาพให้ชัดขึ้น
+</div>
+`;
+
+return;
+}
+
+let html='';
+
+found.forEach(item=>{
+
+html+=`
+<div class="ingredient">
+<h3>${item.name}</h3>
+<p>${item.benefit}</p>
+</div>
+`;
+
+});
+
+result.innerHTML=html;
+
+}
 
 </script>
 
