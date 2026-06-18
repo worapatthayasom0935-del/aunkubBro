@@ -1,283 +1,41 @@
-<!DOCTYPE html>
-
-<html lang="th">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Beauty Ingredient Scanner</title>
-
-<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;700&display=swap" rel="stylesheet">
-
-<style>
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-    font-family:'Kanit',sans-serif;
-}
-
-body{
-    background:linear-gradient(135deg,#fff7fa,#ffeef5);
-    color:#333;
-}
-
-header{
-    text-align:center;
-    padding:40px 20px;
-}
-
-.logo{
-    width:90px;
-    height:90px;
-    margin:auto;
-    border-radius:50%;
-    overflow:hidden;
-    box-shadow:0 5px 15px rgba(0,0,0,.15);
-}
-
-.logo img{
-    width:100%;
-    height:100%;
-    object-fit:cover;
-}
-
-header h1{
-    margin-top:15px;
-    color:#ff4d8d;
-    font-size:2.2rem;
-}
-
-header p{
-    color:#666;
-    margin-top:10px;
-}
-
-.hero{
-    display:flex;
-    flex-wrap:wrap;
-    align-items:center;
-    justify-content:center;
-    gap:30px;
-    padding:20px;
-}
-
-.hero img{
-    width:350px;
-    border-radius:25px;
-    box-shadow:0 10px 30px rgba(0,0,0,.1);
-}
-
-.card{
-    background:white;
-    padding:25px;
-    border-radius:25px;
-    width:420px;
-    box-shadow:0 10px 25px rgba(0,0,0,.08);
-}
-
-.card h2{
-    color:#ff4d8d;
-    margin-bottom:15px;
-}
-
-button{
-    background:#ff4d8d;
-    color:white;
-    border:none;
-    padding:12px 25px;
-    border-radius:50px;
-    cursor:pointer;
-    font-size:16px;
-    transition:.3s;
-}
-
-button:hover{
-    background:#ff2c76;
-}
-
-video,canvas{
-    width:100%;
-    margin-top:15px;
-    border-radius:15px;
-}
-
-.result{
-    margin-top:20px;
-    padding:15px;
-    background:#fff7fa;
-    border-radius:15px;
-}
-
-.result h3{
-    color:#ff4d8d;
-}
-
-.features{
-    padding:60px 20px;
-}
-
-.features h2{
-    text-align:center;
-    margin-bottom:30px;
-    color:#ff4d8d;
-}
-
-.grid{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
-    gap:20px;
-}
-
-.feature-box{
-    background:white;
-    padding:20px;
-    border-radius:20px;
-    text-align:center;
-    box-shadow:0 5px 15px rgba(0,0,0,.08);
-}
-
-.feature-box img{
-    width:100%;
-    border-radius:15px;
-    margin-bottom:15px;
-}
-
-footer{
-    text-align:center;
-    padding:25px;
-    color:#888;
-}
-</style>
-
-</head>
-<body>
-
-<header>
-
-<div class="logo">
-<img src="https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=400" alt="">
-</div>
-
-<h1>Beauty Ingredient Scanner</h1>
-
-<p>สแกนสกินแคร์ วิเคราะห์ส่วนผสม และดูสรรพคุณได้ทันที</p>
-
-</header>
-
-<section class="hero">
-
-<img src="https://images.unsplash.com/photo-1556228578-dd6c1842f7df?w=800" alt="Skincare">
-
-<div class="card">
-
-<h2>📷 สแกนผลิตภัณฑ์</h2>
-
-<button onclick="startCamera()">
-เปิดกล้อง
-</button>
-
 <video id="video" autoplay playsinline></video>
 
-<button onclick="takePhoto()" style="margin-top:10px;">
-ถ่ายภาพ
-</button>
-
-<canvas id="canvas" style="display:none;"></canvas>
-
-<div class="result">
-
-<h3>ผลวิเคราะห์</h3>
-
-<p id="analysis">
-ถ่ายภาพเพื่อวิเคราะห์ส่วนผสม
-</p>
-
-</div>
-
-</div>
-
-</section>
-
-<section class="features">
-
-<h2>ทำไมต้องใช้ Beauty Scanner?</h2>
-
-<div class="grid">
-
-<div class="feature-box">
-<img src="https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=500">
-<h3>วิเคราะห์ส่วนผสม</h3>
-<p>ตรวจสอบสารสำคัญในผลิตภัณฑ์</p>
-</div>
-
-<div class="feature-box">
-<img src="https://images.unsplash.com/photo-1596755389378-c31d21fd1273?w=500">
-<h3>ดูสรรพคุณ</h3>
-<p>บอกคุณสมบัติและประโยชน์ของส่วนผสม</p>
-</div>
-
-<div class="feature-box">
-<img src="https://images.unsplash.com/photo-1515377905703-c4788e51af15?w=500">
-<h3>ปลอดภัยและน่าเชื่อถือ</h3>
-<p>ออกแบบให้ใช้งานง่ายและดูเป็นมืออาชีพ</p>
-</div>
-
-</div>
-
-</section>
-
-<footer>
-© 2025 Beauty Ingredient Scanner
-</footer>
-
 <script>
+async function startCamera() {
+  const stream = await navigator.mediaDevices.getUserMedia({
+    video: {
+      facingMode: {
+        ideal: "environment"
+      }
+    }
+  });
 
-const video = document.getElementById('video');
-
-async function startCamera(){
-
-try{
-
-const stream = await navigator.mediaDevices.getUserMedia({
-video:true
-});
-
-video.srcObject = stream;
-
-}catch(err){
-
-alert("ไม่สามารถเปิดกล้องได้");
-
+  document.getElementById("video").srcObject = stream;
 }
 
-}
-
-function takePhoto(){
-
-const canvas = document.getElementById('canvas');
-const context = canvas.getContext('2d');
-
-canvas.width = video.videoWidth;
-canvas.height = video.videoHeight;
-
-context.drawImage(video,0,0);
-
-document.getElementById("analysis").innerHTML = `
-<b>ตัวอย่างผลวิเคราะห์</b><br><br>
-
-✅ Niacinamide<br>
-ช่วยลดรอยดำและควบคุมความมัน<br><br>
-
-✅ Hyaluronic Acid<br>
-เพิ่มความชุ่มชื้นให้ผิว<br><br>
-
-✅ Vitamin C<br>
-ช่วยให้ผิวกระจ่างใส ลดจุดด่างดำ
-`;
-
-}
-
+startCamera();
 </script>
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+const result = await Tesseract.recognize(imageFile,'eng');
+const text = result.data.text;
+const ingredientDB = {
+  "niacinamide":{
+    benefit:"ลดรอยดำ คุมมัน",
+    usage:"ใช้เช้าและเย็น"
+  },
 
-</body>
-</html>
+  "hyaluronic acid":{
+    benefit:"เพิ่มความชุ่มชื้น",
+    usage:"ใช้ก่อนมอยส์เจอไรเซอร์"
+  },
+
+  "ceramide":{
+    benefit:"ฟื้นฟูเกราะป้องกันผิว",
+    usage:"ใช้ทุกวัน"
+  },
+
+  "salicylic acid":{
+    benefit:"ลดสิวอุดตัน",
+    usage:"เริ่มสัปดาห์ละ 2-3 ครั้ง"
+  }
+}
