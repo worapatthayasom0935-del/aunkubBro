@@ -1,130 +1,101 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Indy - Personal Website</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: "Prompt", sans-serif;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ระบบสแกน QR ผลิตภัณฑ์ยา</title>
 
-        body {
-            background: linear-gradient(135deg, #6a11cb, #2575fc);
-            color: white;
-            min-height: 100vh;
-        }
+<script src="https://unpkg.com/html5-qrcode"></script>
 
-        .container {
-            max-width: 900px;
-            margin: auto;
-            padding: 50px 20px;
-            text-align: center;
-        }
+<style>
+body{
+    font-family: Arial,sans-serif;
+    background:#f5f7fa;
+    text-align:center;
+    padding:20px;
+}
 
-        .profile-img {
-            width: 180px;
-            height: 180px;
-            border-radius: 50%;
-            border: 5px solid white;
-            object-fit: cover;
-            margin-bottom: 20px;
-        }
+#reader{
+    width:350px;
+    margin:auto;
+}
 
-        h1 {
-            font-size: 3rem;
-            margin-bottom: 10px;
-        }
-
-        .subtitle {
-            font-size: 1.3rem;
-            opacity: 0.9;
-            margin-bottom: 30px;
-        }
-
-        .card {
-            background: rgba(255,255,255,0.15);
-            backdrop-filter: blur(10px);
-            padding: 25px;
-            border-radius: 20px;
-            margin-top: 20px;
-        }
-
-        .skills {
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-top: 15px;
-        }
-
-        .skill {
-            background: rgba(255,255,255,0.2);
-            padding: 10px 18px;
-            border-radius: 30px;
-        }
-
-        .contact {
-            margin-top: 30px;
-        }
-
-        .contact a {
-            color: white;
-            text-decoration: none;
-            margin: 0 10px;
-            font-weight: bold;
-        }
-
-        footer {
-            margin-top: 50px;
-            opacity: 0.8;
-        }
-    </style>
+.result{
+    margin-top:20px;
+    padding:20px;
+    background:white;
+    border-radius:10px;
+    box-shadow:0 0 10px rgba(0,0,0,.1);
+}
+</style>
 </head>
 <body>
 
-<div class="container">
-    <img src="https://via.placeholder.com/180" alt="Profile" class="profile-img">
+<h1>สแกน QR Code ผลิตภัณฑ์ยา</h1>
 
-    <h1>สวัสดีครับ ผมอินดี้ 👋</h1>
-    <p class="subtitle">นักสร้างสรรค์ | ผู้พัฒนาเว็บไซต์ | คนรักเทคโนโลยี</p>
+<div id="reader"></div>
 
-    <div class="card">
-        <h2>เกี่ยวกับฉัน</h2>
-        <p>
-            ผมชื่ออินดี้ สนใจด้านเทคโนโลยี การพัฒนาเว็บไซต์
-            และการสร้างสรรค์ผลงานดิจิทัลใหม่ ๆ
-            ชอบเรียนรู้สิ่งใหม่และพัฒนาทักษะอยู่เสมอ
-        </p>
-    </div>
-
-    <div class="card">
-        <h2>ทักษะ</h2>
-        <div class="skills">
-            <div class="skill">HTML</div>
-            <div class="skill">CSS</div>
-            <div class="skill">JavaScript</div>
-            <div class="skill">UI/UX</div>
-            <div class="skill">Web Design</div>
-        </div>
-    </div>
-
-    <div class="contact">
-        <h2>ติดต่อ</h2>
-        <p>
-            <a href="#">Facebook</a>
-            <a href="#">Instagram</a>
-            <a href="#">GitHub</a>
-        </p>
-    </div>
-
-    <footer>
-        © 2026 Indy. All Rights Reserved.
-    </footer>
+<div class="result" id="result">
+    รอสแกน QR Code...
 </div>
+
+<script>
+
+// ฐานข้อมูลตัวอย่าง
+const medicineDB = {
+
+    "PARA500":{
+        name:"Paracetamol 500mg",
+        use:"บรรเทาอาการปวด ลดไข้",
+        dosage:"ครั้งละ 1-2 เม็ด ทุก 4-6 ชั่วโมง",
+        warning:"ไม่ควรเกิน 8 เม็ดต่อวัน"
+    },
+
+    "AMOX500":{
+        name:"Amoxicillin 500mg",
+        use:"ยาปฏิชีวนะรักษาการติดเชื้อแบคทีเรีย",
+        dosage:"ตามแพทย์สั่ง",
+        warning:"ควรใช้ตามคำแนะนำของแพทย์"
+    }
+
+};
+
+function onScanSuccess(decodedText){
+
+    let resultDiv=document.getElementById("result");
+
+    if(medicineDB[decodedText]){
+
+        let med=medicineDB[decodedText];
+
+        resultDiv.innerHTML=`
+        <h2>${med.name}</h2>
+        <p><b>สรรพคุณ:</b> ${med.use}</p>
+        <p><b>วิธีใช้:</b> ${med.dosage}</p>
+        <p><b>คำเตือน:</b> ${med.warning}</p>
+        `;
+
+    }else{
+
+        resultDiv.innerHTML=`
+        <h2>ไม่พบข้อมูลยา</h2>
+        <p>QR: ${decodedText}</p>
+        `;
+    }
+}
+
+const html5QrCode = new Html5Qrcode("reader");
+
+html5QrCode.start(
+    { facingMode: "environment" },
+    {
+        fps: 10,
+        qrbox: 250
+    },
+    onScanSuccess
+);
+
+</script>
 
 </body>
 </html>
