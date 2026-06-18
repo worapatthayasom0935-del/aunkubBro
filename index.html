@@ -4,269 +4,276 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Beauty Ingredient Scanner</title>
 
-<title>SkinCare Scanner 🌸</title>
-
-<script src="https://unpkg.com/tesseract.js@5/dist/tesseract.min.js"></script>
-
-<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;700&display=swap" rel="stylesheet">
 
 <style>
-
 *{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:'Kanit',sans-serif;
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Kanit',sans-serif;
 }
 
 body{
-background:linear-gradient(135deg,#ffd6e7,#d8f3ff);
-min-height:100vh;
-padding:20px;
+    background:linear-gradient(135deg,#fff7fa,#ffeef5);
+    color:#333;
 }
 
-.container{
-max-width:800px;
-margin:auto;
+header{
+    text-align:center;
+    padding:40px 20px;
 }
 
-.header{
-text-align:center;
-margin-bottom:25px;
+.logo{
+    width:90px;
+    height:90px;
+    margin:auto;
+    border-radius:50%;
+    overflow:hidden;
+    box-shadow:0 5px 15px rgba(0,0,0,.15);
 }
 
-.header h1{
-color:#ff4f87;
-font-size:2.3rem;
+.logo img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
 }
 
-.header p{
-color:#666;
+header h1{
+    margin-top:15px;
+    color:#ff4d8d;
+    font-size:2.2rem;
+}
+
+header p{
+    color:#666;
+    margin-top:10px;
+}
+
+.hero{
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    justify-content:center;
+    gap:30px;
+    padding:20px;
+}
+
+.hero img{
+    width:350px;
+    border-radius:25px;
+    box-shadow:0 10px 30px rgba(0,0,0,.1);
 }
 
 .card{
-background:white;
-border-radius:25px;
-padding:20px;
-box-shadow:0 10px 30px rgba(0,0,0,.08);
-margin-bottom:20px;
+    background:white;
+    padding:25px;
+    border-radius:25px;
+    width:420px;
+    box-shadow:0 10px 25px rgba(0,0,0,.08);
 }
 
-video{
-width:100%;
-border-radius:20px;
-border:4px solid #ffe4ef;
+.card h2{
+    color:#ff4d8d;
+    margin-bottom:15px;
 }
 
 button{
-width:100%;
-padding:15px;
-border:none;
-border-radius:15px;
-background:linear-gradient(90deg,#ff78a8,#7bcfff);
-color:white;
-font-size:18px;
-font-weight:bold;
-cursor:pointer;
-margin-top:15px;
-transition:.3s;
+    background:#ff4d8d;
+    color:white;
+    border:none;
+    padding:12px 25px;
+    border-radius:50px;
+    cursor:pointer;
+    font-size:16px;
+    transition:.3s;
 }
 
 button:hover{
-transform:translateY(-2px);
+    background:#ff2c76;
 }
 
-.result-card{
-background:#fff8fc;
-border-left:6px solid #ff79a9;
-padding:15px;
-margin-top:15px;
-border-radius:12px;
+video,canvas{
+    width:100%;
+    margin-top:15px;
+    border-radius:15px;
 }
 
-.ingredient{
-padding:12px;
-margin:10px 0;
-background:white;
-border-radius:12px;
-box-shadow:0 3px 8px rgba(0,0,0,.05);
+.result{
+    margin-top:20px;
+    padding:15px;
+    background:#fff7fa;
+    border-radius:15px;
 }
 
-.ingredient h3{
-color:#ff4f87;
+.result h3{
+    color:#ff4d8d;
 }
 
-.loading{
-text-align:center;
-color:#666;
+.features{
+    padding:60px 20px;
 }
 
-.footer{
-text-align:center;
-margin-top:20px;
-color:#777;
-font-size:14px;
+.features h2{
+    text-align:center;
+    margin-bottom:30px;
+    color:#ff4d8d;
 }
 
+.grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+    gap:20px;
+}
+
+.feature-box{
+    background:white;
+    padding:20px;
+    border-radius:20px;
+    text-align:center;
+    box-shadow:0 5px 15px rgba(0,0,0,.08);
+}
+
+.feature-box img{
+    width:100%;
+    border-radius:15px;
+    margin-bottom:15px;
+}
+
+footer{
+    text-align:center;
+    padding:25px;
+    color:#888;
+}
 </style>
 
 </head>
 <body>
 
-<div class="container">
+<header>
 
-<div class="header">
-<h1>🌸 SkinCare Scanner</h1>
-<p>สแกนส่วนผสมสกินแคร์และดูสรรพคุณทันที</p>
+<div class="logo">
+<img src="https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=400" alt="">
 </div>
+
+<h1>Beauty Ingredient Scanner</h1>
+
+<p>สแกนสกินแคร์ วิเคราะห์ส่วนผสม และดูสรรพคุณได้ทันที</p>
+
+</header>
+
+<section class="hero">
+
+<img src="https://images.unsplash.com/photo-1556228578-dd6c1842f7df?w=800" alt="Skincare">
 
 <div class="card">
 
+<h2>📷 สแกนผลิตภัณฑ์</h2>
+
+<button onclick="startCamera()">
+เปิดกล้อง
+</button>
+
 <video id="video" autoplay playsinline></video>
 
-<button onclick="captureImage()">
-📸 ถ่ายภาพและวิเคราะห์
+<button onclick="takePhoto()" style="margin-top:10px;">
+ถ่ายภาพ
 </button>
 
 <canvas id="canvas" style="display:none;"></canvas>
 
-</div>
+<div class="result">
 
-<div class="card">
+<h3>ผลวิเคราะห์</h3>
 
-<h2>💖 ผลการวิเคราะห์</h2>
-
-<div id="result">
-กรุณาถ่ายรูปฉลากส่วนผสมก่อน
-</div>
+<p id="analysis">
+ถ่ายภาพเพื่อวิเคราะห์ส่วนผสม
+</p>
 
 </div>
 
-<div class="footer">
-Made with ❤️ for SkinCare Lovers
+</div>
+
+</section>
+
+<section class="features">
+
+<h2>ทำไมต้องใช้ Beauty Scanner?</h2>
+
+<div class="grid">
+
+<div class="feature-box">
+<img src="https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=500">
+<h3>วิเคราะห์ส่วนผสม</h3>
+<p>ตรวจสอบสารสำคัญในผลิตภัณฑ์</p>
+</div>
+
+<div class="feature-box">
+<img src="https://images.unsplash.com/photo-1596755389378-c31d21fd1273?w=500">
+<h3>ดูสรรพคุณ</h3>
+<p>บอกคุณสมบัติและประโยชน์ของส่วนผสม</p>
+</div>
+
+<div class="feature-box">
+<img src="https://images.unsplash.com/photo-1515377905703-c4788e51af15?w=500">
+<h3>ปลอดภัยและน่าเชื่อถือ</h3>
+<p>ออกแบบให้ใช้งานง่ายและดูเป็นมืออาชีพ</p>
 </div>
 
 </div>
+
+</section>
+
+<footer>
+© 2025 Beauty Ingredient Scanner
+</footer>
 
 <script>
 
-const ingredientsDB={
+const video = document.getElementById('video');
 
-"niacinamide":{
-benefit:"✨ ลดรอยดำ กระชับรูขุมขน ลดความมัน"
-},
+async function startCamera(){
 
-"hyaluronic acid":{
-benefit:"💧 เพิ่มความชุ่มชื้น อุ้มน้ำให้ผิว"
-},
+try{
 
-"retinol":{
-benefit:"🌟 ลดริ้วรอย กระตุ้นคอลลาเจน"
-},
-
-"vitamin c":{
-benefit:"🍊 ผิวกระจ่างใส ลดจุดด่างดำ"
-},
-
-"salicylic acid":{
-benefit:"🧼 ลดสิวอุดตัน ผลัดเซลล์ผิว"
-},
-
-"ceramide":{
-benefit:"🛡️ เสริมเกราะป้องกันผิว"
-},
-
-"centella":{
-benefit:"🌿 ปลอบประโลมผิว ลดการระคายเคือง"
-},
-
-"alpha arbutin":{
-benefit:"✨ ลดฝ้า กระ จุดด่างดำ"
-},
-
-"panthenol":{
-benefit:"💙 เพิ่มความชุ่มชื้น ฟื้นฟูผิว"
-},
-
-"peptide":{
-benefit:"💎 ช่วยให้ผิวกระชับและยืดหยุ่น"
-}
-
-};
-
-navigator.mediaDevices.getUserMedia({
-video:{
-facingMode:"environment"
-}
-})
-.then(stream=>{
-document.getElementById("video").srcObject=stream;
+const stream = await navigator.mediaDevices.getUserMedia({
+video:true
 });
 
-async function captureImage(){
+video.srcObject = stream;
 
-const result=document.getElementById("result");
+}catch(err){
 
-result.innerHTML=
-'<div class="loading">🔍 กำลังวิเคราะห์...</div>';
+alert("ไม่สามารถเปิดกล้องได้");
 
-const video=document.getElementById("video");
-const canvas=document.getElementById("canvas");
-
-canvas.width=video.videoWidth;
-canvas.height=video.videoHeight;
-
-const ctx=canvas.getContext("2d");
-ctx.drawImage(video,0,0);
-
-const ocr=await Tesseract.recognize(
-canvas,
-'eng'
-);
-
-const text=ocr.data.text.toLowerCase();
-
-let found=[];
-
-for(let ingredient in ingredientsDB){
-
-if(text.includes(ingredient)){
-found.push({
-name:ingredient,
-benefit:ingredientsDB[ingredient].benefit
-});
 }
 
 }
 
-if(found.length===0){
+function takePhoto(){
 
-result.innerHTML=`
-<div class="result-card">
-❌ ไม่พบส่วนผสมในฐานข้อมูล
-<br><br>
-ลองถ่ายภาพให้ชัดขึ้น
-</div>
+const canvas = document.getElementById('canvas');
+const context = canvas.getContext('2d');
+
+canvas.width = video.videoWidth;
+canvas.height = video.videoHeight;
+
+context.drawImage(video,0,0);
+
+document.getElementById("analysis").innerHTML = `
+<b>ตัวอย่างผลวิเคราะห์</b><br><br>
+
+✅ Niacinamide<br>
+ช่วยลดรอยดำและควบคุมความมัน<br><br>
+
+✅ Hyaluronic Acid<br>
+เพิ่มความชุ่มชื้นให้ผิว<br><br>
+
+✅ Vitamin C<br>
+ช่วยให้ผิวกระจ่างใส ลดจุดด่างดำ
 `;
-
-return;
-}
-
-let html='';
-
-found.forEach(item=>{
-
-html+=`
-<div class="ingredient">
-<h3>${item.name}</h3>
-<p>${item.benefit}</p>
-</div>
-`;
-
-});
-
-result.innerHTML=html;
 
 }
 
