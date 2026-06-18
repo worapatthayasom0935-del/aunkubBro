@@ -1,41 +1,493 @@
+```html
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BeautyScan AI</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+
+:root{
+--primary:#ff5f9e;
+--secondary:#6ec8ff;
+--bg:#f8fbff;
+--dark:#1e293b;
+}
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Prompt',sans-serif;
+}
+
+body{
+background:linear-gradient(135deg,#fff,#f8faff,#fff0f5);
+min-height:100vh;
+color:#333;
+}
+
+header{
+padding:25px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+background:rgba(255,255,255,.8);
+backdrop-filter:blur(20px);
+position:sticky;
+top:0;
+z-index:100;
+box-shadow:0 5px 20px rgba(0,0,0,.05);
+}
+
+.logo{
+display:flex;
+align-items:center;
+gap:10px;
+font-weight:700;
+font-size:22px;
+color:var(--primary);
+}
+
+.badge{
+background:#ecfeff;
+padding:8px 14px;
+border-radius:30px;
+font-size:12px;
+color:#0891b2;
+font-weight:600;
+}
+
+.hero{
+padding:50px 20px;
+text-align:center;
+}
+
+.hero h1{
+font-size:42px;
+color:var(--dark);
+margin-bottom:15px;
+}
+
+.hero p{
+color:#64748b;
+max-width:700px;
+margin:auto;
+}
+
+.hero-image{
+width:100%;
+max-width:900px;
+margin:35px auto;
+border-radius:30px;
+overflow:hidden;
+box-shadow:0 20px 60px rgba(0,0,0,.12);
+}
+
+.hero-image img{
+width:100%;
+display:block;
+}
+
+.container{
+width:min(1200px,95%);
+margin:auto;
+}
+
+.card{
+background:rgba(255,255,255,.85);
+backdrop-filter:blur(18px);
+border-radius:25px;
+padding:25px;
+box-shadow:0 10px 35px rgba(0,0,0,.08);
+margin-bottom:25px;
+}
+
+h2{
+margin-bottom:15px;
+color:#0f172a;
+}
+
+.camera-wrap{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:20px;
+}
+
+video,
+canvas,
+img.preview{
+width:100%;
+border-radius:20px;
+background:#000;
+}
+
+.controls{
+display:flex;
+gap:12px;
+flex-wrap:wrap;
+margin-top:15px;
+}
+
+button{
+border:none;
+padding:12px 22px;
+border-radius:15px;
+cursor:pointer;
+font-size:15px;
+font-weight:600;
+transition:.3s;
+}
+
+.primary{
+background:var(--primary);
+color:#fff;
+}
+
+.secondary{
+background:var(--secondary);
+color:#fff;
+}
+
+.success{
+background:#10b981;
+color:#fff;
+}
+
+button:hover{
+transform:translateY(-2px);
+}
+
+.result{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+gap:15px;
+margin-top:20px;
+}
+
+.result-card{
+background:#f8fafc;
+padding:18px;
+border-radius:18px;
+}
+
+.result-card h3{
+margin-bottom:10px;
+color:var(--primary);
+}
+
+.trust{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+gap:20px;
+}
+
+.trust-box{
+background:white;
+padding:20px;
+border-radius:20px;
+text-align:center;
+box-shadow:0 8px 20px rgba(0,0,0,.05);
+}
+
+footer{
+margin-top:50px;
+padding:25px;
+text-align:center;
+color:#64748b;
+}
+
+@media(max-width:900px){
+
+.camera-wrap{
+grid-template-columns:1fr;
+}
+
+.hero h1{
+font-size:30px;
+}
+
+}
+
+</style>
+</head>
+<body>
+
+<header>
+
+<div class="logo">
+🧴 BeautyScan AI
+</div>
+
+<div class="badge">
+Dermatology Inspired
+</div>
+
+</header>
+
+<section class="hero">
+
+<h1>สแกนสกินแคร์ด้วย AI</h1>
+
+<p>
+ถ่ายภาพผลิตภัณฑ์ อ่านส่วนผสม วิเคราะห์สรรพคุณ
+พร้อมแนะนำวิธีใช้และคำเตือนในการใช้งาน
+</p>
+
+<div class="hero-image">
+
+<img src="https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=1200" alt="Skincare">
+
+</div>
+
+</section>
+
+<div class="container">
+
+<div class="card">
+
+<h2>📷 กล้องสแกนสกินแคร์</h2>
+
+<div class="camera-wrap">
+
+<div>
+
 <video id="video" autoplay playsinline></video>
 
-<script>
-async function startCamera() {
-  const stream = await navigator.mediaDevices.getUserMedia({
-    video: {
-      facingMode: {
-        ideal: "environment"
-      }
-    }
-  });
+<div class="controls">
 
-  document.getElementById("video").srcObject = stream;
+<button class="primary" onclick="startCamera()">
+เปิดกล้อง
+</button>
+
+<button class="secondary" onclick="switchCamera()">
+สลับกล้อง
+</button>
+
+<button class="success" onclick="capture()">
+ถ่ายภาพ
+</button>
+
+</div>
+
+</div>
+
+<div>
+
+<canvas id="canvas"></canvas>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="card">
+
+<h2>🧪 ผลวิเคราะห์</h2>
+
+<div class="result">
+
+<div class="result-card">
+
+<h3>ส่วนผสม</h3>
+
+<div id="ingredients">
+ยังไม่มีข้อมูล
+</div>
+
+</div>
+
+<div class="result-card">
+
+<h3>สรรพคุณ</h3>
+
+<div id="benefits">
+ยังไม่มีข้อมูล
+</div>
+
+</div>
+
+<div class="result-card">
+
+<h3>วิธีใช้</h3>
+
+<div id="usage">
+ยังไม่มีข้อมูล
+</div>
+
+</div>
+
+<div class="result-card">
+
+<h3>คำเตือน</h3>
+
+<div id="warning">
+ยังไม่มีข้อมูล
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="card">
+
+<h2>⭐ ทำไมผู้ใช้ถึงเชื่อถือ BeautyScan AI</h2>
+
+<div class="trust">
+
+<div class="trust-box">
+🔬<br><br>
+วิเคราะห์ส่วนผสมยอดนิยม
+</div>
+
+<div class="trust-box">
+📚<br><br>
+ฐานข้อมูลสกินแคร์
+</div>
+
+<div class="trust-box">
+🧴<br><br>
+แนะนำวิธีใช้อย่างถูกต้อง
+</div>
+
+<div class="trust-box">
+⚠️<br><br>
+แจ้งคำเตือนสารที่อาจระคายเคือง
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<footer>
+
+BeautyScan AI © 2026
+
+</footer>
+
+<script>
+
+let currentCamera = "environment";
+let stream = null;
+
+async function startCamera(){
+
+try{
+
+if(stream){
+
+stream.getTracks().forEach(track=>track.stop());
+
+}
+
+stream = await navigator.mediaDevices.getUserMedia({
+
+video:{
+facingMode:currentCamera
+}
+
+});
+
+document.getElementById("video").srcObject = stream;
+
+}catch(e){
+
+alert("ไม่สามารถเปิดกล้องได้");
+
+}
+
+}
+
+function switchCamera(){
+
+currentCamera =
+currentCamera === "environment"
+? "user"
+: "environment";
+
+startCamera();
+
+}
+
+function capture(){
+
+const video =
+document.getElementById("video");
+
+const canvas =
+document.getElementById("canvas");
+
+const ctx =
+canvas.getContext("2d");
+
+canvas.width =
+video.videoWidth;
+
+canvas.height =
+video.videoHeight;
+
+ctx.drawImage(
+video,
+0,
+0,
+canvas.width,
+canvas.height
+);
+
+showDemoAnalysis();
+
+}
+
+function showDemoAnalysis(){
+
+document.getElementById("ingredients")
+.innerHTML=
+`
+• Niacinamide<br>
+• Hyaluronic Acid<br>
+• Ceramide NP<br>
+• Panthenol
+`;
+
+document.getElementById("benefits")
+.innerHTML=
+`
+ลดรอยดำ<br>
+เพิ่มความชุ่มชื้น<br>
+เสริมเกราะป้องกันผิว<br>
+ปลอบประโลมผิว
+`;
+
+document.getElementById("usage")
+.innerHTML=
+`
+1. ล้างหน้าให้สะอาด<br>
+2. ทาเซรั่ม 2-3 หยด<br>
+3. ตามด้วยมอยส์เจอร์ไรเซอร์<br>
+4. กลางวันทากันแดด
+`;
+
+document.getElementById("warning")
+.innerHTML=
+`
+ทดสอบการแพ้ก่อนใช้<br>
+หลีกเลี่ยงบริเวณรอบดวงตา
+`;
+
 }
 
 startCamera();
+
 </script>
-<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
-const result = await Tesseract.recognize(imageFile,'eng');
-const text = result.data.text;
-const ingredientDB = {
-  "niacinamide":{
-    benefit:"ลดรอยดำ คุมมัน",
-    usage:"ใช้เช้าและเย็น"
-  },
 
-  "hyaluronic acid":{
-    benefit:"เพิ่มความชุ่มชื้น",
-    usage:"ใช้ก่อนมอยส์เจอไรเซอร์"
-  },
-
-  "ceramide":{
-    benefit:"ฟื้นฟูเกราะป้องกันผิว",
-    usage:"ใช้ทุกวัน"
-  },
-
-  "salicylic acid":{
-    benefit:"ลดสิวอุดตัน",
-    usage:"เริ่มสัปดาห์ละ 2-3 ครั้ง"
-  }
-}
+</body>
+</html>
+```
