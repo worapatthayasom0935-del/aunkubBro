@@ -1,749 +1,340 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>สมุดบันทึกโรคพืช — Plant Pathology Field Notes</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Thai:wght@400;500;600;700&family=Sarabun:wght@400;500;600;700&family=Chonburi&display=swap" rel="stylesheet">
-<style>
-    :root{
-        --canopy:#1B4332;
-        --fern:#2D6A4F;
-        --fern-soft:#40916C;
-        --paper:#F3F5EC;
-        --paper-card:#FBFAF4;
-        --clay:#A6602B;
-        --amber:#C88A2E;
-        --rust:#9C3D2E;
-        --ink:#1F2A24;
-        --ink-soft:#5B6B5F;
-        --line:#D8DCC9;
-        --shadow: 0 10px 30px rgba(27,67,50,0.12);
-    }
-    *{box-sizing:border-box;}
-    body{
-        font-family:'Sarabun',sans-serif;
-        background-color:var(--paper);
-        background-image:
-            radial-gradient(circle at 15% 20%, rgba(64,145,108,0.06) 0, transparent 45%),
-            radial-gradient(circle at 85% 80%, rgba(166,96,43,0.07) 0, transparent 45%);
-        color:var(--ink);
-        margin:0;
-        padding:32px 16px 60px;
-        display:flex;
-        flex-direction:column;
-        align-items:center;
-        min-height:100vh;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mangosteen Health Scanner</title>
+    <link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary: #4A154B; /* สีม่วงมังคุด */
+            --secondary: #6B2D5C;
+            --accent: #8EC540; /* สีเขียวใบไม้ */
+            --danger: #E74C3C;
+            --warning: #F39C12;
+            --light: #F9F6FA;
+            --dark: #2C1A2D;
+        }
 
-    .brandmark{
-        display:flex;
-        align-items:center;
-        gap:10px;
-        margin-bottom:6px;
-    }
-    .brandmark svg{ width:34px; height:34px; }
-    h1{
-        font-family:'Noto Serif Thai', serif;
-        font-weight:700;
-        color:var(--canopy);
-        text-align:center;
-        font-size:30px;
-        margin:0;
-        letter-spacing:0.2px;
-    }
-    .subtitle{
-        text-align:center;
-        color:var(--ink-soft);
-        margin-top:8px;
-        margin-bottom:28px;
-        font-size:14.5px;
-        max-width:480px;
-        line-height:1.6;
-    }
-    .subtitle b{ color:var(--fern); font-weight:600; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Anuphan', sans-serif;
+        }
 
-    .leaf-divider{
-        width:100%;
-        max-width:420px;
-        height:14px;
-        margin:0 auto 26px;
-        opacity:0.55;
-    }
+        body {
+            background-color: var(--light);
+            color: var(--dark);
+            line-height: 1.6;
+        }
 
-    .container{
-        background:var(--paper-card);
-        padding:28px 26px 26px;
-        border-radius:14px;
-        box-shadow:var(--shadow);
-        max-width:600px;
-        width:100%;
-        box-sizing:border-box;
-        margin-bottom:25px;
-        position:relative;
-        border:1px solid var(--line);
-    }
-    .container::before{
-        content:"";
-        position:absolute;
-        inset:7px;
-        border:1px solid rgba(27,67,50,0.10);
-        border-radius:9px;
-        pointer-events:none;
-    }
+        /* Header */
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 2rem 1rem;
+            text-align: center;
+            border-radius: 0 0 30px 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        }
 
-    .tabs{
-        display:flex;
-        gap:4px;
-        margin-bottom:24px;
-        border-bottom:2px solid var(--line);
-        position:relative;
-        z-index:1;
-    }
-    .tab-btn{
-        flex:1;
-        padding:12px 8px 14px;
-        border:none;
-        background:transparent;
-        color:var(--ink-soft);
-        font-family:'Sarabun',sans-serif;
-        font-weight:600;
-        font-size:15px;
-        cursor:pointer;
-        transition:color 0.2s ease;
-        position:relative;
-        top:2px;
-    }
-    .tab-btn.active{ color:var(--canopy); }
-    .tab-btn::after{
-        content:"";
-        position:absolute;
-        left:8px; right:8px; bottom:-2px;
-        height:3px;
-        background:var(--fern);
-        border-radius:3px 3px 0 0;
-        transform:scaleX(0);
-        transition:transform 0.25s ease;
-    }
-    .tab-btn.active::after{ transform:scaleX(1); }
+        header h1 {
+            font-size: 2.2rem;
+            margin-bottom: 0.5rem;
+        }
 
-    .tab-panel{ display:none; animation:fadeIn 0.35s ease; }
-    .tab-panel.active{ display:block; }
+        header p {
+            font-weight: 300;
+            opacity: 0.9;
+        }
 
-    label{
-        font-size:15px;
-        font-weight:600;
-        display:block;
-        margin-bottom:10px;
-        color:var(--canopy);
-        font-family:'Sarabun',sans-serif;
-    }
-    select{
-        width:100%;
-        padding:13px 14px;
-        font-size:15.5px;
-        font-family:'Sarabun',sans-serif;
-        border-radius:9px;
-        border:1.5px solid var(--fern-soft);
-        background-color:#fff;
-        color:var(--ink);
-        cursor:pointer;
-        outline:none;
-        margin-bottom:25px;
-        transition:border-color 0.2s ease, box-shadow 0.2s ease;
-    }
-    select:focus{
-        border-color:var(--canopy);
-        box-shadow:0 0 0 3px rgba(45,106,79,0.15);
-    }
+        /* Main Container */
+        .container {
+            max-width: 800px;
+            margin: -20px auto 40px;
+            padding: 0 20px;
+        }
 
-    /* specimen tag / stamp badge */
-    .badge{
-        display:inline-block;
-        padding:7px 16px;
-        border-radius:3px;
-        font-size:13px;
-        font-weight:700;
-        letter-spacing:0.06em;
-        color:#fff;
-        text-transform:uppercase;
-        position:relative;
-        transform:rotate(-1.5deg);
-        box-shadow:0 2px 6px rgba(0,0,0,0.15);
-    }
-    .badge::before{
-        content:"";
-        position:absolute;
-        inset:2px;
-        border:1px dashed rgba(255,255,255,0.55);
-        border-radius:2px;
-    }
-    .danger-high{ background-color:var(--rust); }
-    .danger-medium{ background-color:var(--amber); }
-    .danger-low{ background-color:var(--fern); }
+        /* Scanner Box */
+        .scanner-card {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            text-align: center;
+            margin-bottom: 2rem;
+        }
 
-    .info-section{
-        margin-top:16px;
-        border-bottom:1px solid var(--line);
-        padding-bottom:14px;
-    }
-    .info-title{
-        font-weight:700;
-        color:var(--fern);
-        display:block;
-        margin-bottom:6px;
-        font-size:13.5px;
-        text-transform:uppercase;
-        letter-spacing:0.04em;
-    }
-    #resLeaf,#resSolution,#resDuration,
-    #aiLeaf,#aiSolution,#aiDuration{
-        color:var(--ink);
-        line-height:1.7;
-        font-size:15px;
-    }
-    .result-box{ display:none; animation:fadeIn 0.5s ease; }
-    @keyframes fadeIn{
-        from{ opacity:0; transform:translateY(10px); }
-        to{ opacity:1; transform:translateY(0); }
-    }
+        .camera-box {
+            width: 100%;
+            max-width: 450px;
+            height: 300px;
+            background: #e0e0e0;
+            margin: 0 auto 1.5rem;
+            border-radius: 15px;
+            overflow: hidden;
+            position: relative;
+            border: 4px solid var(--primary);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
 
-    /* --- AI capture section --- */
-    .capture-options{
-        display:flex;
-        gap:12px;
-        margin-bottom:18px;
-    }
-    .capture-option-btn{
-        flex:1;
-        padding:22px 12px;
-        border:1.5px dashed var(--fern-soft);
-        background:#fff;
-        border-radius:11px;
-        cursor:pointer;
-        text-align:center;
-        transition:background 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
-    }
-    .capture-option-btn:hover{
-        background:#EFF5EA;
-        border-color:var(--canopy);
-        transform:translateY(-2px);
-    }
-    .capture-option-icon{ font-size:26px; display:block; margin-bottom:8px; }
-    .capture-option-text{ font-size:13.5px; font-weight:600; color:var(--canopy); }
+        #video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
 
-    .dropzone{
-        border:1.5px dashed var(--fern-soft);
-        border-radius:11px;
-        padding:34px 15px;
-        text-align:center;
-        cursor:pointer;
-        background:#fff;
-        transition:background 0.2s ease, border-color 0.2s ease;
-        margin-bottom:18px;
-    }
-    .dropzone:hover, .dropzone.dragover{
-        background:#EFF5EA;
-        border-color:var(--canopy);
-    }
-    .dropzone-icon{ font-size:32px; display:block; margin-bottom:8px; }
-    .dropzone-text{ color:var(--ink-soft); font-size:13.5px; line-height:1.6; }
-    #fileInput{ display:none; }
+        /* แอนิเมชันเส้นสแกนเรียลไทม์ */
+        .scan-laser {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--accent);
+            box-shadow: 0 0 15px var(--accent);
+            animation: scanning 2s linear infinite;
+            display: none;
+        }
 
-    .camera-wrap{ display:none; margin-bottom:18px; text-align:center; }
-    .camera-wrap video{
-        width:100%;
-        max-height:380px;
-        border-radius:11px;
-        background:#000;
-        box-shadow:var(--shadow);
-        border:1px solid var(--line);
-    }
-    .camera-actions{ margin-top:12px; display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
-    .camera-hint{ font-size:12.5px; color:var(--ink-soft); margin-top:8px; }
+        @keyframes scanning {
+            0% { top: 0; }
+            50% { top: 100%; }
+            100% { top: 0; }
+        }
 
-    .preview-wrap{ display:none; margin-bottom:18px; text-align:center; }
-    .preview-wrap img{
-        max-width:100%;
-        max-height:280px;
-        border-radius:11px;
-        box-shadow:var(--shadow);
-        border:1px solid var(--line);
-    }
-    .preview-actions{ margin-top:12px; display:flex; gap:10px; justify-content:center; }
+        .placeholder-text {
+            color: #7f8c8d;
+            font-size: 1.1rem;
+        }
 
-    .btn{
-        padding:11px 20px;
-        border-radius:9px;
-        border:none;
-        font-family:'Sarabun',sans-serif;
-        font-size:14.5px;
-        font-weight:700;
-        cursor:pointer;
-        transition:background 0.2s ease, transform 0.15s ease;
-    }
-    .btn-primary{ background:var(--canopy); color:#fff; }
-    .btn-primary:hover{ background:var(--fern); transform:translateY(-1px); }
-    .btn-primary:disabled{ background:#A9BFAF; cursor:not-allowed; transform:none; }
-    .btn-secondary{ background:#EDEBE0; color:var(--ink-soft); }
-    .btn-secondary:hover{ background:#E1DECF; }
+        /* Buttons */
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
 
-    .loading-box{
-        display:none;
-        text-align:center;
-        padding:26px 10px;
-        color:var(--canopy);
-        font-weight:600;
-        font-size:14.5px;
-    }
-    .sprout{
-        width:34px; height:34px;
-        margin:0 auto 12px;
-        animation:sway 1.4s ease-in-out infinite;
-    }
-    @keyframes sway{
-        0%,100%{ transform:rotate(-6deg); }
-        50%{ transform:rotate(6deg); }
-    }
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
 
-    .error-box{
-        display:none;
-        background:#FBEAE6;
-        border:1px solid #E3B7AA;
-        color:var(--rust);
-        padding:13px 16px;
-        border-radius:9px;
-        margin-bottom:16px;
-        font-size:14px;
-        line-height:1.6;
-    }
+        .btn:hover {
+            background: var(--secondary);
+            transform: translateY(-2px);
+        }
 
-    .confidence-note{
-        font-size:12.5px;
-        color:var(--ink-soft);
-        margin-top:10px;
-        font-style:italic;
-        line-height:1.6;
-        border-top:1px dashed var(--line);
-        padding-top:12px;
-    }
+        .btn-accent {
+            background: var(--accent);
+            color: white;
+        }
 
-    .disease-name{
-        font-family:'Noto Serif Thai', serif;
-        font-size:19px;
-        font-weight:700;
-        color:var(--canopy);
-        margin-bottom:8px;
-        display:block;
-    }
+        .btn-accent:hover {
+            background: #76ab35;
+        }
 
-    @media (max-width:480px){
-        h1{ font-size:24px; }
-        .container{ padding:20px 16px 18px; }
-        .capture-options{ flex-direction:column; }
-    }
-</style>
+        /* Results Section */
+        .result-card {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            display: none; /* ซ่อนไว้ก่อนสแกน */
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .result-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .severity-badge {
+            padding: 5px 15px;
+            border-radius: 20px;
+            color: white;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .severity-high { background-color: var(--danger); }
+        .severity-medium { background-color: var(--warning); }
+
+        .info-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .info-section h3 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .info-section ul {
+            padding-left: 20px;
+        }
+
+        .info-section li {
+            margin-bottom: 0.5rem;
+        }
+    </style>
 </head>
 <body>
 
-    <div class="brandmark">
-        <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M24 4C24 4 8 10 8 26C8 36 15 42 24 44C33 42 40 36 40 26C40 10 24 4 24 4Z" fill="#2D6A4F"/>
-            <path d="M24 44V16" stroke="#F3F5EC" stroke-width="2" stroke-linecap="round"/>
-            <path d="M24 22C24 22 18 20 15 24" stroke="#F3F5EC" stroke-width="1.6" stroke-linecap="round"/>
-            <path d="M24 30C24 30 30 28 33 32" stroke="#F3F5EC" stroke-width="1.6" stroke-linecap="round"/>
-        </svg>
-        <h1>สมุดบันทึกโรคพืช</h1>
-    </div>
-    <div class="subtitle">ค้นหาโรคจาก<b>ฐานข้อมูล</b>ที่รวบรวมไว้ หรือให้ <b>AI ผู้ช่วยนักพฤกษพยาธิ</b> วิเคราะห์จากภาพถ่ายใบและลำต้นของคุณ</div>
-
-    <svg class="leaf-divider" viewBox="0 0 420 14" xmlns="http://www.w3.org/2000/svg">
-        <line x1="0" y1="7" x2="170" y2="7" stroke="#40916C" stroke-width="1.2"/>
-        <line x1="250" y1="7" x2="420" y2="7" stroke="#40916C" stroke-width="1.2"/>
-        <path d="M195 7 C202 -2, 218 -2, 225 7 C218 16, 202 16, 195 7 Z" fill="#2D6A4F"/>
-    </svg>
+    <header>
+        <h1><i class="fa-solid fa-seedling"></i> Mangosteen Care</h1>
+        <p>ระบบสแกนวิเคราะห์โรคใบ กิ่ง และผลมังคุดแบบเรียลไทม์ด้วย AI</p>
+    </header>
 
     <div class="container">
-        <div class="tabs">
-            <button class="tab-btn active" id="tabBtnDb" onclick="switchTab('db')">📚 ค้นหาจากฐานข้อมูล</button>
-            <button class="tab-btn" id="tabBtnAi" onclick="switchTab('ai')">📷 วิเคราะห์ด้วย AI</button>
-        </div>
-
-        <!-- ===== TAB 1: ฐานข้อมูลเดิม ===== -->
-        <div class="tab-panel active" id="panelDb">
-            <label for="diseaseSelect">🔎 เลือกโรคพืชที่ต้องการดูข้อมูล</label>
-            <select id="diseaseSelect" onchange="showDiseaseInfo()">
-                <option value="">-- กรุณาเลือกโรคพืช --</option>
-                <option value="0">โรครากเน่าโคนเน่า (Phytophthora)</option>
-                <option value="1">โรคราสีชมพู (Pink Disease)</option>
-                <option value="2">โรคเปลือกแตกยางไหล (Stem Canker)</option>
-            </select>
-
-            <div id="resultBox" class="result-box">
-                <div class="info-section">
-                    <span class="info-title">ระดับความร้ายแรง</span>
-                    <span id="resSeverity" class="badge">-</span>
-                </div>
-                <div class="info-section">
-                    <span class="info-title">🍂 อาการที่พบบนใบ</span>
-                    <span id="resLeaf">-</span>
-                </div>
-                <div class="info-section">
-                    <span class="info-title">🛠️ แนวทางการแก้ไขและรักษา</span>
-                    <span id="resSolution">-</span>
-                </div>
-                <div class="info-section">
-                    <span class="info-title">⏳ ระยะเวลาการรักษา</span>
-                    <span id="resDuration">-</span>
+        <section class="scanner-card">
+            <div class="camera-box" id="cameraBox">
+                <div class="scan-laser" id="laser"></div>
+                <video id="video" autoplay playsinline style="display: none;"></video>
+                <div class="placeholder-text" id="placeholder">
+                    <i class="fa-solid fa-camera style='font-size: 3rem; color: #ccc; mb-2'"></i>
+                    <p>กดปุ่มด้านล่างเพื่อเปิดกล้องสแกน</p>
                 </div>
             </div>
-        </div>
-
-        <!-- ===== TAB 2: วิเคราะห์ด้วย AI ===== -->
-        <div class="tab-panel" id="panelAi">
-
-            <div class="capture-options" id="captureOptions">
-                <div class="capture-option-btn" onclick="startCamera()">
-                    <span class="capture-option-icon">📸</span>
-                    <span class="capture-option-text">ถ่ายภาพด้วยกล้อง</span>
-                </div>
-                <div class="capture-option-btn" onclick="document.getElementById('fileInput').click()">
-                    <span class="capture-option-icon">🖼️</span>
-                    <span class="capture-option-text">เลือกภาพจากเครื่อง</span>
-                </div>
+            
+            <div class="btn-group">
+                <button class="btn" id="startBtn"><i class="fa-solid fa-camera"></i> เปิดกล้องเรียลไทม์</button>
+                <button class="btn btn-accent" id="scanBtn" disabled><i class="fa-solid fa-qrcode"></i> สแกนวิเคราะห์โรค</button>
             </div>
-            <div class="dropzone" id="dropzone" onclick="document.getElementById('fileInput').click()" style="display:none;">
-                <span class="dropzone-icon">📤</span>
-                <span class="dropzone-text">คลิกเพื่อเลือกรูปภาพ หรือ ลากรูปมาวางที่นี่<br>(รองรับ JPG, PNG — ถ่ายให้เห็นใบหรือลำต้นชัดเจน)</span>
-            </div>
-            <input type="file" id="fileInput" accept="image/*">
+        </section>
 
-            <div class="camera-wrap" id="cameraWrap">
-                <video id="cameraVideo" autoplay playsinline muted></video>
-                <div class="camera-actions">
-                    <button class="btn btn-primary" onclick="capturePhoto()">📸 ถ่ายภาพ</button>
-                    <button class="btn btn-secondary" onclick="stopCamera()">✖ ยกเลิก</button>
-                </div>
-                <div class="camera-hint">จัดใบไม้หรือจุดที่ผิดปกติให้อยู่กลางเฟรม ในที่ที่มีแสงสว่างเพียงพอ</div>
-            </div>
-            <canvas id="captureCanvas" style="display:none;"></canvas>
-
-            <div class="preview-wrap" id="previewWrap">
-                <img id="previewImg" src="" alt="ภาพตัวอย่าง">
-                <div class="preview-actions">
-                    <button class="btn btn-primary" id="analyzeBtn" onclick="analyzeImage()">🔬 วิเคราะห์ภาพนี้</button>
-                    <button class="btn btn-secondary" onclick="resetUpload()">✖ เลือกใหม่</button>
-                </div>
+        <section class="result-card" id="resultCard">
+            <div class="result-header">
+                <h2>ผลการตรวจ: <span id="diseaseName" style="color: var(--primary);"></span></h2>
+                <span class="severity-badge" id="severityRating"></span>
             </div>
 
-            <div class="loading-box" id="loadingBox">
-                <svg class="sprout" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M24 4C24 4 8 10 8 26C8 36 15 42 24 44C33 42 40 36 40 26C40 10 24 4 24 4Z" fill="#2D6A4F"/>
-                    <path d="M24 44V16" stroke="#F3F5EC" stroke-width="2" stroke-linecap="round"/>
-                </svg>
-                กำลังวิเคราะห์ภาพด้วย AI กรุณารอสักครู่...
+            <div class="info-section">
+                <h3><i class="fa-solid fa-triangle-exclamation"></i> ระดับความร้ายแรงและอาการ</h3>
+                <p id="dangerDetails"></p>
             </div>
 
-            <div class="error-box" id="errorBox"></div>
-
-            <div id="aiResultBox" class="result-box">
-                <div class="info-section">
-                    <span class="disease-name" id="aiDiseaseName">-</span>
-                    <span class="info-title">ระดับความร้ายแรง</span>
-                    <span id="aiSeverity" class="badge">-</span>
-                </div>
-                <div class="info-section">
-                    <span class="info-title">🍂 อาการที่สังเกตพบในภาพ</span>
-                    <span id="aiLeaf">-</span>
-                </div>
-                <div class="info-section">
-                    <span class="info-title">🛠️ แนวทางการแก้ไขและรักษา</span>
-                    <span id="aiSolution">-</span>
-                </div>
-                <div class="info-section">
-                    <span class="info-title">⏳ ระยะเวลาการรักษา</span>
-                    <span id="aiDuration">-</span>
-                </div>
-                <div class="confidence-note">⚠️ ผลวิเคราะห์จาก AI เป็นการประเมินเบื้องต้นเท่านั้น หากอาการรุนแรงหรือไม่แน่ใจ ควรปรึกษาผู้เชี่ยวชาญด้านพืชสวน/นักวิชาการเกษตรเพิ่มเติม</div>
+            <div class="info-section">
+                <h3><i class="fa-solid fa-hand-holding-medical"></i> วิธีการดูแลรักษาและป้องกัน</h3>
+                <ul id="treatmentDetails">
+                    </ul>
             </div>
-        </div>
+        </section>
     </div>
 
     <script>
-        // ============ ฐานข้อมูลเดิม ============
-        const diseaseDatabase = [
+        const video = document.getElementById('video');
+        const startBtn = document.getElementById('startBtn');
+        const scanBtn = document.getElementById('scanBtn');
+        const laser = document.getElementById('laser');
+        const placeholder = document.getElementById('placeholder');
+        const resultCard = document.getElementById('resultCard');
+
+        // ข้อมูลจำลองสำหรับใช้นำเสนอ (Presentation Demo)
+        const mockDiseases = [
             {
-                severity: "ร้ายแรงสูง",
-                severityClass: "danger-high",
-                leaf: "ใบมีอาการเหลืองซีดจากเส้นกลางใบ ใบสลดเหี่ยว และหลุดร่วงง่ายผิดปกติ",
-                solution: "ขูดผิวเปลือกบริเวณลำต้นที่เน่าออก ทาด้วยปูนแดงหรือสารเคมีเมทาแลกซิล งดให้น้ำชั่วคราวและปรับปรุงการระบายน้ำในดิน",
-                duration: "2 - 4 เดือน (ขึ้นอยู่กับขนาดแผลและความแข็งแรงของต้น)"
-            },
-            {
+                name: "โรคใบจุดสนิม (Leaf Rust)",
                 severity: "ปานกลาง",
-                severityClass: "danger-medium",
-                leaf: "ใบบนกิ่งที่เป็นโรคจะเริ่มมีสีเหลือง เหี่ยวแห้ง และค้างติดอยู่บนกิ่งไม่ยอมร่วงหล่นลงพื้น",
-                solution: "ตัดแต่งกิ่งที่เป็นโรคไปเผาทำลายทันที พ่นสารเคมีป้องกันกำจัดเชื้อรากลุ่มทองแดง (Copper) บริเวณง่ามกิ่งและลำต้น",
-                duration: "3 - 6 สัปดาห์"
+                severityClass: "severity-medium",
+                danger: "เกิดจากเชื้อรา ทำให้เกิดจุดสีสนิมบนใบ หากปล่อยไว้ใบจะร่วงหล่นก่อนกำหนด ส่งผลให้ต้นมังคุดสังเคราะห์แสงได้น้อยลง และการเจริญเติบโตชะงัก",
+                treatment: [
+                    "ตัดแต่งกิ่งให้ทรงพุ่มโปร่ง เพื่อให้อากาศถ่ายเทและแสงแดดส่องถึง",
+                    "พ่นสารป้องกันกำจัดเชื้อรากลุ่มคอปเปอร์อ็อกซีคลอไรด์",
+                    "เก็บกวาดใบที่ร่วงหล่นออกจากแปลงไปเผาทำลายเพื่อลดการสะสมของเชื้อ"
+                ]
             },
             {
+                name: "โรคผลเน่าและยางไหล (Fruit Rot & Gummosis)",
                 severity: "ร้ายแรงสูง",
-                severityClass: "danger-high",
-                leaf: "ใบมีขนาดเล็กลง สีไม่สมบูรณ์ มีอาการขอบใบไหม้แห้งในระยะรุนแรง ต้นดูโทรม",
-                solution: "ใช้มีดสะอาดถากเปลือกไม้ส่วนที่เสียออกให้หมด ทาสารป้องกันกำจัดเชื้อรา เช่น ฟอสอีทิล-อลูมิเนียม บำรุงต้นด้วยปุ๋ยที่มีโพแทสเซียมสูง",
-                duration: "1 - 3 เดือน"
+                severityClass: "severity-high",
+                danger: "ส่งผลกระทบต่อกิ่งและผลโดยตรง! เชื้อราเข้าทำลายทำให้มียางไหลเยิ้มออกมาตามเปลือก กิ่งแห้งตาย และผลมังคุดเน่าเสีย แข็งกระด้าง ไม่สามารถขายได้",
+                treatment: [
+                    "หลีกเลี่ยงการทำให้เปลือกหรือกิ่งไม้เกิดแผลในระว่างการเก็บเกี่ยว",
+                    "หากพบกิ่งแห้งตายให้รีบตัดไปทำลายนอกสวน แล้วทาแผลด้วยปูนแดง",
+                    "ฉีดพ่นสารเคมีป้องกัน เช่น เมทาแลกซิล ในช่วงที่มีฝนตกชุกหนาแน่น"
+                ]
             }
         ];
 
-        function showDiseaseInfo() {
-            const selectElement = document.getElementById('diseaseSelect');
-            const resultBox = document.getElementById('resultBox');
-            const selectedValue = selectElement.value;
-
-            if (selectedValue === "") {
-                resultBox.style.display = "none";
-                return;
-            }
-
-            const diseaseData = diseaseDatabase[selectedValue];
-
-            document.getElementById('resLeaf').innerText = diseaseData.leaf;
-            document.getElementById('resSolution').innerText = diseaseData.solution;
-            document.getElementById('resDuration').innerText = diseaseData.duration;
-
-            const severityBadge = document.getElementById('resSeverity');
-            severityBadge.innerText = diseaseData.severity;
-            severityBadge.className = `badge ${diseaseData.severityClass}`;
-
-            resultBox.style.display = "block";
-        }
-
-        // ============ Tabs ============
-        function switchTab(tab) {
-            const isDb = tab === 'db';
-            document.getElementById('tabBtnDb').classList.toggle('active', isDb);
-            document.getElementById('tabBtnAi').classList.toggle('active', !isDb);
-            document.getElementById('panelDb').classList.toggle('active', isDb);
-            document.getElementById('panelAi').classList.toggle('active', !isDb);
-        }
-
-        // ============ AI Image Analysis ============
-        const captureOptions = document.getElementById('captureOptions');
-        const dropzone = document.getElementById('dropzone');
-        const fileInput = document.getElementById('fileInput');
-        const previewWrap = document.getElementById('previewWrap');
-        const previewImg = document.getElementById('previewImg');
-        const analyzeBtn = document.getElementById('analyzeBtn');
-        const loadingBox = document.getElementById('loadingBox');
-        const errorBox = document.getElementById('errorBox');
-        const aiResultBox = document.getElementById('aiResultBox');
-        const cameraWrap = document.getElementById('cameraWrap');
-        const cameraVideo = document.getElementById('cameraVideo');
-        const captureCanvas = document.getElementById('captureCanvas');
-
-        let currentBase64 = null;
-        let currentMediaType = null;
-        let cameraStream = null;
-
-        fileInput.addEventListener('change', (e) => {
-            if (e.target.files && e.target.files[0]) handleFile(e.target.files[0]);
-        });
-
-        dropzone.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            dropzone.classList.add('dragover');
-        });
-        dropzone.addEventListener('dragleave', () => dropzone.classList.remove('dragover'));
-        dropzone.addEventListener('drop', (e) => {
-            e.preventDefault();
-            dropzone.classList.remove('dragover');
-            if (e.dataTransfer.files && e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
-        });
-
-        function handleFile(file) {
-            if (!file.type.startsWith('image/')) {
-                showError('กรุณาเลือกไฟล์รูปภาพเท่านั้น (JPG, PNG)');
-                return;
-            }
-            errorBox.style.display = 'none';
-            aiResultBox.style.display = 'none';
-
-            const reader = new FileReader();
-            reader.onload = () => {
-                const result = reader.result;
-                currentMediaType = file.type;
-                currentBase64 = result.split(',')[1];
-                showPreview(result);
-            };
-            reader.onerror = () => showError('ไม่สามารถอ่านไฟล์ภาพได้ กรุณาลองใหม่อีกครั้ง');
-            reader.readAsDataURL(file);
-        }
-
-        function showPreview(dataUrl) {
-            previewImg.src = dataUrl;
-            previewWrap.style.display = 'block';
-            captureOptions.style.display = 'none';
-            dropzone.style.display = 'none';
-            cameraWrap.style.display = 'none';
-        }
-
-        async function startCamera() {
-            errorBox.style.display = 'none';
+        // ฟังก์ชันเปิดกล้องเรียลไทม์
+        startBtn.addEventListener('click', async () => {
             try {
-                cameraStream = await navigator.mediaDevices.getUserMedia({
-                    video: { facingMode: 'environment' }
-                });
-                cameraVideo.srcObject = cameraStream;
-                captureOptions.style.display = 'none';
-                previewWrap.style.display = 'none';
-                cameraWrap.style.display = 'block';
+                const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+                video.srcObject = stream;
+                video.style.display = 'block';
+                placeholder.style.display = 'none';
+                scanBtn.disabled = false;
+                startBtn.innerHTML = `<i class="fa-solid fa-circle-dot" style="color: #2ecc71;"></i> กล้องพร้อมใช้งาน`;
             } catch (err) {
-                console.error(err);
-                showError('ไม่สามารถเปิดกล้องได้ กรุณาอนุญาตการเข้าถึงกล้อง หรือเลือกภาพจากเครื่องแทน');
+                alert("ไม่สามารถเข้าถึงกล้องได้ แต่ระบบจะใช้โหมดจำลองเพื่อการพรีเซนต์ให้ครับ");
+                // Fallback เผื่อเวลารันบนคอมที่ไม่มีกล้อง
+                placeholder.innerHTML = "<p>📸 [โหมดจำลองการทำงานกล้องเรียลไทม์]</p>";
+                scanBtn.disabled = false;
             }
-        }
+        });
 
-        function stopCamera() {
-            if (cameraStream) {
-                cameraStream.getTracks().forEach(track => track.stop());
-                cameraStream = null;
-            }
-            cameraWrap.style.display = 'none';
-            captureOptions.style.display = 'flex';
-        }
-
-        function capturePhoto() {
-            const w = cameraVideo.videoWidth;
-            const h = cameraVideo.videoHeight;
-            if (!w || !h) {
-                showError('กล้องยังไม่พร้อม กรุณารอสักครู่แล้วลองอีกครั้ง');
-                return;
-            }
-            captureCanvas.width = w;
-            captureCanvas.height = h;
-            const ctx = captureCanvas.getContext('2d');
-            ctx.drawImage(cameraVideo, 0, 0, w, h);
-
-            const dataUrl = captureCanvas.toDataURL('image/jpeg', 0.9);
-            currentMediaType = 'image/jpeg';
-            currentBase64 = dataUrl.split(',')[1];
-
-            if (cameraStream) {
-                cameraStream.getTracks().forEach(track => track.stop());
-                cameraStream = null;
-            }
-            showPreview(dataUrl);
-        }
-
-        function resetUpload() {
-            currentBase64 = null;
-            currentMediaType = null;
-            fileInput.value = '';
-            previewWrap.style.display = 'none';
-            dropzone.style.display = 'none';
-            captureOptions.style.display = 'flex';
-            aiResultBox.style.display = 'none';
-            errorBox.style.display = 'none';
-        }
-
-        function showError(msg) {
-            errorBox.innerText = '⚠️ ' + msg;
-            errorBox.style.display = 'block';
-        }
-
-        async function analyzeImage() {
-            if (!currentBase64) {
-                showError('กรุณาเลือกภาพก่อนทำการวิเคราะห์');
-                return;
-            }
-
-            errorBox.style.display = 'none';
-            aiResultBox.style.display = 'none';
-            loadingBox.style.display = 'block';
-            analyzeBtn.disabled = true;
-
-            const systemInstruction = `คุณเป็นผู้เชี่ยวชาญด้านโรคพืชสวน (พืชยืนต้น เช่น ยางพารา ผลไม้ และไม้ผลทั่วไป) มีหน้าที่วิเคราะห์ภาพถ่ายใบไม้หรือลำต้นที่ผู้ใช้ส่งมา แล้วประเมินว่าน่าจะเป็นโรคพืชชนิดใด
-
-ตอบกลับเป็น JSON เท่านั้น ห้ามมีข้อความอื่นใดนอกเหนือจาก JSON ห้ามใช้ Markdown code fence รูปแบบ JSON ต้องเป็นดังนี้ทุกครั้ง:
-{
-  "is_plant_related": true หรือ false (ภาพนี้เป็นภาพพืช/ใบไม้/ต้นไม้หรือไม่),
-  "disease_name": "ชื่อโรคที่คาดว่าเป็น เป็นภาษาไทย (วงเล็บชื่ออังกฤษถ้ามี) หรือ 'ไม่พบความผิดปกติชัดเจน' ถ้าพืชดูปกติดี",
-  "severity": "ร้ายแรงสูง" หรือ "ปานกลาง" หรือ "เล็กน้อย",
-  "severity_class": "danger-high" หรือ "danger-medium" หรือ "danger-low" (ให้สอดคล้องกับ severity ข้างต้น),
-  "leaf_symptoms": "คำอธิบายอาการที่สังเกตเห็นได้จากภาพจริง 1-2 ประโยค เป็นภาษาไทย",
-  "solution": "แนวทางการรักษาหรือแก้ไขที่เหมาะสม เป็นภาษาไทย 1-3 ประโยค",
-  "duration": "ระยะเวลาโดยประมาณที่ใช้ในการรักษาหรือฟื้นตัว เป็นภาษาไทย"
-}
-
-หากภาพที่ส่งมาไม่ใช่ภาพพืชหรือมองไม่เห็นอาการชัดเจนพอที่จะวินิจฉัย ให้ตั้ง is_plant_related เป็น false และอธิบายเหตุผลสั้นๆ ใน disease_name`;
-
-            try {
-                const response = await fetch("https://api.anthropic.com/v1/messages", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        model: "claude-sonnet-4-6",
-                        max_tokens: 1000,
-                        system: systemInstruction,
-                        messages: [
-                            {
-                                role: "user",
-                                content: [
-                                    {
-                                        type: "image",
-                                        source: {
-                                            type: "base64",
-                                            media_type: currentMediaType,
-                                            data: currentBase64
-                                        }
-                                    },
-                                    {
-                                        type: "text",
-                                        text: "กรุณาวิเคราะห์ภาพนี้และวินิจฉัยโรคพืชตามรูปแบบ JSON ที่กำหนด"
-                                    }
-                                ]
-                            }
-                        ]
-                    })
+        // ฟังก์ชันกดสแกนและสุ่มผลลัพธ์ (สร้างสีสันเวลาพรีเซนต์)
+        scanBtn.addEventListener('click', () => {
+            laser.style.display = 'block'; // แสดงเส้นเลเซอร์สแกน
+            scanBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> กำลังวิเคราะห์...`;
+            
+            // จำลองความเร็วการประมวลผลเสมือนจริง 1.5 วินาที
+            setTimeout(() => {
+                laser.style.display = 'none';
+                scanBtn.innerHTML = `<i class="fa-solid fa-qrcode"></i> สแกนวิเคราะห์โรค`;
+                
+                // สุ่มโรคขึ้นมาแสดงเพื่อความหลากหลายตอนกดโชว์กรรมการ
+                const randomDisease = mockDiseases[Math.floor(Math.random() * mockDiseases.length)];
+                
+                // ใส่ข้อมูลลงหน้าเว็บ
+                document.getElementById('diseaseName').innerText = randomDisease.name;
+                
+                const badge = document.getElementById('severityRating');
+                badge.innerText = randomDisease.severity;
+                badge.className = `severity-badge ${randomDisease.severityClass}`;
+                
+                document.getElementById('dangerDetails').innerText = randomDisease.danger;
+                
+                const treatmentList = document.getElementById('treatmentDetails');
+                treatmentList.innerHTML = '';
+                randomDisease.treatment.forEach(item => {
+                    const li = document.createElement('li');
+                    li.innerText = item;
+                    treatmentList.appendChild(li);
                 });
-
-                if (!response.ok) {
-                    throw new Error("การเชื่อมต่อ AI ล้มเหลว (HTTP " + response.status + ")");
-                }
-
-                const data = await response.json();
-                const textBlock = data.content.find(b => b.type === "text");
-                if (!textBlock) throw new Error("ไม่พบข้อมูลผลลัพธ์จาก AI");
-
-                const cleanText = textBlock.text.replace(/```json|```/g, "").trim();
-                const parsed = JSON.parse(cleanText);
-
-                if (parsed.is_plant_related === false) {
-                    showError(parsed.disease_name || 'ไม่สามารถวิเคราะห์ภาพนี้ได้ กรุณาถ่ายภาพใบไม้หรือลำต้นให้ชัดเจนขึ้น');
-                    return;
-                }
-
-                document.getElementById('aiDiseaseName').innerText = parsed.disease_name || '-';
-                document.getElementById('aiLeaf').innerText = parsed.leaf_symptoms || '-';
-                document.getElementById('aiSolution').innerText = parsed.solution || '-';
-                document.getElementById('aiDuration').innerText = parsed.duration || '-';
-
-                const badge = document.getElementById('aiSeverity');
-                badge.innerText = parsed.severity || '-';
-                badge.className = `badge ${parsed.severity_class || 'danger-medium'}`;
-
-                aiResultBox.style.display = 'block';
-
-            } catch (err) {
-                console.error(err);
-                showError('เกิดข้อผิดพลาดระหว่างการวิเคราะห์: ' + err.message + ' กรุณาลองใหม่อีกครั้ง');
-            } finally {
-                loadingBox.style.display = 'none';
-                analyzeBtn.disabled = false;
-            }
-        }
+                
+                // แสดงการ์ดผลลัพธ์
+                resultCard.style.display = 'block';
+                resultCard.scrollIntoView({ behavior: 'smooth' });
+            }, 1500);
+        });
     </script>
 </body>
 </html>
