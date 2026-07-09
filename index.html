@@ -6,7 +6,7 @@
     <title>Mangosteen Health Scanner</title>
     <link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+
     <style>
         :root {
             --primary: #4A154B; /* สีม่วงมังคุด */
@@ -14,6 +14,7 @@
             --accent: #8EC540; /* สีเขียวใบไม้ */
             --danger: #E74C3C;
             --warning: #F39C12;
+            --ok: #27AE60;
             --light: #F9F6FA;
             --dark: #2C1A2D;
         }
@@ -112,6 +113,7 @@
             color: #7f8c8d;
             font-size: 1.1rem;
         }
+        .placeholder-text i { font-size: 3rem; color: #ccc; margin-bottom: 0.5rem; display: block; }
 
         /* Buttons */
         .btn-group {
@@ -136,18 +138,38 @@
             gap: 8px;
         }
 
-        .btn:hover {
-            background: var(--secondary);
-            transform: translateY(-2px);
-        }
+        .btn:hover { background: var(--secondary); transform: translateY(-2px); }
+        .btn:disabled { background: #c9b3ca; cursor: not-allowed; transform: none; }
 
-        .btn-accent {
-            background: var(--accent);
-            color: white;
-        }
+        .btn-accent { background: var(--accent); color: white; }
+        .btn-accent:hover { background: #76ab35; }
+        .btn-accent:disabled { background: #c3dba0; cursor: not-allowed; transform: none; }
 
-        .btn-accent:hover {
-            background: #76ab35;
+        /* Upload fallback */
+        .upload-hint {
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            color: #7f8c8d;
+        }
+        .upload-hint label {
+            color: var(--primary);
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+        #fileInput { display: none; }
+
+        /* Error box */
+        .error-box {
+            display: none;
+            background: #fdecea;
+            border: 1px solid #f5c6cb;
+            color: var(--danger);
+            padding: 12px 18px;
+            border-radius: 12px;
+            margin-top: 1.2rem;
+            font-size: 0.95rem;
+            text-align: left;
         }
 
         /* Results Section */
@@ -169,6 +191,8 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
             border-bottom: 2px solid #f0f0f0;
             padding-bottom: 1rem;
             margin-bottom: 1.5rem;
@@ -180,14 +204,15 @@
             color: white;
             font-weight: 600;
             font-size: 0.9rem;
+            white-space: nowrap;
         }
 
         .severity-high { background-color: var(--danger); }
         .severity-medium { background-color: var(--warning); }
+        .severity-low { background-color: var(--ok); }
 
-        .info-section {
-            margin-bottom: 1.5rem;
-        }
+        .info-section { margin-bottom: 1.5rem; }
+        .info-section:last-child { margin-bottom: 0; }
 
         .info-section h3 {
             color: var(--primary);
@@ -197,12 +222,16 @@
             gap: 8px;
         }
 
-        .info-section ul {
-            padding-left: 20px;
-        }
+        .info-section ul { padding-left: 20px; }
+        .info-section li { margin-bottom: 0.5rem; }
 
-        .info-section li {
-            margin-bottom: 0.5rem;
+        .disclaimer {
+            margin-top: 1.5rem;
+            padding-top: 1rem;
+            border-top: 1px dashed #e0e0e0;
+            font-size: 0.85rem;
+            color: #999;
+            font-style: italic;
         }
     </style>
 </head>
@@ -217,17 +246,25 @@
         <section class="scanner-card">
             <div class="camera-box" id="cameraBox">
                 <div class="scan-laser" id="laser"></div>
-                <video id="video" autoplay playsinline style="display: none;"></video>
+                <video id="video" autoplay playsinline muted style="display: none;"></video>
                 <div class="placeholder-text" id="placeholder">
-                    <i class="fa-solid fa-camera style='font-size: 3rem; color: #ccc; mb-2'"></i>
+                    <i class="fa-solid fa-camera"></i>
                     <p>กดปุ่มด้านล่างเพื่อเปิดกล้องสแกน</p>
                 </div>
             </div>
-            
+
             <div class="btn-group">
                 <button class="btn" id="startBtn"><i class="fa-solid fa-camera"></i> เปิดกล้องเรียลไทม์</button>
                 <button class="btn btn-accent" id="scanBtn" disabled><i class="fa-solid fa-qrcode"></i> สแกนวิเคราะห์โรค</button>
             </div>
+
+            <div class="upload-hint">
+                กล้องใช้งานไม่ได้ใช่ไหม? <label for="fileInput">อัปโหลดรูปถ่ายแทน</label>
+            </div>
+            <input type="file" id="fileInput" accept="image/*">
+
+            <div class="error-box" id="errorBox"></div>
+            <canvas id="canvas" style="display:none;"></canvas>
         </section>
 
         <section class="result-card" id="resultCard">
@@ -243,9 +280,15 @@
 
             <div class="info-section">
                 <h3><i class="fa-solid fa-hand-holding-medical"></i> วิธีการดูแลรักษาและป้องกัน</h3>
-                <ul id="treatmentDetails">
-                    </ul>
+                <ul id="treatmentDetails"></ul>
             </div>
+
+            <div class="info-section">
+                <h3><i class="fa-solid fa-clock"></i> ระยะเวลาที่คาดว่าจะฟื้นตัว</h3>
+                <p id="durationDetails"></p>
+            </div>
+
+            <p class="disclaimer">⚠️ ผลวิเคราะห์นี้มาจาก AI เป็นการประเมินเบื้องต้นเท่านั้น หากอาการรุนแรงหรือไม่แน่ใจ ควรปรึกษานักวิชาการเกษตรหรือผู้เชี่ยวชาญด้านมังคุดเพิ่มเติม</p>
         </section>
     </div>
 
@@ -256,84 +299,190 @@
         const laser = document.getElementById('laser');
         const placeholder = document.getElementById('placeholder');
         const resultCard = document.getElementById('resultCard');
+        const errorBox = document.getElementById('errorBox');
+        const fileInput = document.getElementById('fileInput');
+        const canvas = document.getElementById('canvas');
 
-        // ข้อมูลจำลองสำหรับใช้นำเสนอ (Presentation Demo)
-        const mockDiseases = [
-            {
-                name: "โรคใบจุดสนิม (Leaf Rust)",
-                severity: "ปานกลาง",
-                severityClass: "severity-medium",
-                danger: "เกิดจากเชื้อรา ทำให้เกิดจุดสีสนิมบนใบ หากปล่อยไว้ใบจะร่วงหล่นก่อนกำหนด ส่งผลให้ต้นมังคุดสังเคราะห์แสงได้น้อยลง และการเจริญเติบโตชะงัก",
-                treatment: [
-                    "ตัดแต่งกิ่งให้ทรงพุ่มโปร่ง เพื่อให้อากาศถ่ายเทและแสงแดดส่องถึง",
-                    "พ่นสารป้องกันกำจัดเชื้อรากลุ่มคอปเปอร์อ็อกซีคลอไรด์",
-                    "เก็บกวาดใบที่ร่วงหล่นออกจากแปลงไปเผาทำลายเพื่อลดการสะสมของเชื้อ"
-                ]
-            },
-            {
-                name: "โรคผลเน่าและยางไหล (Fruit Rot & Gummosis)",
-                severity: "ร้ายแรงสูง",
-                severityClass: "severity-high",
-                danger: "ส่งผลกระทบต่อกิ่งและผลโดยตรง! เชื้อราเข้าทำลายทำให้มียางไหลเยิ้มออกมาตามเปลือก กิ่งแห้งตาย และผลมังคุดเน่าเสีย แข็งกระด้าง ไม่สามารถขายได้",
-                treatment: [
-                    "หลีกเลี่ยงการทำให้เปลือกหรือกิ่งไม้เกิดแผลในระว่างการเก็บเกี่ยว",
-                    "หากพบกิ่งแห้งตายให้รีบตัดไปทำลายนอกสวน แล้วทาแผลด้วยปูนแดง",
-                    "ฉีดพ่นสารเคมีป้องกัน เช่น เมทาแลกซิล ในช่วงที่มีฝนตกชุกหนาแน่น"
-                ]
-            }
-        ];
+        let cameraStream = null;
+        let pendingBase64 = null;   // ภาพจากไฟล์อัปโหลด (ใช้แทนกล้อง ถ้าไม่มีกล้อง)
+        let pendingMediaType = null;
 
-        // ฟังก์ชันเปิดกล้องเรียลไทม์
+        // ============ เปิดกล้องเรียลไทม์ ============
         startBtn.addEventListener('click', async () => {
+            errorBox.style.display = 'none';
             try {
-                const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
-                video.srcObject = stream;
+                cameraStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+                video.srcObject = cameraStream;
                 video.style.display = 'block';
                 placeholder.style.display = 'none';
                 scanBtn.disabled = false;
-                startBtn.innerHTML = `<i class="fa-solid fa-circle-dot" style="color: #2ecc71;"></i> กล้องพร้อมใช้งาน`;
+                pendingBase64 = null; // กล้องพร้อมแล้ว ใช้ภาพจากกล้องแทนไฟล์อัปโหลด
+                startBtn.innerHTML = `<i class="fa-solid fa-circle-dot" style="color:#2ecc71;"></i> กล้องพร้อมใช้งาน`;
             } catch (err) {
-                alert("ไม่สามารถเข้าถึงกล้องได้ แต่ระบบจะใช้โหมดจำลองเพื่อการพรีเซนต์ให้ครับ");
-                // Fallback เผื่อเวลารันบนคอมที่ไม่มีกล้อง
-                placeholder.innerHTML = "<p>📸 [โหมดจำลองการทำงานกล้องเรียลไทม์]</p>";
-                scanBtn.disabled = false;
+                console.error(err);
+                showError('ไม่สามารถเข้าถึงกล้องได้ กรุณาอนุญาตการเข้าถึงกล้อง หรืออัปโหลดรูปถ่ายแทนด้านล่าง');
             }
         });
 
-        // ฟังก์ชันกดสแกนและสุ่มผลลัพธ์ (สร้างสีสันเวลาพรีเซนต์)
-        scanBtn.addEventListener('click', () => {
-            laser.style.display = 'block'; // แสดงเส้นเลเซอร์สแกน
+        // ============ อัปโหลดรูปแทนกล้อง ============
+        fileInput.addEventListener('change', (e) => {
+            const file = e.target.files && e.target.files[0];
+            if (!file) return;
+            if (!file.type.startsWith('image/')) {
+                showError('กรุณาเลือกไฟล์รูปภาพเท่านั้น (JPG, PNG)');
+                return;
+            }
+            errorBox.style.display = 'none';
+            const reader = new FileReader();
+            reader.onload = () => {
+                pendingMediaType = file.type;
+                pendingBase64 = reader.result.split(',')[1];
+                placeholder.innerHTML = `<i class="fa-solid fa-image"></i><p>เลือกภาพแล้ว พร้อมสแกน</p>`;
+                placeholder.style.display = 'flex';
+                video.style.display = 'none';
+                scanBtn.disabled = false;
+            };
+            reader.onerror = () => showError('ไม่สามารถอ่านไฟล์ภาพได้ กรุณาลองใหม่อีกครั้ง');
+            reader.readAsDataURL(file);
+        });
+
+        function showError(msg) {
+            errorBox.innerText = '⚠️ ' + msg;
+            errorBox.style.display = 'block';
+        }
+
+        function grabFrameFromVideo() {
+            const w = video.videoWidth;
+            const h = video.videoHeight;
+            if (!w || !h) return null;
+            canvas.width = w;
+            canvas.height = h;
+            canvas.getContext('2d').drawImage(video, 0, 0, w, h);
+            return canvas.toDataURL('image/jpeg', 0.9);
+        }
+
+        // ============ System prompt เฉพาะทางโรคมังคุด ============
+        const SYSTEM_INSTRUCTION = `คุณเป็นนักวิชาการเกษตรผู้เชี่ยวชาญด้านสรีรวิทยาและโรคของ "มังคุด" (Garcinia mangostana) โดยเฉพาะ มีความรู้เชิงลึกเกี่ยวกับโรคและความผิดปกติที่พบบ่อยในมังคุด เช่น
+- โรคใบจุดสนิม/ใบจุดสาหร่าย (Algal leaf spot)
+- โรคผลเน่าและยางไหล / กิ่งแห้งยางไหล (Gummosis / Dieback)
+- โรคราดำ (Sooty mold) จากคราบน้ำหวานเพลี้ย
+- โรคราสีชมพู (Pink disease)
+- อาการเนื้อแก้วยางไหลในผล (Translucent flesh / gamboge)
+- โรครากเน่าโคนเน่าจากเชื้อ Phytophthora
+- ความผิดปกติจากธาตุอาหารพืชขาด/เกิน หรือแมลงศัตรูพืช เช่น เพลี้ยไฟ ไรแดง
+
+หน้าที่ของคุณคือวิเคราะห์ภาพถ่ายใบ กิ่ง ลำต้น หรือผลมังคุดที่ผู้ใช้ส่งมา แล้วประเมินว่ามีอาการผิดปกติหรือไม่ และน่าจะเป็นโรค/ปัญหาชนิดใด
+
+ตอบกลับเป็น JSON เท่านั้น ห้ามมีข้อความอื่นใดนอกเหนือจาก JSON ห้ามใช้ Markdown code fence รูปแบบ JSON ต้องเป็นดังนี้ทุกครั้ง:
+{
+  "is_mangosteen_related": true หรือ false (ภาพนี้เป็นภาพส่วนใดส่วนหนึ่งของต้นมังคุด เช่น ใบ กิ่ง ลำต้น หรือผล หรือไม่),
+  "disease_name": "ชื่อโรค/ความผิดปกติที่คาดว่าเป็น เป็นภาษาไทย (วงเล็บชื่ออังกฤษถ้ามี) หรือ 'ต้นมังคุดดูสมบูรณ์ดี ไม่พบความผิดปกติ' ถ้าไม่พบอาการผิดปกติ",
+  "severity": "ร้ายแรงสูง" หรือ "ปานกลาง" หรือ "เล็กน้อย",
+  "severity_class": "severity-high" หรือ "severity-medium" หรือ "severity-low" (ให้สอดคล้องกับ severity ข้างต้น),
+  "danger_details": "อธิบายระดับความร้ายแรงและอาการที่สังเกตเห็นได้จริงในภาพ 2-3 ประโยค เป็นภาษาไทย เจาะจงกับสิ่งที่เห็นในภาพ",
+  "treatment_steps": ["ขั้นตอนการดูแลรักษาหรือป้องกัน ข้อที่ 1", "ข้อที่ 2", "ข้อที่ 3 (2-4 ข้อ เป็นภาษาไทย เจาะจงและปฏิบัติได้จริงสำหรับมังคุด)"],
+  "duration": "ระยะเวลาโดยประมาณที่ใช้ในการรักษาหรือฟื้นตัว เป็นภาษาไทย"
+}
+
+หากภาพที่ส่งมาไม่ใช่ภาพของต้นมังคุด (เช่น เป็นพืชชนิดอื่น หรือไม่ใช่ภาพพืชเลย) หรือมองไม่เห็นอาการชัดเจนพอที่จะวินิจฉัย ให้ตั้ง is_mangosteen_related เป็น false และอธิบายเหตุผลสั้นๆ ใน disease_name`;
+
+        // ============ กดสแกน → เรียก AI วิเคราะห์จริง ============
+        scanBtn.addEventListener('click', async () => {
+            errorBox.style.display = 'none';
+
+            let base64Data, mediaType;
+            if (cameraStream && video.style.display !== 'none') {
+                const dataUrl = grabFrameFromVideo();
+                if (!dataUrl) {
+                    showError('กล้องยังไม่พร้อม กรุณารอสักครู่แล้วลองอีกครั้ง');
+                    return;
+                }
+                base64Data = dataUrl.split(',')[1];
+                mediaType = 'image/jpeg';
+            } else if (pendingBase64) {
+                base64Data = pendingBase64;
+                mediaType = pendingMediaType;
+            } else {
+                showError('กรุณาเปิดกล้องหรืออัปโหลดรูปภาพก่อนสแกน');
+                return;
+            }
+
+            laser.style.display = 'block';
+            scanBtn.disabled = true;
             scanBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> กำลังวิเคราะห์...`;
-            
-            // จำลองความเร็วการประมวลผลเสมือนจริง 1.5 วินาที
-            setTimeout(() => {
-                laser.style.display = 'none';
-                scanBtn.innerHTML = `<i class="fa-solid fa-qrcode"></i> สแกนวิเคราะห์โรค`;
-                
-                // สุ่มโรคขึ้นมาแสดงเพื่อความหลากหลายตอนกดโชว์กรรมการ
-                const randomDisease = mockDiseases[Math.floor(Math.random() * mockDiseases.length)];
-                
-                // ใส่ข้อมูลลงหน้าเว็บ
-                document.getElementById('diseaseName').innerText = randomDisease.name;
-                
+            resultCard.style.display = 'none';
+
+            try {
+                const response = await fetch("https://api.anthropic.com/v1/messages", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        model: "claude-sonnet-4-6",
+                        max_tokens: 1000,
+                        system: SYSTEM_INSTRUCTION,
+                        messages: [
+                            {
+                                role: "user",
+                                content: [
+                                    {
+                                        type: "image",
+                                        source: { type: "base64", media_type: mediaType, data: base64Data }
+                                    },
+                                    {
+                                        type: "text",
+                                        text: "กรุณาวิเคราะห์ภาพนี้และวินิจฉัยโรคของมังคุดตามรูปแบบ JSON ที่กำหนด"
+                                    }
+                                ]
+                            }
+                        ]
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error("การเชื่อมต่อ AI ล้มเหลว (HTTP " + response.status + ")");
+                }
+
+                const data = await response.json();
+                const textBlock = data.content.find(b => b.type === "text");
+                if (!textBlock) throw new Error("ไม่พบข้อมูลผลลัพธ์จาก AI");
+
+                const cleanText = textBlock.text.replace(/```json|```/g, "").trim();
+                const parsed = JSON.parse(cleanText);
+
+                if (parsed.is_mangosteen_related === false) {
+                    showError(parsed.disease_name || 'ไม่สามารถวิเคราะห์ภาพนี้ได้ กรุณาถ่ายภาพใบ กิ่ง หรือผลมังคุดให้ชัดเจนขึ้น');
+                    return;
+                }
+
+                document.getElementById('diseaseName').innerText = parsed.disease_name || '-';
+
                 const badge = document.getElementById('severityRating');
-                badge.innerText = randomDisease.severity;
-                badge.className = `severity-badge ${randomDisease.severityClass}`;
-                
-                document.getElementById('dangerDetails').innerText = randomDisease.danger;
-                
+                badge.innerText = parsed.severity || '-';
+                badge.className = `severity-badge ${parsed.severity_class || 'severity-medium'}`;
+
+                document.getElementById('dangerDetails').innerText = parsed.danger_details || '-';
+
                 const treatmentList = document.getElementById('treatmentDetails');
                 treatmentList.innerHTML = '';
-                randomDisease.treatment.forEach(item => {
+                (parsed.treatment_steps || []).forEach(step => {
                     const li = document.createElement('li');
-                    li.innerText = item;
+                    li.innerText = step;
                     treatmentList.appendChild(li);
                 });
-                
-                // แสดงการ์ดผลลัพธ์
+
+                document.getElementById('durationDetails').innerText = parsed.duration || '-';
+
                 resultCard.style.display = 'block';
                 resultCard.scrollIntoView({ behavior: 'smooth' });
-            }, 1500);
+
+            } catch (err) {
+                console.error(err);
+                showError('เกิดข้อผิดพลาดระหว่างการวิเคราะห์: ' + err.message + ' กรุณาลองใหม่อีกครั้ง');
+            } finally {
+                laser.style.display = 'none';
+                scanBtn.disabled = false;
+                scanBtn.innerHTML = `<i class="fa-solid fa-qrcode"></i> สแกนวิเคราะห์โรค`;
+            }
         });
     </script>
 </body>
