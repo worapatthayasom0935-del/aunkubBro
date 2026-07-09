@@ -1,201 +1,369 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ระบบฐานข้อมูลและวินิจฉัยโรคพืช</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f4f7f5;
-            color: #333;
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        h1 { color: #2e7d32; text-align: center; }
-        .subtitle {
-            text-align: center;
-            color: #666;
-            margin-top: -10px;
-            margin-bottom: 25px;
-            font-size: 14px;
-        }
-        .container {
-            background: #fff;
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            max-width: 600px;
-            width: 100%;
-            box-sizing: border-box;
-            margin-bottom: 25px;
-        }
-        .tabs {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 20px;
-        }
-        .tab-btn {
-            flex: 1;
-            padding: 12px;
-            border: 2px solid #2e7d32;
-            background: #fff;
-            color: #2e7d32;
-            font-weight: bold;
-            font-size: 15px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-        .tab-btn.active {
-            background: #2e7d32;
-            color: #fff;
-        }
-        .tab-panel { display: none; }
-        .tab-panel.active { display: block; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>สมุดบันทึกโรคพืช — Plant Pathology Field Notes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Thai:wght@400;500;600;700&family=Sarabun:wght@400;500;600;700&family=Chonburi&display=swap" rel="stylesheet">
+<style>
+    :root{
+        --canopy:#1B4332;
+        --fern:#2D6A4F;
+        --fern-soft:#40916C;
+        --paper:#F3F5EC;
+        --paper-card:#FBFAF4;
+        --clay:#A6602B;
+        --amber:#C88A2E;
+        --rust:#9C3D2E;
+        --ink:#1F2A24;
+        --ink-soft:#5B6B5F;
+        --line:#D8DCC9;
+        --shadow: 0 10px 30px rgba(27,67,50,0.12);
+    }
+    *{box-sizing:border-box;}
+    body{
+        font-family:'Sarabun',sans-serif;
+        background-color:var(--paper);
+        background-image:
+            radial-gradient(circle at 15% 20%, rgba(64,145,108,0.06) 0, transparent 45%),
+            radial-gradient(circle at 85% 80%, rgba(166,96,43,0.07) 0, transparent 45%);
+        color:var(--ink);
+        margin:0;
+        padding:32px 16px 60px;
+        display:flex;
+        flex-direction:column;
+        align-items:center;
+        min-height:100vh;
+    }
 
-        label {
-            font-size: 16px;
-            font-weight: bold;
-            display: block;
-            margin-bottom: 10px;
-            color: #444;
-        }
-        select {
-            width: 100%;
-            padding: 12px;
-            font-size: 16px;
-            border-radius: 8px;
-            border: 2px solid #2e7d32;
-            background-color: #fff;
-            cursor: pointer;
-            outline: none;
-            margin-bottom: 25px;
-        }
-        .badge {
-            display: inline-block;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 14px;
-            font-weight: bold;
-            color: #fff;
-        }
-        .danger-high { background-color: #d32f2f; }
-        .danger-medium { background-color: #f57c00; }
-        .danger-low { background-color: #388e3c; }
-        .info-section { 
-            margin-top: 15px; 
-            border-bottom: 1px solid #eee; 
-            padding-bottom: 12px; 
-        }
-        .info-title { font-weight: bold; color: #2e7d32; display: block; margin-bottom: 5px; }
-        .result-box { display: none; animation: fadeIn 0.5s ease; }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+    .brandmark{
+        display:flex;
+        align-items:center;
+        gap:10px;
+        margin-bottom:6px;
+    }
+    .brandmark svg{ width:34px; height:34px; }
+    h1{
+        font-family:'Noto Serif Thai', serif;
+        font-weight:700;
+        color:var(--canopy);
+        text-align:center;
+        font-size:30px;
+        margin:0;
+        letter-spacing:0.2px;
+    }
+    .subtitle{
+        text-align:center;
+        color:var(--ink-soft);
+        margin-top:8px;
+        margin-bottom:28px;
+        font-size:14.5px;
+        max-width:480px;
+        line-height:1.6;
+    }
+    .subtitle b{ color:var(--fern); font-weight:600; }
 
-        /* --- AI upload section --- */
-        .dropzone {
-            border: 2px dashed #2e7d32;
-            border-radius: 10px;
-            padding: 30px 15px;
-            text-align: center;
-            cursor: pointer;
-            background: #fafdf8;
-            transition: background 0.2s ease, border-color 0.2s ease;
-            margin-bottom: 18px;
-        }
-        .dropzone:hover, .dropzone.dragover {
-            background: #eef7ec;
-            border-color: #1b5e20;
-        }
-        .dropzone-icon { font-size: 36px; display: block; margin-bottom: 8px; }
-        .dropzone-text { color: #555; font-size: 14px; }
-        #fileInput { display: none; }
+    .leaf-divider{
+        width:100%;
+        max-width:420px;
+        height:14px;
+        margin:0 auto 26px;
+        opacity:0.55;
+    }
 
-        .preview-wrap {
-            display: none;
-            margin-bottom: 18px;
-            text-align: center;
-        }
-        .preview-wrap img {
-            max-width: 100%;
-            max-height: 280px;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.15);
-        }
-        .preview-actions {
-            margin-top: 10px;
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-        }
-        .btn {
-            padding: 10px 18px;
-            border-radius: 8px;
-            border: none;
-            font-size: 15px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-        .btn-primary { background: #2e7d32; color: #fff; }
-        .btn-primary:hover { background: #1b5e20; }
-        .btn-primary:disabled { background: #a5c9a8; cursor: not-allowed; }
-        .btn-secondary { background: #eee; color: #444; }
-        .btn-secondary:hover { background: #ddd; }
+    .container{
+        background:var(--paper-card);
+        padding:28px 26px 26px;
+        border-radius:14px;
+        box-shadow:var(--shadow);
+        max-width:600px;
+        width:100%;
+        box-sizing:border-box;
+        margin-bottom:25px;
+        position:relative;
+        border:1px solid var(--line);
+    }
+    .container::before{
+        content:"";
+        position:absolute;
+        inset:7px;
+        border:1px solid rgba(27,67,50,0.10);
+        border-radius:9px;
+        pointer-events:none;
+    }
 
-        .loading-box {
-            display: none;
-            text-align: center;
-            padding: 20px;
-            color: #2e7d32;
-            font-weight: bold;
-        }
-        .spinner {
-            width: 30px;
-            height: 30px;
-            margin: 0 auto 10px;
-            border: 4px solid #d5e8d4;
-            border-top: 4px solid #2e7d32;
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
+    .tabs{
+        display:flex;
+        gap:4px;
+        margin-bottom:24px;
+        border-bottom:2px solid var(--line);
+        position:relative;
+        z-index:1;
+    }
+    .tab-btn{
+        flex:1;
+        padding:12px 8px 14px;
+        border:none;
+        background:transparent;
+        color:var(--ink-soft);
+        font-family:'Sarabun',sans-serif;
+        font-weight:600;
+        font-size:15px;
+        cursor:pointer;
+        transition:color 0.2s ease;
+        position:relative;
+        top:2px;
+    }
+    .tab-btn.active{ color:var(--canopy); }
+    .tab-btn::after{
+        content:"";
+        position:absolute;
+        left:8px; right:8px; bottom:-2px;
+        height:3px;
+        background:var(--fern);
+        border-radius:3px 3px 0 0;
+        transform:scaleX(0);
+        transition:transform 0.25s ease;
+    }
+    .tab-btn.active::after{ transform:scaleX(1); }
 
-        .error-box {
-            display: none;
-            background: #fdecea;
-            border: 1px solid #f5c6cb;
-            color: #b71c1c;
-            padding: 12px 15px;
-            border-radius: 8px;
-            margin-bottom: 15px;
-            font-size: 14px;
-        }
+    .tab-panel{ display:none; animation:fadeIn 0.35s ease; }
+    .tab-panel.active{ display:block; }
 
-        .confidence-note {
-            font-size: 13px;
-            color: #888;
-            margin-top: 8px;
-            font-style: italic;
-        }
+    label{
+        font-size:15px;
+        font-weight:600;
+        display:block;
+        margin-bottom:10px;
+        color:var(--canopy);
+        font-family:'Sarabun',sans-serif;
+    }
+    select{
+        width:100%;
+        padding:13px 14px;
+        font-size:15.5px;
+        font-family:'Sarabun',sans-serif;
+        border-radius:9px;
+        border:1.5px solid var(--fern-soft);
+        background-color:#fff;
+        color:var(--ink);
+        cursor:pointer;
+        outline:none;
+        margin-bottom:25px;
+        transition:border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    select:focus{
+        border-color:var(--canopy);
+        box-shadow:0 0 0 3px rgba(45,106,79,0.15);
+    }
 
-        .disease-name {
-            font-size: 18px;
-            font-weight: bold;
-            color: #1b5e20;
-            margin-bottom: 6px;
-        }
-    </style>
+    /* specimen tag / stamp badge */
+    .badge{
+        display:inline-block;
+        padding:7px 16px;
+        border-radius:3px;
+        font-size:13px;
+        font-weight:700;
+        letter-spacing:0.06em;
+        color:#fff;
+        text-transform:uppercase;
+        position:relative;
+        transform:rotate(-1.5deg);
+        box-shadow:0 2px 6px rgba(0,0,0,0.15);
+    }
+    .badge::before{
+        content:"";
+        position:absolute;
+        inset:2px;
+        border:1px dashed rgba(255,255,255,0.55);
+        border-radius:2px;
+    }
+    .danger-high{ background-color:var(--rust); }
+    .danger-medium{ background-color:var(--amber); }
+    .danger-low{ background-color:var(--fern); }
+
+    .info-section{
+        margin-top:16px;
+        border-bottom:1px solid var(--line);
+        padding-bottom:14px;
+    }
+    .info-title{
+        font-weight:700;
+        color:var(--fern);
+        display:block;
+        margin-bottom:6px;
+        font-size:13.5px;
+        text-transform:uppercase;
+        letter-spacing:0.04em;
+    }
+    #resLeaf,#resSolution,#resDuration,
+    #aiLeaf,#aiSolution,#aiDuration{
+        color:var(--ink);
+        line-height:1.7;
+        font-size:15px;
+    }
+    .result-box{ display:none; animation:fadeIn 0.5s ease; }
+    @keyframes fadeIn{
+        from{ opacity:0; transform:translateY(10px); }
+        to{ opacity:1; transform:translateY(0); }
+    }
+
+    /* --- AI capture section --- */
+    .capture-options{
+        display:flex;
+        gap:12px;
+        margin-bottom:18px;
+    }
+    .capture-option-btn{
+        flex:1;
+        padding:22px 12px;
+        border:1.5px dashed var(--fern-soft);
+        background:#fff;
+        border-radius:11px;
+        cursor:pointer;
+        text-align:center;
+        transition:background 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
+    }
+    .capture-option-btn:hover{
+        background:#EFF5EA;
+        border-color:var(--canopy);
+        transform:translateY(-2px);
+    }
+    .capture-option-icon{ font-size:26px; display:block; margin-bottom:8px; }
+    .capture-option-text{ font-size:13.5px; font-weight:600; color:var(--canopy); }
+
+    .dropzone{
+        border:1.5px dashed var(--fern-soft);
+        border-radius:11px;
+        padding:34px 15px;
+        text-align:center;
+        cursor:pointer;
+        background:#fff;
+        transition:background 0.2s ease, border-color 0.2s ease;
+        margin-bottom:18px;
+    }
+    .dropzone:hover, .dropzone.dragover{
+        background:#EFF5EA;
+        border-color:var(--canopy);
+    }
+    .dropzone-icon{ font-size:32px; display:block; margin-bottom:8px; }
+    .dropzone-text{ color:var(--ink-soft); font-size:13.5px; line-height:1.6; }
+    #fileInput{ display:none; }
+
+    .camera-wrap{ display:none; margin-bottom:18px; text-align:center; }
+    .camera-wrap video{
+        width:100%;
+        max-height:380px;
+        border-radius:11px;
+        background:#000;
+        box-shadow:var(--shadow);
+        border:1px solid var(--line);
+    }
+    .camera-actions{ margin-top:12px; display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
+    .camera-hint{ font-size:12.5px; color:var(--ink-soft); margin-top:8px; }
+
+    .preview-wrap{ display:none; margin-bottom:18px; text-align:center; }
+    .preview-wrap img{
+        max-width:100%;
+        max-height:280px;
+        border-radius:11px;
+        box-shadow:var(--shadow);
+        border:1px solid var(--line);
+    }
+    .preview-actions{ margin-top:12px; display:flex; gap:10px; justify-content:center; }
+
+    .btn{
+        padding:11px 20px;
+        border-radius:9px;
+        border:none;
+        font-family:'Sarabun',sans-serif;
+        font-size:14.5px;
+        font-weight:700;
+        cursor:pointer;
+        transition:background 0.2s ease, transform 0.15s ease;
+    }
+    .btn-primary{ background:var(--canopy); color:#fff; }
+    .btn-primary:hover{ background:var(--fern); transform:translateY(-1px); }
+    .btn-primary:disabled{ background:#A9BFAF; cursor:not-allowed; transform:none; }
+    .btn-secondary{ background:#EDEBE0; color:var(--ink-soft); }
+    .btn-secondary:hover{ background:#E1DECF; }
+
+    .loading-box{
+        display:none;
+        text-align:center;
+        padding:26px 10px;
+        color:var(--canopy);
+        font-weight:600;
+        font-size:14.5px;
+    }
+    .sprout{
+        width:34px; height:34px;
+        margin:0 auto 12px;
+        animation:sway 1.4s ease-in-out infinite;
+    }
+    @keyframes sway{
+        0%,100%{ transform:rotate(-6deg); }
+        50%{ transform:rotate(6deg); }
+    }
+
+    .error-box{
+        display:none;
+        background:#FBEAE6;
+        border:1px solid #E3B7AA;
+        color:var(--rust);
+        padding:13px 16px;
+        border-radius:9px;
+        margin-bottom:16px;
+        font-size:14px;
+        line-height:1.6;
+    }
+
+    .confidence-note{
+        font-size:12.5px;
+        color:var(--ink-soft);
+        margin-top:10px;
+        font-style:italic;
+        line-height:1.6;
+        border-top:1px dashed var(--line);
+        padding-top:12px;
+    }
+
+    .disease-name{
+        font-family:'Noto Serif Thai', serif;
+        font-size:19px;
+        font-weight:700;
+        color:var(--canopy);
+        margin-bottom:8px;
+        display:block;
+    }
+
+    @media (max-width:480px){
+        h1{ font-size:24px; }
+        .container{ padding:20px 16px 18px; }
+        .capture-options{ flex-direction:column; }
+    }
+</style>
 </head>
 <body>
 
-    <h1>🌿 ระบบข้อมูลโรคพืชและแนวทางการรักษา</h1>
-    <div class="subtitle">ค้นหาจากฐานข้อมูล หรือให้ AI วิเคราะห์จากภาพถ่ายใบ/ต้นไม้</div>
+    <div class="brandmark">
+        <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M24 4C24 4 8 10 8 26C8 36 15 42 24 44C33 42 40 36 40 26C40 10 24 4 24 4Z" fill="#2D6A4F"/>
+            <path d="M24 44V16" stroke="#F3F5EC" stroke-width="2" stroke-linecap="round"/>
+            <path d="M24 22C24 22 18 20 15 24" stroke="#F3F5EC" stroke-width="1.6" stroke-linecap="round"/>
+            <path d="M24 30C24 30 30 28 33 32" stroke="#F3F5EC" stroke-width="1.6" stroke-linecap="round"/>
+        </svg>
+        <h1>สมุดบันทึกโรคพืช</h1>
+    </div>
+    <div class="subtitle">ค้นหาโรคจาก<b>ฐานข้อมูล</b>ที่รวบรวมไว้ หรือให้ <b>AI ผู้ช่วยนักพฤกษพยาธิ</b> วิเคราะห์จากภาพถ่ายใบและลำต้นของคุณ</div>
+
+    <svg class="leaf-divider" viewBox="0 0 420 14" xmlns="http://www.w3.org/2000/svg">
+        <line x1="0" y1="7" x2="170" y2="7" stroke="#40916C" stroke-width="1.2"/>
+        <line x1="250" y1="7" x2="420" y2="7" stroke="#40916C" stroke-width="1.2"/>
+        <path d="M195 7 C202 -2, 218 -2, 225 7 C218 16, 202 16, 195 7 Z" fill="#2D6A4F"/>
+    </svg>
 
     <div class="container">
         <div class="tabs">
@@ -205,7 +373,7 @@
 
         <!-- ===== TAB 1: ฐานข้อมูลเดิม ===== -->
         <div class="tab-panel active" id="panelDb">
-            <label for="diseaseSelect">🔎 เลือกโรคพืชที่ต้องการดูข้อมูล:</label>
+            <label for="diseaseSelect">🔎 เลือกโรคพืชที่ต้องการดูข้อมูล</label>
             <select id="diseaseSelect" onchange="showDiseaseInfo()">
                 <option value="">-- กรุณาเลือกโรคพืช --</option>
                 <option value="0">โรครากเน่าโคนเน่า (Phytophthora)</option>
@@ -215,19 +383,19 @@
 
             <div id="resultBox" class="result-box">
                 <div class="info-section">
-                    <span class="info-title">ระดับความร้ายแรง:</span>
+                    <span class="info-title">ระดับความร้ายแรง</span>
                     <span id="resSeverity" class="badge">-</span>
                 </div>
                 <div class="info-section">
-                    <span class="info-title">🍂 อาการที่พบบนใบ:</span>
+                    <span class="info-title">🍂 อาการที่พบบนใบ</span>
                     <span id="resLeaf">-</span>
                 </div>
                 <div class="info-section">
-                    <span class="info-title">🛠️ แนวทางการแก้ไขและรักษา:</span>
+                    <span class="info-title">🛠️ แนวทางการแก้ไขและรักษา</span>
                     <span id="resSolution">-</span>
                 </div>
                 <div class="info-section">
-                    <span class="info-title">⏳ ระยะเวลาการรักษา:</span>
+                    <span class="info-title">⏳ ระยะเวลาการรักษา</span>
                     <span id="resDuration">-</span>
                 </div>
             </div>
@@ -236,11 +404,31 @@
         <!-- ===== TAB 2: วิเคราะห์ด้วย AI ===== -->
         <div class="tab-panel" id="panelAi">
 
-            <div class="dropzone" id="dropzone" onclick="document.getElementById('fileInput').click()">
+            <div class="capture-options" id="captureOptions">
+                <div class="capture-option-btn" onclick="startCamera()">
+                    <span class="capture-option-icon">📸</span>
+                    <span class="capture-option-text">ถ่ายภาพด้วยกล้อง</span>
+                </div>
+                <div class="capture-option-btn" onclick="document.getElementById('fileInput').click()">
+                    <span class="capture-option-icon">🖼️</span>
+                    <span class="capture-option-text">เลือกภาพจากเครื่อง</span>
+                </div>
+            </div>
+            <div class="dropzone" id="dropzone" onclick="document.getElementById('fileInput').click()" style="display:none;">
                 <span class="dropzone-icon">📤</span>
                 <span class="dropzone-text">คลิกเพื่อเลือกรูปภาพ หรือ ลากรูปมาวางที่นี่<br>(รองรับ JPG, PNG — ถ่ายให้เห็นใบหรือลำต้นชัดเจน)</span>
             </div>
             <input type="file" id="fileInput" accept="image/*">
+
+            <div class="camera-wrap" id="cameraWrap">
+                <video id="cameraVideo" autoplay playsinline muted></video>
+                <div class="camera-actions">
+                    <button class="btn btn-primary" onclick="capturePhoto()">📸 ถ่ายภาพ</button>
+                    <button class="btn btn-secondary" onclick="stopCamera()">✖ ยกเลิก</button>
+                </div>
+                <div class="camera-hint">จัดใบไม้หรือจุดที่ผิดปกติให้อยู่กลางเฟรม ในที่ที่มีแสงสว่างเพียงพอ</div>
+            </div>
+            <canvas id="captureCanvas" style="display:none;"></canvas>
 
             <div class="preview-wrap" id="previewWrap">
                 <img id="previewImg" src="" alt="ภาพตัวอย่าง">
@@ -251,7 +439,10 @@
             </div>
 
             <div class="loading-box" id="loadingBox">
-                <div class="spinner"></div>
+                <svg class="sprout" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M24 4C24 4 8 10 8 26C8 36 15 42 24 44C33 42 40 36 40 26C40 10 24 4 24 4Z" fill="#2D6A4F"/>
+                    <path d="M24 44V16" stroke="#F3F5EC" stroke-width="2" stroke-linecap="round"/>
+                </svg>
                 กำลังวิเคราะห์ภาพด้วย AI กรุณารอสักครู่...
             </div>
 
@@ -260,19 +451,19 @@
             <div id="aiResultBox" class="result-box">
                 <div class="info-section">
                     <span class="disease-name" id="aiDiseaseName">-</span>
-                    <span class="info-title">ระดับความร้ายแรง:</span>
+                    <span class="info-title">ระดับความร้ายแรง</span>
                     <span id="aiSeverity" class="badge">-</span>
                 </div>
                 <div class="info-section">
-                    <span class="info-title">🍂 อาการที่สังเกตพบในภาพ:</span>
+                    <span class="info-title">🍂 อาการที่สังเกตพบในภาพ</span>
                     <span id="aiLeaf">-</span>
                 </div>
                 <div class="info-section">
-                    <span class="info-title">🛠️ แนวทางการแก้ไขและรักษา:</span>
+                    <span class="info-title">🛠️ แนวทางการแก้ไขและรักษา</span>
                     <span id="aiSolution">-</span>
                 </div>
                 <div class="info-section">
-                    <span class="info-title">⏳ ระยะเวลาการรักษา:</span>
+                    <span class="info-title">⏳ ระยะเวลาการรักษา</span>
                     <span id="aiDuration">-</span>
                 </div>
                 <div class="confidence-note">⚠️ ผลวิเคราะห์จาก AI เป็นการประเมินเบื้องต้นเท่านั้น หากอาการรุนแรงหรือไม่แน่ใจ ควรปรึกษาผู้เชี่ยวชาญด้านพืชสวน/นักวิชาการเกษตรเพิ่มเติม</div>
@@ -339,6 +530,7 @@
         }
 
         // ============ AI Image Analysis ============
+        const captureOptions = document.getElementById('captureOptions');
         const dropzone = document.getElementById('dropzone');
         const fileInput = document.getElementById('fileInput');
         const previewWrap = document.getElementById('previewWrap');
@@ -347,9 +539,13 @@
         const loadingBox = document.getElementById('loadingBox');
         const errorBox = document.getElementById('errorBox');
         const aiResultBox = document.getElementById('aiResultBox');
+        const cameraWrap = document.getElementById('cameraWrap');
+        const cameraVideo = document.getElementById('cameraVideo');
+        const captureCanvas = document.getElementById('captureCanvas');
 
         let currentBase64 = null;
         let currentMediaType = null;
+        let cameraStream = null;
 
         fileInput.addEventListener('change', (e) => {
             if (e.target.files && e.target.files[0]) handleFile(e.target.files[0]);
@@ -376,15 +572,69 @@
 
             const reader = new FileReader();
             reader.onload = () => {
-                const result = reader.result; // data:image/xxx;base64,....
+                const result = reader.result;
                 currentMediaType = file.type;
                 currentBase64 = result.split(',')[1];
-                previewImg.src = result;
-                previewWrap.style.display = 'block';
-                dropzone.style.display = 'none';
+                showPreview(result);
             };
             reader.onerror = () => showError('ไม่สามารถอ่านไฟล์ภาพได้ กรุณาลองใหม่อีกครั้ง');
             reader.readAsDataURL(file);
+        }
+
+        function showPreview(dataUrl) {
+            previewImg.src = dataUrl;
+            previewWrap.style.display = 'block';
+            captureOptions.style.display = 'none';
+            dropzone.style.display = 'none';
+            cameraWrap.style.display = 'none';
+        }
+
+        async function startCamera() {
+            errorBox.style.display = 'none';
+            try {
+                cameraStream = await navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: 'environment' }
+                });
+                cameraVideo.srcObject = cameraStream;
+                captureOptions.style.display = 'none';
+                previewWrap.style.display = 'none';
+                cameraWrap.style.display = 'block';
+            } catch (err) {
+                console.error(err);
+                showError('ไม่สามารถเปิดกล้องได้ กรุณาอนุญาตการเข้าถึงกล้อง หรือเลือกภาพจากเครื่องแทน');
+            }
+        }
+
+        function stopCamera() {
+            if (cameraStream) {
+                cameraStream.getTracks().forEach(track => track.stop());
+                cameraStream = null;
+            }
+            cameraWrap.style.display = 'none';
+            captureOptions.style.display = 'flex';
+        }
+
+        function capturePhoto() {
+            const w = cameraVideo.videoWidth;
+            const h = cameraVideo.videoHeight;
+            if (!w || !h) {
+                showError('กล้องยังไม่พร้อม กรุณารอสักครู่แล้วลองอีกครั้ง');
+                return;
+            }
+            captureCanvas.width = w;
+            captureCanvas.height = h;
+            const ctx = captureCanvas.getContext('2d');
+            ctx.drawImage(cameraVideo, 0, 0, w, h);
+
+            const dataUrl = captureCanvas.toDataURL('image/jpeg', 0.9);
+            currentMediaType = 'image/jpeg';
+            currentBase64 = dataUrl.split(',')[1];
+
+            if (cameraStream) {
+                cameraStream.getTracks().forEach(track => track.stop());
+                cameraStream = null;
+            }
+            showPreview(dataUrl);
         }
 
         function resetUpload() {
@@ -392,7 +642,8 @@
             currentMediaType = null;
             fileInput.value = '';
             previewWrap.style.display = 'none';
-            dropzone.style.display = 'block';
+            dropzone.style.display = 'none';
+            captureOptions.style.display = 'flex';
             aiResultBox.style.display = 'none';
             errorBox.style.display = 'none';
         }
