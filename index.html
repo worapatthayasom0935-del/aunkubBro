@@ -16,6 +16,13 @@
             align-items: center;
         }
         h1 { color: #2e7d32; text-align: center; }
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-top: -10px;
+            margin-bottom: 25px;
+            font-size: 14px;
+        }
         .container {
             background: #fff;
             padding: 25px;
@@ -24,7 +31,32 @@
             max-width: 600px;
             width: 100%;
             box-sizing: border-box;
+            margin-bottom: 25px;
         }
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+        .tab-btn {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #2e7d32;
+            background: #fff;
+            color: #2e7d32;
+            font-weight: bold;
+            font-size: 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .tab-btn.active {
+            background: #2e7d32;
+            color: #fff;
+        }
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; }
+
         label {
             font-size: 16px;
             font-weight: bold;
@@ -35,6 +67,435 @@
         select {
             width: 100%;
             padding: 12px;
+            font-size: 16px;
+            border-radius: 8px;
+            border: 2px solid #2e7d32;
+            background-color: #fff;
+            cursor: pointer;
+            outline: none;
+            margin-bottom: 25px;
+        }
+        .badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            color: #fff;
+        }
+        .danger-high { background-color: #d32f2f; }
+        .danger-medium { background-color: #f57c00; }
+        .danger-low { background-color: #388e3c; }
+        .info-section { 
+            margin-top: 15px; 
+            border-bottom: 1px solid #eee; 
+            padding-bottom: 12px; 
+        }
+        .info-title { font-weight: bold; color: #2e7d32; display: block; margin-bottom: 5px; }
+        .result-box { display: none; animation: fadeIn 0.5s ease; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- AI upload section --- */
+        .dropzone {
+            border: 2px dashed #2e7d32;
+            border-radius: 10px;
+            padding: 30px 15px;
+            text-align: center;
+            cursor: pointer;
+            background: #fafdf8;
+            transition: background 0.2s ease, border-color 0.2s ease;
+            margin-bottom: 18px;
+        }
+        .dropzone:hover, .dropzone.dragover {
+            background: #eef7ec;
+            border-color: #1b5e20;
+        }
+        .dropzone-icon { font-size: 36px; display: block; margin-bottom: 8px; }
+        .dropzone-text { color: #555; font-size: 14px; }
+        #fileInput { display: none; }
+
+        .preview-wrap {
+            display: none;
+            margin-bottom: 18px;
+            text-align: center;
+        }
+        .preview-wrap img {
+            max-width: 100%;
+            max-height: 280px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+        }
+        .preview-actions {
+            margin-top: 10px;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+        .btn {
+            padding: 10px 18px;
+            border-radius: 8px;
+            border: none;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .btn-primary { background: #2e7d32; color: #fff; }
+        .btn-primary:hover { background: #1b5e20; }
+        .btn-primary:disabled { background: #a5c9a8; cursor: not-allowed; }
+        .btn-secondary { background: #eee; color: #444; }
+        .btn-secondary:hover { background: #ddd; }
+
+        .loading-box {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            color: #2e7d32;
+            font-weight: bold;
+        }
+        .spinner {
+            width: 30px;
+            height: 30px;
+            margin: 0 auto 10px;
+            border: 4px solid #d5e8d4;
+            border-top: 4px solid #2e7d32;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .error-box {
+            display: none;
+            background: #fdecea;
+            border: 1px solid #f5c6cb;
+            color: #b71c1c;
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+
+        .confidence-note {
+            font-size: 13px;
+            color: #888;
+            margin-top: 8px;
+            font-style: italic;
+        }
+
+        .disease-name {
+            font-size: 18px;
+            font-weight: bold;
+            color: #1b5e20;
+            margin-bottom: 6px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>🌿 ระบบข้อมูลโรคพืชและแนวทางการรักษา</h1>
+    <div class="subtitle">ค้นหาจากฐานข้อมูล หรือให้ AI วิเคราะห์จากภาพถ่ายใบ/ต้นไม้</div>
+
+    <div class="container">
+        <div class="tabs">
+            <button class="tab-btn active" id="tabBtnDb" onclick="switchTab('db')">📚 ค้นหาจากฐานข้อมูล</button>
+            <button class="tab-btn" id="tabBtnAi" onclick="switchTab('ai')">📷 วิเคราะห์ด้วย AI</button>
+        </div>
+
+        <!-- ===== TAB 1: ฐานข้อมูลเดิม ===== -->
+        <div class="tab-panel active" id="panelDb">
+            <label for="diseaseSelect">🔎 เลือกโรคพืชที่ต้องการดูข้อมูล:</label>
+            <select id="diseaseSelect" onchange="showDiseaseInfo()">
+                <option value="">-- กรุณาเลือกโรคพืช --</option>
+                <option value="0">โรครากเน่าโคนเน่า (Phytophthora)</option>
+                <option value="1">โรคราสีชมพู (Pink Disease)</option>
+                <option value="2">โรคเปลือกแตกยางไหล (Stem Canker)</option>
+            </select>
+
+            <div id="resultBox" class="result-box">
+                <div class="info-section">
+                    <span class="info-title">ระดับความร้ายแรง:</span>
+                    <span id="resSeverity" class="badge">-</span>
+                </div>
+                <div class="info-section">
+                    <span class="info-title">🍂 อาการที่พบบนใบ:</span>
+                    <span id="resLeaf">-</span>
+                </div>
+                <div class="info-section">
+                    <span class="info-title">🛠️ แนวทางการแก้ไขและรักษา:</span>
+                    <span id="resSolution">-</span>
+                </div>
+                <div class="info-section">
+                    <span class="info-title">⏳ ระยะเวลาการรักษา:</span>
+                    <span id="resDuration">-</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== TAB 2: วิเคราะห์ด้วย AI ===== -->
+        <div class="tab-panel" id="panelAi">
+
+            <div class="dropzone" id="dropzone" onclick="document.getElementById('fileInput').click()">
+                <span class="dropzone-icon">📤</span>
+                <span class="dropzone-text">คลิกเพื่อเลือกรูปภาพ หรือ ลากรูปมาวางที่นี่<br>(รองรับ JPG, PNG — ถ่ายให้เห็นใบหรือลำต้นชัดเจน)</span>
+            </div>
+            <input type="file" id="fileInput" accept="image/*">
+
+            <div class="preview-wrap" id="previewWrap">
+                <img id="previewImg" src="" alt="ภาพตัวอย่าง">
+                <div class="preview-actions">
+                    <button class="btn btn-primary" id="analyzeBtn" onclick="analyzeImage()">🔬 วิเคราะห์ภาพนี้</button>
+                    <button class="btn btn-secondary" onclick="resetUpload()">✖ เลือกใหม่</button>
+                </div>
+            </div>
+
+            <div class="loading-box" id="loadingBox">
+                <div class="spinner"></div>
+                กำลังวิเคราะห์ภาพด้วย AI กรุณารอสักครู่...
+            </div>
+
+            <div class="error-box" id="errorBox"></div>
+
+            <div id="aiResultBox" class="result-box">
+                <div class="info-section">
+                    <span class="disease-name" id="aiDiseaseName">-</span>
+                    <span class="info-title">ระดับความร้ายแรง:</span>
+                    <span id="aiSeverity" class="badge">-</span>
+                </div>
+                <div class="info-section">
+                    <span class="info-title">🍂 อาการที่สังเกตพบในภาพ:</span>
+                    <span id="aiLeaf">-</span>
+                </div>
+                <div class="info-section">
+                    <span class="info-title">🛠️ แนวทางการแก้ไขและรักษา:</span>
+                    <span id="aiSolution">-</span>
+                </div>
+                <div class="info-section">
+                    <span class="info-title">⏳ ระยะเวลาการรักษา:</span>
+                    <span id="aiDuration">-</span>
+                </div>
+                <div class="confidence-note">⚠️ ผลวิเคราะห์จาก AI เป็นการประเมินเบื้องต้นเท่านั้น หากอาการรุนแรงหรือไม่แน่ใจ ควรปรึกษาผู้เชี่ยวชาญด้านพืชสวน/นักวิชาการเกษตรเพิ่มเติม</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============ ฐานข้อมูลเดิม ============
+        const diseaseDatabase = [
+            {
+                severity: "ร้ายแรงสูง",
+                severityClass: "danger-high",
+                leaf: "ใบมีอาการเหลืองซีดจากเส้นกลางใบ ใบสลดเหี่ยว และหลุดร่วงง่ายผิดปกติ",
+                solution: "ขูดผิวเปลือกบริเวณลำต้นที่เน่าออก ทาด้วยปูนแดงหรือสารเคมีเมทาแลกซิล งดให้น้ำชั่วคราวและปรับปรุงการระบายน้ำในดิน",
+                duration: "2 - 4 เดือน (ขึ้นอยู่กับขนาดแผลและความแข็งแรงของต้น)"
+            },
+            {
+                severity: "ปานกลาง",
+                severityClass: "danger-medium",
+                leaf: "ใบบนกิ่งที่เป็นโรคจะเริ่มมีสีเหลือง เหี่ยวแห้ง และค้างติดอยู่บนกิ่งไม่ยอมร่วงหล่นลงพื้น",
+                solution: "ตัดแต่งกิ่งที่เป็นโรคไปเผาทำลายทันที พ่นสารเคมีป้องกันกำจัดเชื้อรากลุ่มทองแดง (Copper) บริเวณง่ามกิ่งและลำต้น",
+                duration: "3 - 6 สัปดาห์"
+            },
+            {
+                severity: "ร้ายแรงสูง",
+                severityClass: "danger-high",
+                leaf: "ใบมีขนาดเล็กลง สีไม่สมบูรณ์ มีอาการขอบใบไหม้แห้งในระยะรุนแรง ต้นดูโทรม",
+                solution: "ใช้มีดสะอาดถากเปลือกไม้ส่วนที่เสียออกให้หมด ทาสารป้องกันกำจัดเชื้อรา เช่น ฟอสอีทิล-อลูมิเนียม บำรุงต้นด้วยปุ๋ยที่มีโพแทสเซียมสูง",
+                duration: "1 - 3 เดือน"
+            }
+        ];
+
+        function showDiseaseInfo() {
+            const selectElement = document.getElementById('diseaseSelect');
+            const resultBox = document.getElementById('resultBox');
+            const selectedValue = selectElement.value;
+
+            if (selectedValue === "") {
+                resultBox.style.display = "none";
+                return;
+            }
+
+            const diseaseData = diseaseDatabase[selectedValue];
+
+            document.getElementById('resLeaf').innerText = diseaseData.leaf;
+            document.getElementById('resSolution').innerText = diseaseData.solution;
+            document.getElementById('resDuration').innerText = diseaseData.duration;
+
+            const severityBadge = document.getElementById('resSeverity');
+            severityBadge.innerText = diseaseData.severity;
+            severityBadge.className = `badge ${diseaseData.severityClass}`;
+
+            resultBox.style.display = "block";
+        }
+
+        // ============ Tabs ============
+        function switchTab(tab) {
+            const isDb = tab === 'db';
+            document.getElementById('tabBtnDb').classList.toggle('active', isDb);
+            document.getElementById('tabBtnAi').classList.toggle('active', !isDb);
+            document.getElementById('panelDb').classList.toggle('active', isDb);
+            document.getElementById('panelAi').classList.toggle('active', !isDb);
+        }
+
+        // ============ AI Image Analysis ============
+        const dropzone = document.getElementById('dropzone');
+        const fileInput = document.getElementById('fileInput');
+        const previewWrap = document.getElementById('previewWrap');
+        const previewImg = document.getElementById('previewImg');
+        const analyzeBtn = document.getElementById('analyzeBtn');
+        const loadingBox = document.getElementById('loadingBox');
+        const errorBox = document.getElementById('errorBox');
+        const aiResultBox = document.getElementById('aiResultBox');
+
+        let currentBase64 = null;
+        let currentMediaType = null;
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files && e.target.files[0]) handleFile(e.target.files[0]);
+        });
+
+        dropzone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropzone.classList.add('dragover');
+        });
+        dropzone.addEventListener('dragleave', () => dropzone.classList.remove('dragover'));
+        dropzone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropzone.classList.remove('dragover');
+            if (e.dataTransfer.files && e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
+        });
+
+        function handleFile(file) {
+            if (!file.type.startsWith('image/')) {
+                showError('กรุณาเลือกไฟล์รูปภาพเท่านั้น (JPG, PNG)');
+                return;
+            }
+            errorBox.style.display = 'none';
+            aiResultBox.style.display = 'none';
+
+            const reader = new FileReader();
+            reader.onload = () => {
+                const result = reader.result; // data:image/xxx;base64,....
+                currentMediaType = file.type;
+                currentBase64 = result.split(',')[1];
+                previewImg.src = result;
+                previewWrap.style.display = 'block';
+                dropzone.style.display = 'none';
+            };
+            reader.onerror = () => showError('ไม่สามารถอ่านไฟล์ภาพได้ กรุณาลองใหม่อีกครั้ง');
+            reader.readAsDataURL(file);
+        }
+
+        function resetUpload() {
+            currentBase64 = null;
+            currentMediaType = null;
+            fileInput.value = '';
+            previewWrap.style.display = 'none';
+            dropzone.style.display = 'block';
+            aiResultBox.style.display = 'none';
+            errorBox.style.display = 'none';
+        }
+
+        function showError(msg) {
+            errorBox.innerText = '⚠️ ' + msg;
+            errorBox.style.display = 'block';
+        }
+
+        async function analyzeImage() {
+            if (!currentBase64) {
+                showError('กรุณาเลือกภาพก่อนทำการวิเคราะห์');
+                return;
+            }
+
+            errorBox.style.display = 'none';
+            aiResultBox.style.display = 'none';
+            loadingBox.style.display = 'block';
+            analyzeBtn.disabled = true;
+
+            const systemInstruction = `คุณเป็นผู้เชี่ยวชาญด้านโรคพืชสวน (พืชยืนต้น เช่น ยางพารา ผลไม้ และไม้ผลทั่วไป) มีหน้าที่วิเคราะห์ภาพถ่ายใบไม้หรือลำต้นที่ผู้ใช้ส่งมา แล้วประเมินว่าน่าจะเป็นโรคพืชชนิดใด
+
+ตอบกลับเป็น JSON เท่านั้น ห้ามมีข้อความอื่นใดนอกเหนือจาก JSON ห้ามใช้ Markdown code fence รูปแบบ JSON ต้องเป็นดังนี้ทุกครั้ง:
+{
+  "is_plant_related": true หรือ false (ภาพนี้เป็นภาพพืช/ใบไม้/ต้นไม้หรือไม่),
+  "disease_name": "ชื่อโรคที่คาดว่าเป็น เป็นภาษาไทย (วงเล็บชื่ออังกฤษถ้ามี) หรือ 'ไม่พบความผิดปกติชัดเจน' ถ้าพืชดูปกติดี",
+  "severity": "ร้ายแรงสูง" หรือ "ปานกลาง" หรือ "เล็กน้อย",
+  "severity_class": "danger-high" หรือ "danger-medium" หรือ "danger-low" (ให้สอดคล้องกับ severity ข้างต้น),
+  "leaf_symptoms": "คำอธิบายอาการที่สังเกตเห็นได้จากภาพจริง 1-2 ประโยค เป็นภาษาไทย",
+  "solution": "แนวทางการรักษาหรือแก้ไขที่เหมาะสม เป็นภาษาไทย 1-3 ประโยค",
+  "duration": "ระยะเวลาโดยประมาณที่ใช้ในการรักษาหรือฟื้นตัว เป็นภาษาไทย"
+}
+
+หากภาพที่ส่งมาไม่ใช่ภาพพืชหรือมองไม่เห็นอาการชัดเจนพอที่จะวินิจฉัย ให้ตั้ง is_plant_related เป็น false และอธิบายเหตุผลสั้นๆ ใน disease_name`;
+
+            try {
+                const response = await fetch("https://api.anthropic.com/v1/messages", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        model: "claude-sonnet-4-6",
+                        max_tokens: 1000,
+                        system: systemInstruction,
+                        messages: [
+                            {
+                                role: "user",
+                                content: [
+                                    {
+                                        type: "image",
+                                        source: {
+                                            type: "base64",
+                                            media_type: currentMediaType,
+                                            data: currentBase64
+                                        }
+                                    },
+                                    {
+                                        type: "text",
+                                        text: "กรุณาวิเคราะห์ภาพนี้และวินิจฉัยโรคพืชตามรูปแบบ JSON ที่กำหนด"
+                                    }
+                                ]
+                            }
+                        ]
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error("การเชื่อมต่อ AI ล้มเหลว (HTTP " + response.status + ")");
+                }
+
+                const data = await response.json();
+                const textBlock = data.content.find(b => b.type === "text");
+                if (!textBlock) throw new Error("ไม่พบข้อมูลผลลัพธ์จาก AI");
+
+                const cleanText = textBlock.text.replace(/```json|```/g, "").trim();
+                const parsed = JSON.parse(cleanText);
+
+                if (parsed.is_plant_related === false) {
+                    showError(parsed.disease_name || 'ไม่สามารถวิเคราะห์ภาพนี้ได้ กรุณาถ่ายภาพใบไม้หรือลำต้นให้ชัดเจนขึ้น');
+                    return;
+                }
+
+                document.getElementById('aiDiseaseName').innerText = parsed.disease_name || '-';
+                document.getElementById('aiLeaf').innerText = parsed.leaf_symptoms || '-';
+                document.getElementById('aiSolution').innerText = parsed.solution || '-';
+                document.getElementById('aiDuration').innerText = parsed.duration || '-';
+
+                const badge = document.getElementById('aiSeverity');
+                badge.innerText = parsed.severity || '-';
+                badge.className = `badge ${parsed.severity_class || 'danger-medium'}`;
+
+                aiResultBox.style.display = 'block';
+
+            } catch (err) {
+                console.error(err);
+                showError('เกิดข้อผิดพลาดระหว่างการวิเคราะห์: ' + err.message + ' กรุณาลองใหม่อีกครั้ง');
+            } finally {
+                loadingBox.style.display = 'none';
+                analyzeBtn.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>            padding: 12px;
             font-size: 16px;
             border-radius: 8px;
             border: 2px solid #2e7d32;
