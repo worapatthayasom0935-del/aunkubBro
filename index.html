@@ -3,9 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>มังคุดวินิฉัย — สแกนโรคมังคุด</title>
+<title>หมอมังคุด — สแกนโรคมังคุดด้วย AI</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Thai:wght@400;600;700&family=Noto+Sans+Thai:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Thai:wght@400;600;700;800&family=Noto+Sans+Thai:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root{
     --bg-deep:#2A1230;
@@ -27,6 +27,7 @@
     --font-mono:'IBM Plex Mono',monospace;
   }
   *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
   body{
     font-family:var(--font-body);
     background:
@@ -37,238 +38,380 @@
     min-height:100vh;
     overflow-x:hidden;
   }
-  .wrap{max-width:640px; margin:0 auto; padding:28px 20px 80px;}
+  a{color:inherit;}
+  .wrap{max-width:760px; margin:0 auto; padding:0 20px;}
 
-  /* Header */
-  header{text-align:center; margin-bottom:22px;}
+  nav{
+    position:sticky; top:0; z-index:50;
+    background:rgba(28,12,34,.72); backdrop-filter:blur(14px);
+    border-bottom:1px solid rgba(255,255,255,.08);
+  }
+  .nav-inner{max-width:760px; margin:0 auto; padding:14px 20px; display:flex; align-items:center; justify-content:space-between;}
+  .brand{display:flex; align-items:center; gap:8px; font-family:var(--font-display); font-weight:700; font-size:18px;}
+  .brand-mark{width:26px; height:26px; flex-shrink:0;}
+  .nav-links{display:flex; align-items:center; gap:22px;}
+  .nav-links a{font-size:13.5px; color:var(--flesh-dim); opacity:.8; text-decoration:none; font-weight:500;}
+  .nav-links a:hover{opacity:1;}
+  .nav-cta{
+    font-family:var(--font-body); font-weight:700; font-size:13px;
+    padding:9px 18px; border-radius:999px; border:none; cursor:pointer;
+    background:linear-gradient(135deg,var(--rind-light),var(--rind)); color:#fff;
+    box-shadow:0 4px 16px rgba(154,59,114,.4);
+  }
+  @media (max-width:560px){ .nav-links a{display:none;} }
+
+  .hero{padding:64px 0 40px; text-align:center; position:relative;}
+  .trust-row{display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin-bottom:22px;}
+  .trust-badge{
+    font-family:var(--font-mono); font-size:11px; letter-spacing:.03em;
+    padding:6px 13px; border-radius:999px; background:rgba(255,255,255,.06);
+    border:1px solid rgba(255,255,255,.14); color:var(--flesh-dim); display:flex; align-items:center; gap:6px;
+  }
   .eyebrow{
     font-family:var(--font-mono); font-size:11px; letter-spacing:.18em;
-    color:var(--rind-glow); text-transform:uppercase; margin-bottom:10px;
+    color:var(--rind-glow); text-transform:uppercase; margin-bottom:14px;
     display:flex; align-items:center; justify-content:center; gap:8px;
   }
   .eyebrow::before,.eyebrow::after{content:""; width:22px; height:1px; background:var(--rind-glow); opacity:.5;}
   h1{
-    font-family:var(--font-display); font-weight:700; font-size:34px;
-    letter-spacing:.01em; color:var(--flesh);
-    text-shadow:0 2px 24px rgba(194,75,134,.35);
+    font-family:var(--font-display); font-weight:800; font-size:44px; line-height:1.25;
+    letter-spacing:.005em; color:var(--flesh); text-shadow:0 2px 30px rgba(194,75,134,.35);
   }
-  .sub{color:var(--flesh-dim); opacity:.75; font-size:14.5px; margin-top:8px; line-height:1.6;}
+  h1 .accent{color:var(--rind-glow);}
+  .sub{color:var(--flesh-dim); opacity:.8; font-size:15.5px; margin:16px auto 0; line-height:1.8; max-width:480px;}
+  .hero-cta-row{display:flex; gap:12px; justify-content:center; margin-top:30px; flex-wrap:wrap;}
+  button.primary-cta{
+    font-family:var(--font-body); font-weight:700; font-size:16px;
+    padding:16px 32px; border-radius:999px; border:none; cursor:pointer;
+    background:linear-gradient(135deg,var(--rind-light),var(--rind)); color:#fff;
+    box-shadow:0 10px 30px rgba(154,59,114,.45); transition:transform .15s ease, box-shadow .15s ease;
+  }
+  button.primary-cta:hover{transform:translateY(-2px); box-shadow:0 14px 36px rgba(154,59,114,.55);}
+  button.primary-cta:active{transform:translateY(0) scale(.97);}
+  a.secondary-cta{
+    font-family:var(--font-body); font-weight:600; font-size:15px;
+    padding:15px 24px; border-radius:999px; text-decoration:none;
+    background:rgba(255,255,255,.06); color:var(--flesh); border:1px solid rgba(255,255,255,.16);
+    display:flex; align-items:center; gap:6px;
+  }
+  .hero-visual{width:180px; height:180px; margin:40px auto 0; position:relative; animation:float 5s ease-in-out infinite;}
+  @keyframes float{0%,100%{transform:translateY(0);} 50%{transform:translateY(-10px);}}
+  .hero-visual svg{width:100%; height:100%; filter:drop-shadow(0 10px 30px rgba(194,75,134,.4));}
 
-  /* Part selector — segments like mangosteen flesh wedges */
-  .segments{
-    display:flex; gap:8px; justify-content:center; margin:24px 0 20px; flex-wrap:wrap;
+  .stats{display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin:50px 0;}
+  .stat-card{background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.1); border-radius:16px; padding:20px 14px; text-align:center;}
+  .stat-num{font-family:var(--font-display); font-weight:800; font-size:28px; color:var(--gold);}
+  .stat-label{font-size:12px; color:var(--flesh-dim); opacity:.75; margin-top:4px; line-height:1.5;}
+
+  section{padding:50px 0;}
+  .section-eyebrow{font-family:var(--font-mono); font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--gold); margin-bottom:10px;}
+  h2{font-family:var(--font-display); font-weight:700; font-size:28px; margin-bottom:10px;}
+  .section-sub{color:var(--flesh-dim); opacity:.75; font-size:14.5px; line-height:1.7; max-width:520px; margin-bottom:32px;}
+  .reveal{opacity:0; transform:translateY(24px); transition:all .7s cubic-bezier(.2,.8,.2,1);}
+  .reveal.in{opacity:1; transform:translateY(0);}
+
+  .steps{display:flex; flex-direction:column; gap:14px;}
+  .step-card{display:flex; gap:16px; align-items:flex-start; background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.09); border-radius:16px; padding:18px 20px;}
+  .step-num{
+    font-family:var(--font-display); font-weight:800; font-size:20px; color:var(--rind-glow);
+    background:rgba(194,75,134,.14); width:38px; height:38px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center; flex-shrink:0;
   }
+  .step-title{font-weight:700; font-size:15.5px; margin-bottom:3px;}
+  .step-desc{font-size:13.5px; color:var(--flesh-dim); opacity:.75; line-height:1.6;}
+
+  .db-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px;}
+  .db-card{background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.09); border-radius:16px; padding:18px; position:relative; overflow:hidden;}
+  .db-card::before{content:""; position:absolute; top:0; left:0; width:4px; height:100%; background:var(--leaf-light);}
+  .db-icon{font-size:22px; margin-bottom:8px; display:block;}
+  .db-name{font-weight:700; font-size:14.5px; margin-bottom:4px;}
+  .db-type{font-family:var(--font-mono); font-size:10.5px; color:var(--gold); text-transform:uppercase; letter-spacing:.05em;}
+  .db-more{display:flex; align-items:center; justify-content:center; text-align:center; background:rgba(255,255,255,.02); border:1px dashed rgba(255,255,255,.15); border-radius:16px; padding:18px; font-size:13px; color:var(--flesh-dim); opacity:.6;}
+  .source-cite{margin-top:22px; font-size:12px; color:var(--flesh-dim); opacity:.55; line-height:1.7; border-top:1px dashed rgba(255,255,255,.12); padding-top:16px;}
+
+  #scanner-section{background:rgba(255,255,255,.03); border-radius:28px; border:1px solid rgba(255,255,255,.1); padding:44px 24px; margin:20px 0 60px; text-align:center;}
+
+  #permission-gate{display:flex; flex-direction:column; align-items:center; gap:16px;}
+  .permission-icon{
+    width:74px; height:74px; border-radius:50%; background:linear-gradient(135deg,var(--rind-light),var(--rind));
+    display:flex; align-items:center; justify-content:center; font-size:30px; box-shadow:0 10px 30px rgba(154,59,114,.4);
+  }
+  .permission-title{font-family:var(--font-display); font-weight:700; font-size:20px;}
+  .permission-desc{font-size:13.5px; color:var(--flesh-dim); opacity:.75; max-width:340px; line-height:1.7;}
+  .permission-denied{display:none; color:var(--alert); font-size:13px; margin-top:6px; max-width:340px; line-height:1.6;}
+  .permission-denied.show{display:block;}
+
+  .segments{display:flex; gap:8px; justify-content:center; margin:24px 0 20px; flex-wrap:wrap;}
   .segment{
-    font-family:var(--font-body); font-weight:600; font-size:13.5px;
-    padding:9px 16px; border-radius:999px;
-    background:rgba(255,255,255,.06); color:var(--flesh-dim);
-    border:1px solid rgba(255,255,255,.12); cursor:pointer;
-    transition:all .25s ease;
+    font-family:var(--font-body); font-weight:600; font-size:13.5px; padding:9px 16px; border-radius:999px;
+    background:rgba(255,255,255,.06); color:var(--flesh-dim); border:1px solid rgba(255,255,255,.12); cursor:pointer; transition:all .25s ease;
   }
-  .segment.active{
-    background:linear-gradient(135deg,var(--rind-light),var(--rind));
-    color:#fff; border-color:transparent;
-    box-shadow:0 4px 18px rgba(154,59,114,.45);
-  }
+  .segment.active{background:linear-gradient(135deg,var(--rind-light),var(--rind)); color:#fff; border-color:transparent; box-shadow:0 4px 18px rgba(154,59,114,.45);}
   .segment:hover:not(.active){background:rgba(255,255,255,.1);}
 
-  /* Calyx viewfinder — signature element */
-  .viewfinder-stage{
-    position:relative; width:280px; height:280px; margin:0 auto 22px;
-    display:flex; align-items:center; justify-content:center;
-  }
-  .calyx-frame{
-    position:absolute; inset:0;
-    filter:drop-shadow(0 8px 30px rgba(194,75,134,.4));
-  }
+  .viewfinder-stage{position:relative; width:260px; height:260px; margin:0 auto 22px; display:flex; align-items:center; justify-content:center;}
+  .calyx-frame{position:absolute; inset:0; filter:drop-shadow(0 8px 30px rgba(194,75,134,.4));}
   .calyx-frame svg{width:100%; height:100%;}
   .lens{
-    position:relative; width:200px; height:200px; border-radius:50%;
-    overflow:hidden; background:#100515;
-    border:3px solid var(--gold);
-    box-shadow:inset 0 0 40px rgba(0,0,0,.6), 0 0 0 6px rgba(201,161,90,.12);
+    position:relative; width:186px; height:186px; border-radius:50%; overflow:hidden; background:#100515;
+    border:3px solid var(--gold); box-shadow:inset 0 0 40px rgba(0,0,0,.6), 0 0 0 6px rgba(201,161,90,.12);
   }
-  #video, #captured-img{
-    width:100%; height:100%; object-fit:cover; display:block;
-  }
+  #video, #captured-img{width:100%; height:100%; object-fit:cover; display:block;}
   #captured-img{display:none;}
-  .lens-placeholder{
-    position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
-    flex-direction:column; gap:8px; color:var(--flesh-dim); opacity:.6; text-align:center;
-    font-size:12px; padding:20px;
-  }
-  .pulse-ring{
-    position:absolute; inset:-6px; border-radius:50%;
-    border:2px solid var(--rind-glow); opacity:0; pointer-events:none;
-  }
+  .pulse-ring{position:absolute; inset:-6px; border-radius:50%; border:2px solid var(--rind-glow); opacity:0; pointer-events:none;}
   .pulse-ring.active{animation:pulse 1.6s ease-out infinite;}
-  @keyframes pulse{
-    0%{transform:scale(1); opacity:.7;}
-    100%{transform:scale(1.35); opacity:0;}
-  }
+  @keyframes pulse{0%{transform:scale(1); opacity:.7;} 100%{transform:scale(1.35); opacity:0;}}
 
   .controls{display:flex; flex-direction:column; align-items:center; gap:12px;}
   .btn-row{display:flex; gap:10px; justify-content:center;}
   button.action{
-    font-family:var(--font-body); font-weight:700; font-size:15px;
-    padding:13px 28px; border-radius:999px; border:none; cursor:pointer;
-    background:linear-gradient(135deg,var(--rind-light),var(--rind));
-    color:#fff; box-shadow:0 6px 20px rgba(154,59,114,.4);
-    transition:transform .15s ease, box-shadow .15s ease;
+    font-family:var(--font-body); font-weight:700; font-size:15px; padding:13px 28px; border-radius:999px; border:none; cursor:pointer;
+    background:linear-gradient(135deg,var(--rind-light),var(--rind)); color:#fff; box-shadow:0 6px 20px rgba(154,59,114,.4); transition:transform .15s ease;
   }
   button.action:active{transform:scale(.96);}
   button.action:disabled{opacity:.5; cursor:not-allowed;}
   button.ghost{
-    font-family:var(--font-body); font-weight:600; font-size:14px;
-    padding:12px 22px; border-radius:999px; cursor:pointer;
-    background:rgba(255,255,255,.06); color:var(--flesh-dim);
-    border:1px solid rgba(255,255,255,.15);
+    font-family:var(--font-body); font-weight:600; font-size:14px; padding:12px 22px; border-radius:999px; cursor:pointer;
+    background:rgba(255,255,255,.06); color:var(--flesh-dim); border:1px solid rgba(255,255,255,.15);
   }
   .hint{font-size:12.5px; color:var(--flesh-dim); opacity:.55; text-align:center; max-width:340px;}
 
-  /* Loading */
   .loading-wrap{display:none; flex-direction:column; align-items:center; gap:14px; margin-top:20px;}
   .loading-wrap.active{display:flex;}
   .loading-text{font-family:var(--font-mono); font-size:12.5px; color:var(--gold); letter-spacing:.05em;}
-  .spinner{
-    width:34px; height:34px; border-radius:50%;
-    border:3px solid rgba(201,161,90,.2); border-top-color:var(--gold);
-    animation:spin 1s linear infinite;
-  }
+  .spinner{width:34px; height:34px; border-radius:50%; border:3px solid rgba(201,161,90,.2); border-top-color:var(--gold); animation:spin 1s linear infinite;}
   @keyframes spin{to{transform:rotate(360deg);}}
 
-  /* Result card */
-  #result{
-    margin-top:28px; opacity:0; transform:translateY(24px) scale(.98);
-    transition:all .6s cubic-bezier(.2,.8,.2,1); pointer-events:none;
-  }
+  #result{margin-top:28px; opacity:0; transform:translateY(24px) scale(.98); transition:all .6s cubic-bezier(.2,.8,.2,1); pointer-events:none;}
   #result.show{opacity:1; transform:translateY(0) scale(1); pointer-events:auto;}
   .card{
-    background:linear-gradient(180deg,var(--flesh) 0%, var(--flesh-dim) 100%);
-    color:var(--ink); border-radius:22px; padding:26px 24px;
-    box-shadow:0 20px 60px rgba(0,0,0,.4);
-    position:relative; overflow:hidden;
+    background:linear-gradient(180deg,var(--flesh) 0%, var(--flesh-dim) 100%); color:var(--ink); border-radius:22px; padding:26px 24px; text-align:left;
+    box-shadow:0 20px 60px rgba(0,0,0,.4); position:relative; overflow:hidden;
   }
-  .card::before{
-    content:""; position:absolute; top:0; left:0; right:0; height:6px;
-    background:linear-gradient(90deg,var(--leaf),var(--rind),var(--gold));
-  }
+  .card::before{content:""; position:absolute; top:0; left:0; right:0; height:6px; background:linear-gradient(90deg,var(--leaf),var(--rind),var(--gold));}
   .result-header{display:flex; align-items:flex-start; justify-content:space-between; gap:12px; margin-bottom:6px;}
-  .part-tag{
-    font-family:var(--font-mono); font-size:10.5px; letter-spacing:.1em;
-    text-transform:uppercase; color:var(--rind); opacity:.7;
-  }
-  .status-pill{
-    font-family:var(--font-mono); font-size:11px; font-weight:600;
-    padding:4px 11px; border-radius:999px; white-space:nowrap;
-  }
+  .part-tag{font-family:var(--font-mono); font-size:10.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--rind); opacity:.7;}
+  .status-pill{font-family:var(--font-mono); font-size:11px; font-weight:600; padding:4px 11px; border-radius:999px; white-space:nowrap;}
   .status-pill.found{background:var(--alert-dim); color:var(--alert);}
   .status-pill.healthy{background:#DCEBD3; color:var(--leaf-dark);}
   .status-pill.unknown{background:#EDE6DA; color:#8B7355;}
-
-  .disease-name{
-    font-family:var(--font-display); font-weight:700; font-size:24px;
-    margin:6px 0 2px; color:var(--ink);
-  }
-  .disease-en{font-size:13px; color:#8a7a86; font-style:italic; margin-bottom:14px;}
-
-  .section-label{
-    font-family:var(--font-mono); font-size:11px; letter-spacing:.1em; text-transform:uppercase;
-    color:var(--rind); margin:16px 0 6px; display:flex; align-items:center; gap:6px;
-  }
+  .disease-name{font-family:var(--font-display); font-weight:700; font-size:24px; margin:6px 0 2px; color:var(--ink);}
+  .section-label{font-family:var(--font-mono); font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--rind); margin:16px 0 6px; display:flex; align-items:center; gap:6px;}
   .section-label::before{content:""; width:5px; height:5px; border-radius:50%; background:var(--rind);}
   .body-text{font-size:14.5px; line-height:1.75; color:#3a2a38;}
-
   .dose-table{width:100%; border-collapse:collapse; margin-top:6px; font-size:13.5px;}
   .dose-table td{padding:9px 0; border-bottom:1px solid rgba(0,0,0,.08); vertical-align:top;}
   .dose-table td:first-child{color:var(--leaf-dark); font-weight:600; width:42%; padding-right:10px;}
   .dose-table td:last-child{font-family:var(--font-mono); font-size:12.5px; color:#3a2a38;}
-
   .confidence-wrap{display:flex; align-items:center; gap:10px; margin-top:4px;}
   .seg-dots{display:flex; gap:4px;}
   .seg-dot{width:9px; height:9px; border-radius:2px; background:rgba(0,0,0,.1); transform:rotate(45deg);}
   .seg-dot.on{background:var(--rind);}
   .conf-label{font-family:var(--font-mono); font-size:11.5px; color:#8a7a86;}
-
-  .source-note{
-    margin-top:18px; padding-top:14px; border-top:1px dashed rgba(0,0,0,.12);
-    font-size:11.5px; color:#a0909c; line-height:1.6;
-  }
-
+  .source-note{margin-top:18px; padding-top:14px; border-top:1px dashed rgba(0,0,0,.12); font-size:11.5px; color:#a0909c; line-height:1.6;}
   .rescan-btn{
-    display:block; margin:18px auto 0; font-family:var(--font-body); font-weight:700;
-    font-size:14px; padding:11px 24px; border-radius:999px; border:none;
-    background:var(--ink); color:var(--flesh); cursor:pointer;
+    display:block; margin:18px auto 0; font-family:var(--font-body); font-weight:700; font-size:14px; padding:11px 24px;
+    border-radius:999px; border:none; background:var(--ink); color:var(--flesh); cursor:pointer;
   }
 
-  footer{text-align:center; margin-top:36px; font-size:11.5px; color:var(--flesh-dim); opacity:.4;}
+  footer{text-align:center; padding:30px 0 50px; font-size:11.5px; color:var(--flesh-dim); opacity:.4; line-height:1.8;}
 
-  @media (max-width:420px){
-    h1{font-size:27px;}
-    .viewfinder-stage{width:230px; height:230px;}
-    .lens{width:165px; height:165px;}
+  @media (max-width:560px){
+    h1{font-size:32px;}
+    .stats{grid-template-columns:1fr 1fr;}
+    .viewfinder-stage{width:220px; height:220px;}
+    .lens{width:156px; height:156px;}
   }
-
-  @media (prefers-reduced-motion: reduce){
-    *{animation-duration:.01ms !important; transition-duration:.01ms !important;}
-  }
+  @media (prefers-reduced-motion: reduce){ *{animation-duration:.01ms !important; transition-duration:.01ms !important;} }
 </style>
 </head>
 <body>
+
+<nav>
+  <div class="nav-inner">
+    <div class="brand">
+      <svg class="brand-mark" viewBox="0 0 100 100"><polygon points="50,4 61,35 94,35 67,55 78,88 50,68 22,88 33,55 6,35 39,35" fill="#C9A15A"/></svg>
+      หมอมังคุด
+    </div>
+    <div class="nav-links">
+      <a href="#how">วิธีใช้งาน</a>
+      <a href="#database">ฐานข้อมูล</a>
+      <button class="nav-cta" onclick="scrollToScanner()">เริ่มสแกน</button>
+    </div>
+  </div>
+</nav>
+
 <div class="wrap">
 
-  <header>
-    <div class="eyebrow">สแกนแบบเรียลไทม์</div>
-    <h1>หมอมังคุด</h1>
-    <p class="sub">ส่องกล้องไปที่ผล ใบ ดอก หรือลำต้นมังคุด<br>ให้ AI ช่วยวินิจฉัยโรคและแนะนำวิธีรักษา</p>
-  </header>
-
-  <div class="segments" id="part-selector">
-    <div class="segment active" data-part="ผล">🟣 ผล</div>
-    <div class="segment" data-part="ใบ">🍃 ใบ</div>
-    <div class="segment" data-part="ดอก">🌸 ดอก</div>
-    <div class="segment" data-part="ลำต้น/กิ่ง">🌳 ลำต้น/กิ่ง</div>
-  </div>
-
-  <div class="viewfinder-stage">
-    <div class="pulse-ring" id="pulse-ring"></div>
-    <div class="calyx-frame" id="calyx-frame">
-      <svg viewBox="0 0 280 280" xmlns="http://www.w3.org/2000/svg">
-        <g fill="none" stroke="#7A9A63" stroke-width="2.5" opacity="0.85">
-          <path id="calyx-path" d=""/>
+  <div class="hero">
+    <div class="eyebrow">AI Vision · วินิจฉัยโรคพืชเรียลไทม์</div>
+    <h1>ตรวจโรคมังคุด<br>ได้ใน<span class="accent">ไม่กี่วินาที</span></h1>
+    <p class="sub">ส่องกล้องไปที่ผล ใบ ดอก หรือลำต้น ให้ AI ช่วยวิเคราะห์อาการ เทียบกับฐานข้อมูลโรคและศัตรูพืชของกรมวิชาการเกษตร พร้อมวิธีรักษาที่ใช้ได้จริง</p>
+    <div class="trust-row">
+      <span class="trust-badge">📚 อ้างอิงกรมวิชาการเกษตร</span>
+      <span class="trust-badge">🆓 ใช้งานฟรี</span>
+      <span class="trust-badge">🔒 ไม่เก็บภาพของคุณ</span>
+    </div>
+    <div class="hero-cta-row">
+      <button class="primary-cta" onclick="scrollToScanner()">📷 เริ่มสแกนตอนนี้</button>
+      <a class="secondary-cta" href="#how">ดูวิธีใช้งาน ↓</a>
+    </div>
+    <div class="hero-visual">
+      <svg viewBox="0 0 200 200">
+        <circle cx="100" cy="100" r="72" fill="#6B2050" opacity="0.9"/>
+        <circle cx="100" cy="100" r="72" fill="none" stroke="#C9A15A" stroke-width="2"/>
+        <g fill="none" stroke="#7A9A63" stroke-width="3">
+          <path d="M100,28 L112,55 L142,55 L118,72 L128,100 L100,82 L72,100 L82,72 L58,55 L88,55 Z"/>
         </g>
+        <circle cx="100" cy="100" r="8" fill="#7A9A63"/>
       </svg>
     </div>
-    <div class="lens">
-      <video id="video" autoplay playsinline muted></video>
-      <img id="captured-img" alt="ภาพที่ถ่าย">
-      <div class="lens-placeholder" id="lens-placeholder">กำลังขอเข้าถึงกล้อง…</div>
+  </div>
+
+  <div class="stats reveal">
+    <div class="stat-card">
+      <div class="stat-num">3+</div>
+      <div class="stat-label">โรค/ศัตรูพืชในฐานข้อมูล<br>(เพิ่มเรื่อยๆ)</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">4</div>
+      <div class="stat-label">ส่วนของต้นที่ตรวจได้<br>ผล · ใบ · ดอก · ลำต้น</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">~10<span style="font-size:16px;">วิ</span></div>
+      <div class="stat-label">เวลาเฉลี่ยในการ<br>วิเคราะห์ผล</div>
     </div>
   </div>
 
-  <div class="controls">
-    <div class="btn-row" id="pre-capture-controls">
-      <button class="action" id="capture-btn" disabled>📸 ถ่ายภาพวินิจฉัย</button>
-      <button class="ghost" id="switch-cam-btn">🔄 สลับกล้อง</button>
+  <section id="how">
+    <div class="section-eyebrow reveal">วิธีใช้งาน</div>
+    <h2 class="reveal">ง่ายแค่ 3 ขั้นตอน</h2>
+    <p class="section-sub reveal">ไม่ต้องติดตั้งแอป ไม่ต้องสมัครสมาชิก ใช้งานผ่านเบราว์เซอร์ได้ทันที</p>
+    <div class="steps">
+      <div class="step-card reveal">
+        <div class="step-num">1</div>
+        <div>
+          <div class="step-title">เลือกส่วนของต้นที่จะตรวจ</div>
+          <div class="step-desc">เลือกว่าจะถ่ายภาพผล ใบ ดอก หรือลำต้น/กิ่ง เพื่อให้ AI วิเคราะห์ได้ตรงจุด</div>
+        </div>
+      </div>
+      <div class="step-card reveal">
+        <div class="step-num">2</div>
+        <div>
+          <div class="step-title">ถ่ายภาพให้เห็นรอยผิดปกติชัด</div>
+          <div class="step-desc">อนุญาตให้เว็บเข้าถึงกล้อง แล้วส่องไปที่บริเวณที่สงสัยในที่แสงสว่างเพียงพอ</div>
+        </div>
+      </div>
+      <div class="step-card reveal">
+        <div class="step-num">3</div>
+        <div>
+          <div class="step-title">รับผลวินิจฉัยและวิธีรักษา</div>
+          <div class="step-desc">ระบบเทียบภาพกับฐานข้อมูลโรค แจ้งชื่อโรค สาเหตุ และวิธีป้องกันกำจัดพร้อมอัตราสารเคมีที่แนะนำ</div>
+        </div>
+      </div>
     </div>
-    <p class="hint">เคล็ดลับ: ถ่ายให้เห็นรอยผิดปกติชัดๆ ในที่แสงสว่างเพียงพอ จะช่วยให้วินิจฉัยแม่นยำขึ้น</p>
-  </div>
+  </section>
 
-  <div class="loading-wrap" id="loading-wrap">
-    <div class="spinner"></div>
-    <div class="loading-text" id="loading-text">กำลังวิเคราะห์ภาพ…</div>
-  </div>
+  <section id="database">
+    <div class="section-eyebrow reveal">ฐานข้อมูลอ้างอิง</div>
+    <h2 class="reveal">ครอบคลุมโรคและศัตรูพืชสำคัญ</h2>
+    <p class="section-sub reveal">ระบบจะตอบเฉพาะสิ่งที่มีอยู่ในฐานข้อมูลจริงเท่านั้น หากไม่ตรงกับรายการใด จะแจ้งตรงๆ ว่า "ไม่พบข้อมูล" แทนการเดา</p>
+    <div class="db-grid reveal">
+      <div class="db-card">
+        <span class="db-icon">🍂</span>
+        <div class="db-name">ใบจุดมังคุด</div>
+        <div class="db-type">โรคพืช · เชื้อรา</div>
+      </div>
+      <div class="db-card">
+        <span class="db-icon">🐛</span>
+        <div class="db-name">เพลี้ยไฟ</div>
+        <div class="db-type">แมลงศัตรูพืช</div>
+      </div>
+      <div class="db-card">
+        <span class="db-icon">🐛</span>
+        <div class="db-name">หนอนกินใบอ่อน</div>
+        <div class="db-type">แมลงศัตรูพืช</div>
+      </div>
+      <div class="db-more">+ กำลังเพิ่มข้อมูล<br>โรคอื่นๆ อย่างต่อเนื่อง</div>
+    </div>
+    <div class="source-cite reveal">
+      แหล่งอ้างอิง: กรมวิชาการเกษตร (2557) เอกสารวิชาการโรคมังคุด · กรมวิชาการเกษตร (2563) การจัดการศัตรูมังคุดเพื่อการส่งออก
+    </div>
+  </section>
 
-  <div id="result">
-    <div class="card" id="card-content"></div>
-    <button class="rescan-btn" id="rescan-btn">↺ สแกนใหม่</button>
-  </div>
+  <section id="scanner-section">
+    <div class="section-eyebrow">ทดลองใช้งาน</div>
+    <h2 style="margin-bottom:6px;">สแกนมังคุดของคุณ</h2>
+    <p class="section-sub" style="margin:0 auto 28px;">เลือกส่วนที่ต้องการตรวจ แล้วอนุญาตให้ใช้กล้องเพื่อเริ่มวินิจฉัย</p>
 
-  <footer>ผลวินิจฉัยจาก AI เป็นเพียงข้อมูลเบื้องต้น หากอาการรุนแรงควรปรึกษาเจ้าหน้าที่เกษตรในพื้นที่</footer>
+    <div id="permission-gate">
+      <div class="permission-icon">📷</div>
+      <div class="permission-title">ขออนุญาตใช้กล้อง</div>
+      <p class="permission-desc">เว็บนี้ต้องเข้าถึงกล้องของคุณเพื่อถ่ายภาพมังคุดสำหรับวิเคราะห์ ภาพจะถูกส่งไปวิเคราะห์เท่านั้น ไม่มีการบันทึกหรือเก็บไว้ที่อื่น</p>
+      <button class="action" id="request-camera-btn">✅ อนุญาตให้ใช้กล้อง</button>
+      <p class="permission-denied" id="permission-denied-msg">ไม่สามารถเข้าถึงกล้องได้ กรุณาอนุญาตการใช้กล้องในเบราว์เซอร์ของคุณ แล้วลองใหม่อีกครั้ง</p>
+    </div>
+
+    <div id="scanner-ui" style="display:none;">
+      <div class="segments" id="part-selector">
+        <div class="segment active" data-part="ผล">🟣 ผล</div>
+        <div class="segment" data-part="ใบ">🍃 ใบ</div>
+        <div class="segment" data-part="ดอก">🌸 ดอก</div>
+        <div class="segment" data-part="ลำต้น/กิ่ง">🌳 ลำต้น/กิ่ง</div>
+      </div>
+
+      <div class="viewfinder-stage">
+        <div class="pulse-ring" id="pulse-ring"></div>
+        <div class="calyx-frame" id="calyx-frame">
+          <svg viewBox="0 0 280 280" xmlns="http://www.w3.org/2000/svg">
+            <g fill="none" stroke="#7A9A63" stroke-width="2.5" opacity="0.85">
+              <path id="calyx-path" d=""/>
+            </g>
+          </svg>
+        </div>
+        <div class="lens">
+          <video id="video" autoplay playsinline muted></video>
+          <img id="captured-img" alt="ภาพที่ถ่าย">
+        </div>
+      </div>
+
+      <div class="controls">
+        <div class="btn-row" id="pre-capture-controls">
+          <button class="action" id="capture-btn">📸 ถ่ายภาพวินิจฉัย</button>
+          <button class="ghost" id="switch-cam-btn">🔄 สลับกล้อง</button>
+        </div>
+        <p class="hint">เคล็ดลับ: ถ่ายให้เห็นรอยผิดปกติชัดๆ ในที่แสงสว่างเพียงพอ จะช่วยให้วินิจฉัยแม่นยำขึ้น</p>
+      </div>
+
+      <div class="loading-wrap" id="loading-wrap">
+        <div class="spinner"></div>
+        <div class="loading-text" id="loading-text">กำลังวิเคราะห์ภาพ…</div>
+      </div>
+
+      <div id="result">
+        <div class="card" id="card-content"></div>
+        <button class="rescan-btn" id="rescan-btn">↺ สแกนใหม่</button>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    ผลวินิจฉัยจาก AI เป็นเพียงข้อมูลเบื้องต้นจากฐานข้อมูลที่มีอยู่ หากอาการรุนแรงหรือไม่แน่ใจ ควรปรึกษาเจ้าหน้าที่เกษตรในพื้นที่<br>
+    © หมอมังคุด — เครื่องมือช่วยวินิจฉัยเบื้องต้น ไม่ใช่คำแนะนำทางการเกษตรอย่างเป็นทางการ
+  </footer>
 </div>
 
 <script>
-/* ---------- Calyx star path (mangosteen calyx signature shape) ---------- */
+const revealEls = document.querySelectorAll('.reveal');
+const io = new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } });
+},{threshold:.15});
+revealEls.forEach(el=>io.observe(el));
+
+function scrollToScanner(){
+  document.getElementById('scanner-section').scrollIntoView({behavior:'smooth', block:'start'});
+}
+
 (function drawCalyx(){
   const cx=140, cy=140, points=6, outerR=138, innerR=112;
   let d="";
@@ -280,10 +423,10 @@
     d += (i===0?"M":"L") + x.toFixed(1) + "," + y.toFixed(1) + " ";
   }
   d += "Z";
-  document.getElementById('calyx-path').setAttribute('d', d);
+  const p = document.getElementById('calyx-path');
+  if(p) p.setAttribute('d', d);
 })();
 
-/* ---------- Disease/pest database (grows as more data arrives) ---------- */
 const DISEASE_DB = `
 [ฐานข้อมูลโรคและศัตรูมังคุด — ใช้จับคู่กับภาพที่วิเคราะห์เท่านั้น ห้ามเดาโรคที่ไม่อยู่ในฐานข้อมูลนี้]
 
@@ -330,10 +473,8 @@ const DISEASE_DB = `
    หมายเหตุสำคัญ: ⚠️ ข้อมูลวิธีการควบคุม/สารเคมีกำจัดยังไม่สมบูรณ์ในฐานข้อมูลนี้ — หากภาพตรงกับอาการนี้ ให้แจ้งอาการและผลกระทบตามข้อมูลข้างต้น แต่ระบุชัดเจนว่ายังไม่มีคำแนะนำวิธีรักษาที่สมบูรณ์ แนะนำให้ปรึกษาเจ้าหน้าที่เกษตรในพื้นที่เพิ่มเติม
 `;
 
-/* ---------- Camera handling ---------- */
 const video = document.getElementById('video');
 const capturedImg = document.getElementById('captured-img');
-const lensPlaceholder = document.getElementById('lens-placeholder');
 const captureBtn = document.getElementById('capture-btn');
 const switchCamBtn = document.getElementById('switch-cam-btn');
 const pulseRing = document.getElementById('pulse-ring');
@@ -343,6 +484,10 @@ const resultEl = document.getElementById('result');
 const cardContent = document.getElementById('card-content');
 const rescanBtn = document.getElementById('rescan-btn');
 const preCaptureControls = document.getElementById('pre-capture-controls');
+const permissionGate = document.getElementById('permission-gate');
+const scannerUI = document.getElementById('scanner-ui');
+const requestCameraBtn = document.getElementById('request-camera-btn');
+const permissionDeniedMsg = document.getElementById('permission-denied-msg');
 
 let currentStream = null;
 let facingMode = 'environment';
@@ -358,41 +503,44 @@ document.querySelectorAll('.segment').forEach(seg=>{
 
 async function startCamera(){
   try{
-    if(currentStream){
-      currentStream.getTracks().forEach(t=>t.stop());
-    }
-    lensPlaceholder.textContent = 'กำลังขอเข้าถึงกล้อง…';
-    lensPlaceholder.style.display = 'flex';
+    if(currentStream){ currentStream.getTracks().forEach(t=>t.stop()); }
     const stream = await navigator.mediaDevices.getUserMedia({
       video:{ facingMode, width:{ideal:720}, height:{ideal:720} },
       audio:false
     });
     currentStream = stream;
     video.srcObject = stream;
-    video.style.display = 'block';
-    capturedImg.style.display = 'none';
-    lensPlaceholder.style.display = 'none';
-    captureBtn.disabled = false;
-    pulseRing.classList.add('active');
+    return true;
   }catch(err){
-    lensPlaceholder.style.display = 'flex';
-    lensPlaceholder.textContent = 'ไม่สามารถเข้าถึงกล้องได้ — กรุณาอนุญาตการใช้กล้องในเบราว์เซอร์';
-    captureBtn.disabled = true;
     console.error(err);
+    return false;
   }
 }
-startCamera();
 
-switchCamBtn.addEventListener('click', ()=>{
+requestCameraBtn.addEventListener('click', async ()=>{
+  requestCameraBtn.textContent = 'กำลังขอสิทธิ์…';
+  requestCameraBtn.disabled = true;
+  const ok = await startCamera();
+  if(ok){
+    permissionGate.style.display = 'none';
+    scannerUI.style.display = 'block';
+    pulseRing.classList.add('active');
+  }else{
+    permissionDeniedMsg.classList.add('show');
+    requestCameraBtn.textContent = '✅ อนุญาตให้ใช้กล้อง';
+    requestCameraBtn.disabled = false;
+  }
+});
+
+switchCamBtn.addEventListener('click', async ()=>{
   facingMode = facingMode === 'environment' ? 'user' : 'environment';
-  startCamera();
+  await startCamera();
 });
 
 function captureFrame(){
   const canvas = document.createElement('canvas');
   const size = 640;
-  canvas.width = size;
-  canvas.height = size;
+  canvas.width = size; canvas.height = size;
   const ctx = canvas.getContext('2d');
   const vw = video.videoWidth, vh = video.videoHeight;
   const minDim = Math.min(vw, vh);
@@ -413,10 +561,7 @@ captureBtn.addEventListener('click', async ()=>{
 
   const loadingMsgs = ['กำลังส่องดูรอยแผล…','เทียบกับฐานข้อมูลโรค…','กำลังสรุปผลวินิจฉัย…'];
   let mi = 0;
-  const msgInterval = setInterval(()=>{
-    mi = (mi+1) % loadingMsgs.length;
-    loadingText.textContent = loadingMsgs[mi];
-  }, 1400);
+  const msgInterval = setInterval(()=>{ mi=(mi+1)%loadingMsgs.length; loadingText.textContent = loadingMsgs[mi]; }, 1400);
   loadingText.textContent = loadingMsgs[0];
 
   try{
@@ -482,9 +627,7 @@ ${DISEASE_DB}
 function confidenceDots(n){
   n = Math.max(1, Math.min(6, n||3));
   let html = '<div class="seg-dots">';
-  for(let i=1;i<=6;i++){
-    html += `<div class="seg-dot ${i<=n?'on':''}"></div>`;
-  }
+  for(let i=1;i<=6;i++){ html += `<div class="seg-dot ${i<=n?'on':''}"></div>`; }
   html += '</div>';
   return html;
 }
@@ -519,21 +662,16 @@ function renderResult(r){
         ${confidenceDots(r.confidence)}
         <span class="conf-label">${r.type || ''}</span>
       </div>
-
       <div class="section-label">อาการที่พบ</div>
       <p class="body-text">${r.symptoms_matched || '-'}</p>
-
       ${r.cause ? `<div class="section-label">สาเหตุ</div><p class="body-text">${r.cause}</p>` : ''}
-
       <div class="section-label">วิธีป้องกันกำจัด</div>
       <p class="body-text">${r.treatment_summary || '-'}</p>
-
       ${(r.chemical_options && r.chemical_options.length) ? `
         <table class="dose-table">
           ${r.chemical_options.map(c=>`<tr><td>${c.name}</td><td>${c.dose}</td></tr>`).join('')}
         </table>
       ` : ''}
-
       ${r.incomplete_warning ? `<div class="source-note" style="color:var(--alert); border-color:var(--alert);">⚠️ ${r.incomplete_warning}</div>` : ''}
       ${r.note ? `<div class="source-note">${r.note}</div>` : ''}
     `;
