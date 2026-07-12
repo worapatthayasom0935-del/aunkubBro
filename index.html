@@ -3,182 +3,214 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>มังคุดสแกน — ตรวจโรคมังคุดด้วยกล้อง</title>
+<title>หมอมังคุด — สแกนโรคมังคุด</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Thai:wght@500;600;700&family=Noto+Sans+Thai:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Thai:wght@400;600;700&family=Noto+Sans+Thai:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root{
-    --rind: #5B1A40;
-    --rind-deep: #34102A;
-    --leaf: #2F5233;
-    --calyx: #7A9B57;
-    --flesh: #FBF3EC;
-    --flesh-dim: #F0E4DA;
-    --gold: #B9791A;
-    --ink: #241019;
-    --line: rgba(36,16,25,0.14);
+    --bg-deep:#2A1230;
+    --bg-deep2:#1C0C22;
+    --rind:#6B2050;
+    --rind-light:#9A3B72;
+    --rind-glow:#C24B86;
+    --flesh:#FDF8F3;
+    --flesh-dim:#F1E8DE;
+    --leaf:#4A6B3D;
+    --leaf-dark:#2F4527;
+    --leaf-light:#7A9A63;
+    --alert:#C1502E;
+    --alert-dim:#F3DCD2;
+    --gold:#C9A15A;
+    --ink:#2A1230;
+    --font-display:'Noto Serif Thai',serif;
+    --font-body:'Noto Sans Thai',sans-serif;
+    --font-mono:'IBM Plex Mono',monospace;
   }
-  *{box-sizing:border-box;}
-  html,body{margin:0;padding:0;}
+  *{box-sizing:border-box; margin:0; padding:0;}
   body{
-    background: var(--flesh);
-    color: var(--ink);
-    font-family:'Noto Sans Thai', sans-serif;
+    font-family:var(--font-body);
+    background:
+      radial-gradient(ellipse at 20% -10%, #4A1F45 0%, transparent 55%),
+      radial-gradient(ellipse at 100% 10%, #3A1638 0%, transparent 50%),
+      linear-gradient(180deg,var(--bg-deep) 0%,var(--bg-deep2) 100%);
+    color:var(--flesh);
     min-height:100vh;
-    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
   }
-  .wrap{ max-width:640px; margin:0 auto; padding:28px 20px 60px; }
+  .wrap{max-width:640px; margin:0 auto; padding:28px 20px 80px;}
 
-  header{ margin-bottom:22px; }
+  /* Header */
+  header{text-align:center; margin-bottom:22px;}
   .eyebrow{
-    font-family:'IBM Plex Mono', monospace;
-    font-size:11px; letter-spacing:.14em; text-transform:uppercase;
-    color: var(--leaf); display:flex; align-items:center; gap:8px; margin-bottom:10px;
+    font-family:var(--font-mono); font-size:11px; letter-spacing:.18em;
+    color:var(--rind-glow); text-transform:uppercase; margin-bottom:10px;
+    display:flex; align-items:center; justify-content:center; gap:8px;
   }
-  .eyebrow::before{ content:""; width:7px; height:7px; border-radius:50%; background:var(--calyx); display:inline-block; }
+  .eyebrow::before,.eyebrow::after{content:""; width:22px; height:1px; background:var(--rind-glow); opacity:.5;}
   h1{
-    font-family:'Noto Serif Thai', serif; font-weight:700;
-    font-size:clamp(28px,6vw,38px); line-height:1.15; margin:0 0 8px;
-    color: var(--rind-deep);
+    font-family:var(--font-display); font-weight:700; font-size:34px;
+    letter-spacing:.01em; color:var(--flesh);
+    text-shadow:0 2px 24px rgba(194,75,134,.35);
   }
-  .sub{ font-size:14.5px; color:#5b4552; max-width:46ch; line-height:1.6; }
+  .sub{color:var(--flesh-dim); opacity:.75; font-size:14.5px; margin-top:8px; line-height:1.6;}
 
-  /* Viewfinder */
-  .stage{
-    position:relative; border-radius:22px; overflow:hidden;
-    background: var(--rind-deep);
-    aspect-ratio: 4/5; width:100%;
-    box-shadow: 0 18px 40px -18px rgba(52,16,42,0.55);
+  /* Part selector — segments like mangosteen flesh wedges */
+  .segments{
+    display:flex; gap:8px; justify-content:center; margin:24px 0 20px; flex-wrap:wrap;
   }
-  video, .stage img.shot{
-    position:absolute; inset:0; width:100%; height:100%; object-fit:cover;
-    display:block;
+  .segment{
+    font-family:var(--font-body); font-weight:600; font-size:13.5px;
+    padding:9px 16px; border-radius:999px;
+    background:rgba(255,255,255,.06); color:var(--flesh-dim);
+    border:1px solid rgba(255,255,255,.12); cursor:pointer;
+    transition:all .25s ease;
   }
-  .stage-empty{
+  .segment.active{
+    background:linear-gradient(135deg,var(--rind-light),var(--rind));
+    color:#fff; border-color:transparent;
+    box-shadow:0 4px 18px rgba(154,59,114,.45);
+  }
+  .segment:hover:not(.active){background:rgba(255,255,255,.1);}
+
+  /* Calyx viewfinder — signature element */
+  .viewfinder-stage{
+    position:relative; width:280px; height:280px; margin:0 auto 22px;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .calyx-frame{
+    position:absolute; inset:0;
+    filter:drop-shadow(0 8px 30px rgba(194,75,134,.4));
+  }
+  .calyx-frame svg{width:100%; height:100%;}
+  .lens{
+    position:relative; width:200px; height:200px; border-radius:50%;
+    overflow:hidden; background:#100515;
+    border:3px solid var(--gold);
+    box-shadow:inset 0 0 40px rgba(0,0,0,.6), 0 0 0 6px rgba(201,161,90,.12);
+  }
+  #video, #captured-img{
+    width:100%; height:100%; object-fit:cover; display:block;
+  }
+  #captured-img{display:none;}
+  .lens-placeholder{
     position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
-    flex-direction:column; gap:10px; color:rgba(251,243,236,0.65); text-align:center; padding:24px;
+    flex-direction:column; gap:8px; color:var(--flesh-dim); opacity:.6; text-align:center;
+    font-size:12px; padding:20px;
   }
-  .stage-empty svg{ opacity:.8; }
-  .stage-empty p{ font-size:13.5px; max-width:26ch; margin:0; }
-
-  /* calyx-petal corner brackets — signature element */
-  .petal{
-    position:absolute; width:34px; height:34px; z-index:3; pointer-events:none;
-    filter: drop-shadow(0 1px 2px rgba(0,0,0,0.35));
+  .pulse-ring{
+    position:absolute; inset:-6px; border-radius:50%;
+    border:2px solid var(--rind-glow); opacity:0; pointer-events:none;
   }
-  .petal.tl{ top:14px; left:14px; }
-  .petal.tr{ top:14px; right:14px; transform:scaleX(-1); }
-  .petal.bl{ bottom:14px; left:14px; transform:scaleY(-1); }
-  .petal.br{ bottom:14px; right:14px; transform:scale(-1,-1); }
-
-  .scan-sweep{
-    position:absolute; inset:0; z-index:2; pointer-events:none; opacity:0;
-  }
-  .scan-sweep.active{
-    opacity:1;
-    background: linear-gradient(180deg, transparent 0%, rgba(251,243,236,0.28) 48%, transparent 100%);
-    background-size: 100% 260%;
-    animation: sweep 1.6s ease-in-out infinite;
-  }
-  @keyframes sweep{
-    0%{ background-position: 0 -100%; }
-    100%{ background-position: 0 160%; }
+  .pulse-ring.active{animation:pulse 1.6s ease-out infinite;}
+  @keyframes pulse{
+    0%{transform:scale(1); opacity:.7;}
+    100%{transform:scale(1.35); opacity:0;}
   }
 
-  .stage-status{
-    position:absolute; left:14px; bottom:14px; z-index:3;
-    font-family:'IBM Plex Mono', monospace; font-size:11px; letter-spacing:.06em;
-    color: var(--flesh); background: rgba(52,16,42,0.55); backdrop-filter: blur(3px);
-    padding:5px 10px; border-radius:20px; display:flex; align-items:center; gap:6px;
+  .controls{display:flex; flex-direction:column; align-items:center; gap:12px;}
+  .btn-row{display:flex; gap:10px; justify-content:center;}
+  button.action{
+    font-family:var(--font-body); font-weight:700; font-size:15px;
+    padding:13px 28px; border-radius:999px; border:none; cursor:pointer;
+    background:linear-gradient(135deg,var(--rind-light),var(--rind));
+    color:#fff; box-shadow:0 6px 20px rgba(154,59,114,.4);
+    transition:transform .15s ease, box-shadow .15s ease;
   }
-  .stage-status .dot{ width:6px; height:6px; border-radius:50%; background:#e0a94a; }
-  .stage-status.live .dot{ background:#8fd39a; }
+  button.action:active{transform:scale(.96);}
+  button.action:disabled{opacity:.5; cursor:not-allowed;}
+  button.ghost{
+    font-family:var(--font-body); font-weight:600; font-size:14px;
+    padding:12px 22px; border-radius:999px; cursor:pointer;
+    background:rgba(255,255,255,.06); color:var(--flesh-dim);
+    border:1px solid rgba(255,255,255,.15);
+  }
+  .hint{font-size:12.5px; color:var(--flesh-dim); opacity:.55; text-align:center; max-width:340px;}
 
-  /* controls */
-  .controls{ display:flex; gap:10px; margin-top:16px; }
-  button{
-    font-family:'Noto Sans Thai', sans-serif; font-weight:600; font-size:14.5px;
-    border-radius:12px; border:none; cursor:pointer; padding:14px 18px;
-    transition: transform .12s ease, box-shadow .12s ease, opacity .15s ease;
+  /* Loading */
+  .loading-wrap{display:none; flex-direction:column; align-items:center; gap:14px; margin-top:20px;}
+  .loading-wrap.active{display:flex;}
+  .loading-text{font-family:var(--font-mono); font-size:12.5px; color:var(--gold); letter-spacing:.05em;}
+  .spinner{
+    width:34px; height:34px; border-radius:50%;
+    border:3px solid rgba(201,161,90,.2); border-top-color:var(--gold);
+    animation:spin 1s linear infinite;
   }
-  button:active{ transform: scale(0.97); }
-  button:disabled{ opacity:.45; cursor:not-allowed; }
-  .btn-primary{
-    flex:1; background: var(--rind); color: var(--flesh);
-    box-shadow: 0 10px 22px -10px rgba(91,26,64,0.65);
-  }
-  .btn-primary:hover:not(:disabled){ background: var(--rind-deep); }
-  .btn-ghost{
-    background: transparent; color: var(--rind); border:1.5px solid var(--line);
-  }
-  .btn-ghost:hover{ border-color: var(--rind); }
+  @keyframes spin{to{transform:rotate(360deg);}}
 
-  .hint{ font-size:12.5px; color:#8a7580; margin-top:10px; line-height:1.5; }
-
-  /* result panel */
-  .result{
-    margin-top:26px; border-top:1px solid var(--line); padding-top:22px;
-    display:none;
+  /* Result card */
+  #result{
+    margin-top:28px; opacity:0; transform:translateY(24px) scale(.98);
+    transition:all .6s cubic-bezier(.2,.8,.2,1); pointer-events:none;
   }
-  .result.show{ display:block; animation: rise .4s ease both; }
-  @keyframes rise{ from{ opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);} }
+  #result.show{opacity:1; transform:translateY(0) scale(1); pointer-events:auto;}
+  .card{
+    background:linear-gradient(180deg,var(--flesh) 0%, var(--flesh-dim) 100%);
+    color:var(--ink); border-radius:22px; padding:26px 24px;
+    box-shadow:0 20px 60px rgba(0,0,0,.4);
+    position:relative; overflow:hidden;
+  }
+  .card::before{
+    content:""; position:absolute; top:0; left:0; right:0; height:6px;
+    background:linear-gradient(90deg,var(--leaf),var(--rind),var(--gold));
+  }
+  .result-header{display:flex; align-items:flex-start; justify-content:space-between; gap:12px; margin-bottom:6px;}
+  .part-tag{
+    font-family:var(--font-mono); font-size:10.5px; letter-spacing:.1em;
+    text-transform:uppercase; color:var(--rind); opacity:.7;
+  }
+  .status-pill{
+    font-family:var(--font-mono); font-size:11px; font-weight:600;
+    padding:4px 11px; border-radius:999px; white-space:nowrap;
+  }
+  .status-pill.found{background:var(--alert-dim); color:var(--alert);}
+  .status-pill.healthy{background:#DCEBD3; color:var(--leaf-dark);}
+  .status-pill.unknown{background:#EDE6DA; color:#8B7355;}
 
-  .result-head{ display:flex; align-items:flex-start; justify-content:space-between; gap:14px; margin-bottom:14px; }
   .disease-name{
-    font-family:'Noto Serif Thai', serif; font-weight:700; font-size:21px; color:var(--rind-deep);
-    line-height:1.3;
+    font-family:var(--font-display); font-weight:700; font-size:24px;
+    margin:6px 0 2px; color:var(--ink);
   }
-  .disease-latin{ font-family:'IBM Plex Mono', monospace; font-size:12px; color:#8a7580; margin-top:3px; }
-  .badge{
-    font-family:'IBM Plex Mono', monospace; font-size:11px; letter-spacing:.05em;
-    padding:6px 11px; border-radius:20px; white-space:nowrap; font-weight:500;
-  }
-  .badge.high{ background:#f4dcdc; color:#8a2b2b; }
-  .badge.med{ background:#f7e6c9; color:#8a5a10; }
-  .badge.low{ background:#e1ecdc; color:#3a5a2e; }
-  .badge.none{ background:#e6e0e3; color:#5b4552; }
+  .disease-en{font-size:13px; color:#8a7a86; font-style:italic; margin-bottom:14px;}
 
-  .block{ margin-bottom:18px; }
-  .block h3{
-    font-size:12px; text-transform:uppercase; letter-spacing:.1em; color:var(--leaf);
-    font-family:'IBM Plex Mono', monospace; margin:0 0 8px; font-weight:500;
+  .section-label{
+    font-family:var(--font-mono); font-size:11px; letter-spacing:.1em; text-transform:uppercase;
+    color:var(--rind); margin:16px 0 6px; display:flex; align-items:center; gap:6px;
   }
-  .block p{ margin:0; font-size:14.5px; line-height:1.7; color:#3a2a33; }
-  ol.steps{ margin:0; padding-left:20px; }
-  ol.steps li{ font-size:14.5px; line-height:1.75; color:#3a2a33; margin-bottom:6px; }
+  .section-label::before{content:""; width:5px; height:5px; border-radius:50%; background:var(--rind);}
+  .body-text{font-size:14.5px; line-height:1.75; color:#3a2a38;}
 
-  .med-box{
-    background: var(--flesh-dim); border-radius:12px; padding:14px 16px;
-    font-family:'IBM Plex Mono', monospace; font-size:13px; line-height:1.8; color:var(--rind-deep);
-    border-left:3px solid var(--gold);
-  }
-  .duration-row{ display:flex; gap:20px; }
-  .duration-row .item{ flex:1; }
-  .duration-row .num{ font-family:'IBM Plex Mono', monospace; font-size:22px; font-weight:500; color:var(--rind); }
-  .duration-row .lbl{ font-size:12px; color:#8a7580; margin-top:2px; }
+  .dose-table{width:100%; border-collapse:collapse; margin-top:6px; font-size:13.5px;}
+  .dose-table td{padding:9px 0; border-bottom:1px solid rgba(0,0,0,.08); vertical-align:top;}
+  .dose-table td:first-child{color:var(--leaf-dark); font-weight:600; width:42%; padding-right:10px;}
+  .dose-table td:last-child{font-family:var(--font-mono); font-size:12.5px; color:#3a2a38;}
 
-  .err{
-    margin-top:18px; padding:14px 16px; border-radius:12px; background:#f4dcdc; color:#7a2424;
-    font-size:13.5px; line-height:1.6; display:none;
-  }
-  .err.show{ display:block; }
+  .confidence-wrap{display:flex; align-items:center; gap:10px; margin-top:4px;}
+  .seg-dots{display:flex; gap:4px;}
+  .seg-dot{width:9px; height:9px; border-radius:2px; background:rgba(0,0,0,.1); transform:rotate(45deg);}
+  .seg-dot.on{background:var(--rind);}
+  .conf-label{font-family:var(--font-mono); font-size:11.5px; color:#8a7a86;}
 
-  /* db reference footer */
-  .db-ref{ margin-top:34px; border-top:1px solid var(--line); padding-top:18px; }
-  .db-ref h4{
-    font-family:'IBM Plex Mono', monospace; font-size:11px; text-transform:uppercase;
-    letter-spacing:.1em; color:#8a7580; margin:0 0 10px; font-weight:500;
+  .source-note{
+    margin-top:18px; padding-top:14px; border-top:1px dashed rgba(0,0,0,.12);
+    font-size:11.5px; color:#a0909c; line-height:1.6;
   }
-  .db-list{ display:flex; flex-direction:column; gap:6px; }
-  .db-item{
-    font-size:13px; color:#5b4552; display:flex; align-items:baseline; gap:8px;
-  }
-  .db-item::before{ content:"·"; color:var(--calyx); font-weight:700; }
 
-  select{
-    font-family:'Noto Sans Thai', sans-serif; font-size:13px; padding:8px 10px;
-    border-radius:10px; border:1.5px solid var(--line); background:var(--flesh);
-    color:var(--ink);
+  .rescan-btn{
+    display:block; margin:18px auto 0; font-family:var(--font-body); font-weight:700;
+    font-size:14px; padding:11px 24px; border-radius:999px; border:none;
+    background:var(--ink); color:var(--flesh); cursor:pointer;
+  }
+
+  footer{text-align:center; margin-top:36px; font-size:11.5px; color:var(--flesh-dim); opacity:.4;}
+
+  @media (max-width:420px){
+    h1{font-size:27px;}
+    .viewfinder-stage{width:230px; height:230px;}
+    .lens{width:165px; height:165px;}
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:.01ms !important; transition-duration:.01ms !important;}
   }
 </style>
 </head>
@@ -186,232 +218,233 @@
 <div class="wrap">
 
   <header>
-    <div class="eyebrow">มังคุดสแกน</div>
-    <h1>ส่องกล้องดูใบ ลำต้น หรือผล<br>แล้วให้ระบบช่วยวินิจฉัยโรค</h1>
-    <p class="sub">ถ่ายภาพจากต้นมังคุดของคุณ ระบบจะเทียบกับฐานข้อมูลโรคและแมลงศัตรูมังคุดที่บันทึกไว้ พร้อมแนวทางรักษาและปริมาณยาที่แนะนำ</p>
+    <div class="eyebrow">สแกนแบบเรียลไทม์</div>
+    <h1>หมอมังคุด</h1>
+    <p class="sub">ส่องกล้องไปที่ผล ใบ ดอก หรือลำต้นมังคุด<br>ให้ AI ช่วยวินิจฉัยโรคและแนะนำวิธีรักษา</p>
   </header>
 
-  <div class="stage" id="stage">
-    <video id="video" autoplay playsinline muted style="display:none;"></video>
-    <img id="shot" class="shot" style="display:none;" alt="ภาพที่ถ่าย">
-    <div class="stage-empty" id="stageEmpty">
-      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M4 8a2 2 0 0 1 2-2h1.2a1 1 0 0 0 .87-.5l.86-1.5A1 1 0 0 1 9.8 3.5h4.4a1 1 0 0 1 .87.5l.86 1.5a1 1 0 0 0 .87.5H18a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8z"/><circle cx="12" cy="12.5" r="3.2"/></svg>
-      <p>เปิดกล้องเพื่อเริ่มสแกน — วางใบหรือผลให้อยู่กึ่งกลางเฟรม แสงสว่างพอดี</p>
+  <div class="segments" id="part-selector">
+    <div class="segment active" data-part="ผล">🟣 ผล</div>
+    <div class="segment" data-part="ใบ">🍃 ใบ</div>
+    <div class="segment" data-part="ดอก">🌸 ดอก</div>
+    <div class="segment" data-part="ลำต้น/กิ่ง">🌳 ลำต้น/กิ่ง</div>
+  </div>
+
+  <div class="viewfinder-stage">
+    <div class="pulse-ring" id="pulse-ring"></div>
+    <div class="calyx-frame" id="calyx-frame">
+      <svg viewBox="0 0 280 280" xmlns="http://www.w3.org/2000/svg">
+        <g fill="none" stroke="#7A9A63" stroke-width="2.5" opacity="0.85">
+          <path id="calyx-path" d=""/>
+        </g>
+      </svg>
     </div>
-
-    <svg class="petal tl" viewBox="0 0 34 34"><path d="M2 2 L2 14 M2 2 L14 2 M2 2 Q10 2 10 10 Q10 2 2 2" fill="none" stroke="#FBF3EC" stroke-width="2.4" stroke-linecap="round"/></svg>
-    <svg class="petal tr" viewBox="0 0 34 34"><path d="M2 2 L2 14 M2 2 L14 2 M2 2 Q10 2 10 10 Q10 2 2 2" fill="none" stroke="#FBF3EC" stroke-width="2.4" stroke-linecap="round"/></svg>
-    <svg class="petal bl" viewBox="0 0 34 34"><path d="M2 2 L2 14 M2 2 L14 2 M2 2 Q10 2 10 10 Q10 2 2 2" fill="none" stroke="#FBF3EC" stroke-width="2.4" stroke-linecap="round"/></svg>
-    <svg class="petal br" viewBox="0 0 34 34"><path d="M2 2 L2 14 M2 2 L14 2 M2 2 Q10 2 10 10 Q10 2 2 2" fill="none" stroke="#FBF3EC" stroke-width="2.4" stroke-linecap="round"/></svg>
-
-    <div class="scan-sweep" id="sweep"></div>
-    <div class="stage-status" id="stageStatus"><span class="dot"></span><span id="stageStatusText">กล้องปิดอยู่</span></div>
+    <div class="lens">
+      <video id="video" autoplay playsinline muted></video>
+      <img id="captured-img" alt="ภาพที่ถ่าย">
+      <div class="lens-placeholder" id="lens-placeholder">กำลังขอเข้าถึงกล้อง…</div>
+    </div>
   </div>
 
   <div class="controls">
-    <button class="btn-ghost" id="cameraBtn">เปิดกล้อง</button>
-    <button class="btn-primary" id="captureBtn" disabled>ถ่ายภาพ &amp; วิเคราะห์</button>
-  </div>
-  <div class="controls" id="retakeRow" style="display:none;">
-    <button class="btn-ghost" id="retakeBtn">ถ่ายใหม่</button>
-  </div>
-
-  <p class="hint">ต้องเปิดผ่าน HTTPS หรือ localhost และอนุญาตสิทธิ์กล้องในเบราว์เซอร์ ผลวิเคราะห์เป็นการช่วยประเมินเบื้องต้นเท่านั้น หากอาการรุนแรงควรปรึกษานักวิชาการเกษตรในพื้นที่</p>
-
-  <div class="err" id="errBox"></div>
-
-  <div class="result" id="result">
-    <div class="result-head">
-      <div>
-        <div class="disease-name" id="rName">—</div>
-        <div class="disease-latin" id="rLatin"></div>
-      </div>
-      <div class="badge" id="rBadge">—</div>
+    <div class="btn-row" id="pre-capture-controls">
+      <button class="action" id="capture-btn" disabled>📸 ถ่ายภาพวินิจฉัย</button>
+      <button class="ghost" id="switch-cam-btn">🔄 สลับกล้อง</button>
     </div>
-
-    <div class="block">
-      <h3>อาการที่พบ</h3>
-      <p id="rSymptoms">—</p>
-    </div>
-
-    <div class="block">
-      <h3>แนวทางรักษา</h3>
-      <ol class="steps" id="rSteps"></ol>
-    </div>
-
-    <div class="block">
-      <div class="duration-row">
-        <div class="item">
-          <div class="num" id="rDuration">—</div>
-          <div class="lbl">ระยะเวลาที่คาดว่าจะเห็นผล</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="block">
-      <h3>ยาที่แนะนำ</h3>
-      <div class="med-box" id="rMed">—</div>
-    </div>
+    <p class="hint">เคล็ดลับ: ถ่ายให้เห็นรอยผิดปกติชัดๆ ในที่แสงสว่างเพียงพอ จะช่วยให้วินิจฉัยแม่นยำขึ้น</p>
   </div>
 
-  <div class="db-ref">
-    <h4>ฐานข้อมูลที่ใช้อ้างอิงในระบบ</h4>
-    <div class="db-list" id="dbList"></div>
+  <div class="loading-wrap" id="loading-wrap">
+    <div class="spinner"></div>
+    <div class="loading-text" id="loading-text">กำลังวิเคราะห์ภาพ…</div>
   </div>
 
+  <div id="result">
+    <div class="card" id="card-content"></div>
+    <button class="rescan-btn" id="rescan-btn">↺ สแกนใหม่</button>
+  </div>
+
+  <footer>ผลวินิจฉัยจาก AI เป็นเพียงข้อมูลเบื้องต้น หากอาการรุนแรงควรปรึกษาเจ้าหน้าที่เกษตรในพื้นที่</footer>
 </div>
 
 <script>
-// ---------- disease / pest reference database ----------
-const DB = [
-  {
-    id: "leaf_spot",
-    name: "ใบจุดมังคุด",
-    latin: "สาเหตุจากเชื้อรา Pestalotiopsis flagisettula (Guba) Stay",
-    part: "ใบ กิ่ง และผล",
-    symptoms: "เกิดจุดแผลบนใบ กิ่ง และผล ลุกลามได้ในสภาพอากาศชื้นและฝนตกชุก ใบที่เป็นโรครุนแรงจะร่วงก่อนกำหนด",
-    control: [
-      "ตัดแต่งกิ่งและเก็บทำลายส่วนที่เป็นโรคเพื่อลดแหล่งสะสมเชื้อ (สุขาภิบาลสวน)",
-      "สำรวจแปลงปลูกอย่างสม่ำเสมอเพื่อพบโรคตั้งแต่ระยะเริ่มต้น",
-      "พ่นสารป้องกันกำจัดเชื้อรา คาร์เบนดาซิม 50% WP อัตรา 10–20 กรัม ต่อน้ำ 20 ลิตร หรือ คอปเปอร์ออกซีคลอไรด์ 85% WP อัตรา 30–80 กรัม ต่อน้ำ 20 ลิตร"
-    ],
-    duration: "7–14 วัน",
-    source: "กรมวิชาการเกษตร 2557 (โรคมังคุด), กรมวิชาการเกษตร 2563 (การจัดการศัตรูมังคุดเพื่อการส่งออก)"
-  },
-  {
-    id: "thrips",
-    name: "เพลี้ยไฟ",
-    latin: "Scirtothrips dorsalis Hood",
-    part: "ยอดอ่อน ดอก และผลอ่อน",
-    symptoms: "ยอดแห้ง ดอกร่วง ผิวผลเป็นรอยสีน้ำตาลคล้ายขี้กลากมียางไหล ใบหงิกงอ ระบาดรุนแรงในช่วงอากาศร้อนแห้งแล้งต่อเนื่อง",
-    control: [
-      "สำรวจโดยเคาะยอดอ่อนหรือช่อดอกลงบนกระดาษแข็งสีดำ หากพบเฉลี่ยมากกว่า 1 ตัวต่อยอด หรือเห็นร่องรอยทำลายที่ช่อดอก/ผล ให้เริ่มควบคุม",
-      "ระยะดอกบานและผลอ่อนเป็นช่วงวิกฤต หากพบเพลี้ยไฟบนช่อดอกให้พ่นสารทันที",
-      "หากระบาดไม่รุนแรง ใช้น้ำเปล่าฉีดพ่นแรง ๆ เพื่อเพิ่มความชื้นและล้างตัวเพลี้ยไฟออก",
-      "ใช้การให้น้ำสลับกับการพ่นสารเคมีเพื่อลดการดื้อยา และหมุนเวียนกลุ่มสารออกฤทธิ์",
-      "เลือกพ่นสารชนิดใดชนิดหนึ่งต่อน้ำ 20 ลิตร: อิมิดาโคลพริด 10% SL 10 มล. หรือ อะซีทามิพริด 20% SP 4 กรัม หรือ สปินีโทแรม 12% SC 10 มล. หรือ ฟิโพรนิล 5% SC 10 มล.",
-      "ตรวจติดตามซ้ำหลังพ่นสาร 5–7 วัน และประสานควบคุมพร้อมกับสวนข้างเคียงเพื่อลดการอพยพกลับมาระบาดซ้ำ"
-    ],
-    duration: "5–7 วัน (ตรวจติดตามซ้ำ)",
-    source: "บันทึกจากผู้ใช้งาน"
-  },
-  {
-    id: "leaf_caterpillar",
-    name: "หนอนกินใบอ่อน",
-    latin: "Stictoptera sp.",
-    part: "ใบอ่อน",
-    symptoms: "หนอนตัวยาวประมาณ 2–2.5 ซม. สีเขียวอมเหลืองพรางตัวกับใบอ่อน กัดกินใบอ่อนเวลากลางคืนจนแหว่งเป็นรอยไม่เป็นระเบียบถึงเส้นกลางใบ ลดการสังเคราะห์แสงและการเจริญเติบโต หากระบาดรุนแรงในช่วงใบอ่อนชุดสุดท้ายก่อนออกดอก จะทำให้ยอดไม่พัฒนาเป็นตาดอกทันเวลา (ยอดต้องการความสมบูรณ์อย่างน้อย 9 สัปดาห์) ส่งผลให้ออกดอกและติดผลลดลง",
-    control: [
-      "หมั่นสำรวจร่องรอยการกัดกินใบและปริมาณตัวหนอนอย่างสม่ำเสมอ โดยเฉพาะช่วงใบอ่อนชุดสุดท้ายก่อนออกดอก",
-      "หนอนหลบซ่อนในดินหรือเศษใบใต้ทรงพุ่มเวลากลางวัน ควรตรวจบริเวณดังกล่าวประกอบการสำรวจ"
-    ],
-    duration: "ยังไม่มีข้อมูลระยะเวลาการควบคุม (ข้อมูลด้านการใช้สารยังไม่สมบูรณ์)",
-    source: "บันทึกจากผู้ใช้งาน",
-    incomplete: true
+/* ---------- Calyx star path (mangosteen calyx signature shape) ---------- */
+(function drawCalyx(){
+  const cx=140, cy=140, points=6, outerR=138, innerR=112;
+  let d="";
+  for(let i=0;i<points*2;i++){
+    const r = i%2===0 ? outerR : innerR;
+    const angle = (Math.PI/points)*i - Math.PI/2;
+    const x = cx + r*Math.cos(angle);
+    const y = cy + r*Math.sin(angle);
+    d += (i===0?"M":"L") + x.toFixed(1) + "," + y.toFixed(1) + " ";
   }
-];
+  d += "Z";
+  document.getElementById('calyx-path').setAttribute('d', d);
+})();
 
-// ---------- render db footer ----------
-const dbList = document.getElementById('dbList');
-DB.forEach(d=>{
-  const row = document.createElement('div');
-  row.className = 'db-item';
-  row.textContent = d.name + (d.latin ? ' — ' + d.latin : '');
-  dbList.appendChild(row);
+/* ---------- Disease/pest database (grows as more data arrives) ---------- */
+const DISEASE_DB = `
+[ฐานข้อมูลโรคและศัตรูมังคุด — ใช้จับคู่กับภาพที่วิเคราะห์เท่านั้น ห้ามเดาโรคที่ไม่อยู่ในฐานข้อมูลนี้]
+
+1) ชื่อ: ใบจุดมังคุด (Leaf/Twig/Fruit Spot Disease)
+   ประเภท: โรคพืช (เชื้อรา)
+   ส่วนที่พบ: ใบ, กิ่ง, ผล
+   สาเหตุ: เชื้อรา Pestalotiopsis flagisettula (Guba) Stay
+   อาการ: เกิดจุดแผลบนใบ กิ่ง และผล แผลลุกลามเมื่อสภาพอากาศชื้นและมีฝนตกชุก
+   สภาพที่ระบาด: ความชื้นสูง ฝนตกชุก
+   การป้องกันกำจัด:
+     - สุขาภิบาลสวน ตัดแต่งกิ่งที่เป็นโรคออกและทำลาย
+     - สำรวจแปลงปลูกอย่างสม่ำเสมอ
+     - สารเคมี: คาร์เบนดาซิม 50% WP อัตรา 10-20 กรัม ต่อน้ำ 20 ลิตร
+       หรือ คอปเปอร์ออกซีคลอไรด์ 85% WP อัตรา 30-80 กรัม ต่อน้ำ 20 ลิตร
+   แหล่งอ้างอิง: กรมวิชาการเกษตร 2557 (โรคมังคุด หน้า 3-5), กรมวิชาการเกษตร 2563 (การจัดการศัตรูมังคุดเพื่อการส่งออก)
+
+2) ชื่อ: เพลี้ยไฟ (Thrips)
+   ประเภท: แมลงศัตรูพืช
+   ชื่อวิทยาศาสตร์: Scirtothrips dorsalis Hood
+   ส่วนที่พบ: ยอดอ่อน, ดอก, ผลอ่อน
+   อาการ: ยอดแห้ง ดอกร่วง ผิวผลเป็นรอยแผลสีน้ำตาลคล้ายขี้กลาก (ขี้กลาก) มีคราบยางบนผล ใบหงิกงอ
+   สภาพที่ระบาด: อากาศแห้งแล้งต่อเนื่อง ระบาดหนักช่วงอากาศร้อนแห้ง
+   ศัตรูธรรมชาติ: แมงมุม ตัวอ่อนแมลงช้างปีกใส เพลี้ยไฟตัวห้ำ
+   การสำรวจ: เคาะช่อใบอ่อน/ช่อดอกลงบนกระดาษแข็งสีดำเพื่อนับตัว เกณฑ์เศรษฐกิจ: พบมากกว่า 1 ตัว/ยอด หรือพบร่องรอยทำลายบนช่อดอก/ผล ให้เริ่มควบคุมทันทีโดยเฉพาะช่วงดอกบานและผลอ่อน
+   การป้องกันกำจัด:
+     - วิธีกล: ฉีดพ่นน้ำเปล่าแรงดันเพื่อเพิ่มความชื้นและล้างตัวเพลี้ยไฟออก (ใช้เมื่อระบาดไม่รุนแรง)
+     - วิธีเขตกรรม: ใช้การให้น้ำสลับกับการพ่นสารเคมีเพื่อลดการดื้อยา
+     - สารเคมี (เลือกใช้ 1 ชนิด ต่อน้ำ 20 ลิตร และสลับกลุ่มสารเพื่อป้องกันการดื้อยา):
+         อิมิดาโคลพริด 10% SL อัตรา 10-20 มล.
+         หรือ อะซีทามิพริด 20% SP อัตรา 4 กรัม
+         หรือ สปินีโทแรม 12% SC อัตรา 10 มล.
+         หรือ ฟิโพรนิล 5% SC อัตรา 10 มล.
+         หรือ ไทอะมีทอกแซม 25% WG อัตรา 2-4 กรัม
+         หรือ คาร์โบซัลแฟน 20% EC อัตรา 40 มล.
+     - พ่นให้ทั่วทรงพุ่ม ตรวจซ้ำหลังพ่น 5-7 วัน และประสานควบคุมพร้อมกันกับสวนข้างเคียงเพื่อลดการระบาดซ้ำ
+
+3) ชื่อ: หนอนกินใบอ่อน (Leaf-eating Caterpillar)
+   ประเภท: แมลงศัตรูพืช
+   ชื่อวิทยาศาสตร์: Stictoptera sp.
+   ลักษณะตัวหนอน: ยาวประมาณ 2-2.5 ซม. สีเขียวอมเหลือง พรางตัวเข้ากับใบอ่อน กัดกินใบเฉพาะเวลากลางคืน กลางวันหลบซ่อนในดิน เศษใบไม้ หรือพุ่มใบทึบ
+   อาการ: ใบอ่อนถูกกัดแหว่งเป็นรอยไม่เป็นระเบียบจนเหลือแต่เส้นกลางใบ ลดพื้นที่สังเคราะห์แสงและการเจริญเติบโต
+   ผลกระทบสำคัญ: หากระบาดรุนแรงช่วงใบอ่อนชุดสุดท้ายก่อนออกดอก จะทำให้ยอดไม่พัฒนาเป็นตาดอก (ยอดต้องสมบูรณ์อย่างน้อย 9 สัปดาห์) ส่งผลให้ออกดอกและติดผลลดลง คุณภาพผลผลิตลดลง
+   การป้องกันกำจัด: หมั่นสำรวจร่องรอยการทำลายและปริมาณตัวหนอนในแปลง
+   หมายเหตุสำคัญ: ⚠️ ข้อมูลวิธีการควบคุม/สารเคมีกำจัดยังไม่สมบูรณ์ในฐานข้อมูลนี้ — หากภาพตรงกับอาการนี้ ให้แจ้งอาการและผลกระทบตามข้อมูลข้างต้น แต่ระบุชัดเจนว่ายังไม่มีคำแนะนำวิธีรักษาที่สมบูรณ์ แนะนำให้ปรึกษาเจ้าหน้าที่เกษตรในพื้นที่เพิ่มเติม
+`;
+
+/* ---------- Camera handling ---------- */
+const video = document.getElementById('video');
+const capturedImg = document.getElementById('captured-img');
+const lensPlaceholder = document.getElementById('lens-placeholder');
+const captureBtn = document.getElementById('capture-btn');
+const switchCamBtn = document.getElementById('switch-cam-btn');
+const pulseRing = document.getElementById('pulse-ring');
+const loadingWrap = document.getElementById('loading-wrap');
+const loadingText = document.getElementById('loading-text');
+const resultEl = document.getElementById('result');
+const cardContent = document.getElementById('card-content');
+const rescanBtn = document.getElementById('rescan-btn');
+const preCaptureControls = document.getElementById('pre-capture-controls');
+
+let currentStream = null;
+let facingMode = 'environment';
+let selectedPart = 'ผล';
+
+document.querySelectorAll('.segment').forEach(seg=>{
+  seg.addEventListener('click', ()=>{
+    document.querySelectorAll('.segment').forEach(s=>s.classList.remove('active'));
+    seg.classList.add('active');
+    selectedPart = seg.dataset.part;
+  });
 });
 
-// ---------- camera handling ----------
-const video = document.getElementById('video');
-const shotImg = document.getElementById('shot');
-const stageEmpty = document.getElementById('stageEmpty');
-const cameraBtn = document.getElementById('cameraBtn');
-const captureBtn = document.getElementById('captureBtn');
-const retakeBtn = document.getElementById('retakeBtn');
-const retakeRow = document.getElementById('retakeRow');
-const sweep = document.getElementById('sweep');
-const stageStatus = document.getElementById('stageStatus');
-const stageStatusText = document.getElementById('stageStatusText');
-const errBox = document.getElementById('errBox');
-const resultEl = document.getElementById('result');
-
-let stream = null;
-
-async function openCamera(){
-  errBox.classList.remove('show');
+async function startCamera(){
   try{
-    stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }, audio:false });
+    if(currentStream){
+      currentStream.getTracks().forEach(t=>t.stop());
+    }
+    lensPlaceholder.textContent = 'กำลังขอเข้าถึงกล้อง…';
+    lensPlaceholder.style.display = 'flex';
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video:{ facingMode, width:{ideal:720}, height:{ideal:720} },
+      audio:false
+    });
+    currentStream = stream;
     video.srcObject = stream;
     video.style.display = 'block';
-    shotImg.style.display = 'none';
-    stageEmpty.style.display = 'none';
+    capturedImg.style.display = 'none';
+    lensPlaceholder.style.display = 'none';
     captureBtn.disabled = false;
-    cameraBtn.textContent = 'ปิดกล้อง';
-    stageStatus.classList.add('live');
-    stageStatusText.textContent = 'กล้องพร้อมใช้งาน';
-    retakeRow.style.display = 'none';
-  }catch(e){
-    showError('เปิดกล้องไม่สำเร็จ: ' + (e.message || 'ตรวจสอบสิทธิ์การใช้กล้องของเบราว์เซอร์') );
+    pulseRing.classList.add('active');
+  }catch(err){
+    lensPlaceholder.style.display = 'flex';
+    lensPlaceholder.textContent = 'ไม่สามารถเข้าถึงกล้องได้ — กรุณาอนุญาตการใช้กล้องในเบราว์เซอร์';
+    captureBtn.disabled = true;
+    console.error(err);
   }
 }
+startCamera();
 
-function closeCamera(){
-  if(stream){ stream.getTracks().forEach(t=>t.stop()); stream = null; }
-  video.style.display = 'none';
-  stageEmpty.style.display = 'flex';
-  captureBtn.disabled = true;
-  cameraBtn.textContent = 'เปิดกล้อง';
-  stageStatus.classList.remove('live');
-  stageStatusText.textContent = 'กล้องปิดอยู่';
-}
-
-cameraBtn.addEventListener('click', ()=>{
-  if(stream){ closeCamera(); } else { openCamera(); }
+switchCamBtn.addEventListener('click', ()=>{
+  facingMode = facingMode === 'environment' ? 'user' : 'environment';
+  startCamera();
 });
 
-retakeBtn.addEventListener('click', ()=>{
-  shotImg.style.display = 'none';
-  resultEl.classList.remove('show');
-  errBox.classList.remove('show');
-  retakeRow.style.display = 'none';
-  if(!stream){ openCamera(); } else {
-    video.style.display = 'block';
-    captureBtn.disabled = false;
-  }
-});
-
-function showError(msg){
-  errBox.textContent = msg;
-  errBox.classList.add('show');
-}
-
-function buildDbContext(){
-  return DB.map(d => (
-    `ชื่อ: ${d.name}\nชื่อวิทยาศาสตร์/สาเหตุ: ${d.latin}\nส่วนที่พบ: ${d.part}\nอาการ: ${d.symptoms}\nการควบคุม: ${d.control.join(' / ')}\nระยะเวลา: ${d.duration}`
-  )).join('\n\n---\n\n');
-}
-
-async function captureAndAnalyze(){
+function captureFrame(){
   const canvas = document.createElement('canvas');
-  canvas.width = video.videoWidth;
-  canvas.height = video.videoHeight;
+  const size = 640;
+  canvas.width = size;
+  canvas.height = size;
   const ctx = canvas.getContext('2d');
-  ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-  const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
-  const base64 = dataUrl.split(',')[1];
+  const vw = video.videoWidth, vh = video.videoHeight;
+  const minDim = Math.min(vw, vh);
+  const sx = (vw - minDim)/2, sy = (vh - minDim)/2;
+  ctx.drawImage(video, sx, sy, minDim, minDim, 0, 0, size, size);
+  return canvas.toDataURL('image/jpeg', 0.85);
+}
 
-  shotImg.src = dataUrl;
-  shotImg.style.display = 'block';
+captureBtn.addEventListener('click', async ()=>{
+  const dataUrl = captureFrame();
+  capturedImg.src = dataUrl;
+  capturedImg.style.display = 'block';
   video.style.display = 'none';
-  retakeRow.style.display = 'flex';
-  captureBtn.disabled = true;
-  errBox.classList.remove('show');
+  pulseRing.classList.remove('active');
+  preCaptureControls.style.display = 'none';
   resultEl.classList.remove('show');
-  sweep.classList.add('active');
-  stageStatusText.textContent = 'กำลังวิเคราะห์...';
+  loadingWrap.classList.add('active');
+
+  const loadingMsgs = ['กำลังส่องดูรอยแผล…','เทียบกับฐานข้อมูลโรค…','กำลังสรุปผลวินิจฉัย…'];
+  let mi = 0;
+  const msgInterval = setInterval(()=>{
+    mi = (mi+1) % loadingMsgs.length;
+    loadingText.textContent = loadingMsgs[mi];
+  }, 1400);
+  loadingText.textContent = loadingMsgs[0];
 
   try{
-    const dbContext = buildDbContext();
-    const systemPrompt = `คุณเป็นผู้ช่วยวินิจฉัยโรคและศัตรูพืชของต้นมังคุด หน้าที่ของคุณคือดูภาพที่ได้รับ แล้วเทียบกับฐานข้อมูลด้านล่างนี้เท่านั้น ห้ามเดาโรคที่ไม่มีในฐานข้อมูล หากอาการในภาพไม่ตรงกับรายการใดเลยในฐานข้อมูล ให้ตอบว่าไม่พบข้อมูลตรงกันและแนะนำให้ปรึกษาผู้เชี่ยวชาญ\n\nฐานข้อมูล:\n${dbContext}\n\nตอบกลับเป็น JSON เท่านั้น ห้ามมีข้อความอื่นนอกเหนือจาก JSON ห้ามใช้ backtick ใช้โครงสร้างนี้:\n{\n  "matched": true หรือ false,\n  "name": "ชื่อโรค/ศัตรูพืชที่ตรงกับฐานข้อมูล หรือค่าว่างถ้าไม่พบ",\n  "latin": "ชื่อวิทยาศาสตร์/สาเหตุจากฐานข้อมูล",\n  "severity": "high" หรือ "medium" หรือ "low" หรือ "none",\n  "symptoms": "สรุปอาการที่สังเกตเห็นในภาพ เทียบกับฐานข้อมูล เขียนเป็นภาษาไทย",\n  "steps": ["ขั้นตอนการรักษาแบบเรียงลำดับ ดึงจากฐานข้อมูล เขียนเป็นภาษาไทย"],\n  "duration": "ระยะเวลาที่คาดว่าจะเห็นผล จากฐานข้อมูล",\n  "medicine": "สรุปยา/สารเคมีและปริมาณที่แนะนำ จากฐานข้อมูลเท่านั้น"\n}`;
+    const base64Data = dataUrl.split(',')[1];
+    const systemPrompt = `คุณคือผู้เชี่ยวชาญด้านโรคพืชและศัตรูพืชมังคุด หน้าที่ของคุณคือวิเคราะห์ภาพส่วนของต้นมังคุด (${selectedPart}) แล้วจับคู่กับฐานข้อมูลโรค/แมลงศัตรูพืชด้านล่างนี้เท่านั้น
+
+${DISEASE_DB}
+
+กติกาสำคัญ:
+- ห้ามวินิจฉัยหรือแต่งชื่อโรค/สาเหตุ/วิธีรักษาที่ไม่มีอยู่ในฐานข้อมูลข้างต้นโดยเด็ดขาด
+- หากภาพดูปกติดี ไม่มีอาการผิดปกติ ให้ตอบว่า healthy
+- หากมีอาการผิดปกติแต่ไม่ตรงกับรายการใดในฐานข้อมูล ให้ตอบว่า unknown
+- หากตรงกับรายการใดในฐานข้อมูล ให้ตอบว่า found พร้อมระบุชื่อและข้อมูลตามฐานข้อมูลเป๊ะๆ ห้ามเสริมสารเคมีหรือวิธีรักษาที่ไม่ได้ระบุไว้
+- สำหรับรายการที่ระบุว่า "ข้อมูลวิธีการควบคุมยังไม่สมบูรณ์" ให้คงคำเตือนนี้ไว้ในผลลัพธ์ตรงๆ อย่าแต่งวิธีรักษาขึ้นมาเอง
+
+ตอบกลับเป็น JSON เท่านั้น ห้ามมีข้อความอื่นนอกเหนือจาก JSON ห้ามใช้ code block ห้ามมี backtick รูปแบบ:
+{
+  "status": "found" | "healthy" | "unknown",
+  "thai_name": "ชื่อไทยของโรค/แมลง (ถ้ามี)",
+  "type": "โรคพืช" | "แมลงศัตรูพืช" | "",
+  "confidence": 1-6,
+  "symptoms_matched": "อาการที่พบตรงกับที่สังเกตในภาพ อธิบายสั้นๆ",
+  "cause": "สาเหตุ/ชื่อวิทยาศาสตร์ ถ้ามีในฐานข้อมูล",
+  "treatment_summary": "สรุปวิธีป้องกันกำจัดแบบสั้น เป็นข้อความอ่านง่าย",
+  "chemical_options": [{"name":"ชื่อสาร","dose":"อัตราการใช้"}],
+  "incomplete_warning": "ข้อความเตือนถ้าข้อมูลวิธีรักษายังไม่สมบูรณ์ ไม่งั้นเว้นว่าง",
+  "note": "คำแนะนำเพิ่มเติมสั้นๆ เช่น ให้ปรึกษาเจ้าหน้าที่เกษตร (ถ้าจำเป็น)"
+}`;
 
     const response = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
@@ -420,77 +453,111 @@ async function captureAndAnalyze(){
         model: "claude-sonnet-4-6",
         max_tokens: 1000,
         system: systemPrompt,
-        messages: [
-          {
-            role: "user",
-            content: [
-              { type: "image", source: { type: "base64", media_type: "image/jpeg", data: base64 } },
-              { type: "text", text: "นี่คือภาพจากต้นมังคุด ช่วยวิเคราะห์และตอบตามรูปแบบ JSON ที่กำหนด" }
-            ]
-          }
-        ]
+        messages: [{
+          role: "user",
+          content: [
+            { type: "image", source: { type: "base64", media_type: "image/jpeg", data: base64Data } },
+            { type: "text", text: `นี่คือภาพส่วน "${selectedPart}" ของต้นมังคุด กรุณาวิเคราะห์ตามกติกาและตอบเป็น JSON เท่านั้น` }
+          ]
+        }]
       })
     });
 
-    if(!response.ok){
-      throw new Error('เซิร์ฟเวอร์ตอบกลับผิดพลาด (' + response.status + ')');
-    }
-
     const data = await response.json();
-    const textBlock = (data.content || []).map(b => b.text || '').join('\n').trim();
-    const cleaned = textBlock.replace(/```json|```/g, '').trim();
-    const parsed = JSON.parse(cleaned);
+    let text = data.content.map(b => b.text || "").join("");
+    text = text.replace(/```json|```/g, "").trim();
+    const result = JSON.parse(text);
 
-    renderResult(parsed);
-  }catch(e){
-    showError('วิเคราะห์ไม่สำเร็จ: ' + (e.message || 'เกิดข้อผิดพลาดบางอย่าง กรุณาลองใหม่'));
-  }finally{
-    sweep.classList.remove('active');
-    stageStatusText.textContent = stream ? 'กล้องพร้อมใช้งาน' : 'กล้องปิดอยู่';
+    clearInterval(msgInterval);
+    loadingWrap.classList.remove('active');
+    renderResult(result);
+  }catch(err){
+    clearInterval(msgInterval);
+    loadingWrap.classList.remove('active');
+    renderError();
+    console.error(err);
   }
+});
+
+function confidenceDots(n){
+  n = Math.max(1, Math.min(6, n||3));
+  let html = '<div class="seg-dots">';
+  for(let i=1;i<=6;i++){
+    html += `<div class="seg-dot ${i<=n?'on':''}"></div>`;
+  }
+  html += '</div>';
+  return html;
 }
 
 function renderResult(r){
-  const rBadge = document.getElementById('rBadge');
-  const sevMap = { high:['รุนแรง','high'], medium:['ปานกลาง','med'], low:['เล็กน้อย','low'], none:['ไม่พบอาการ','none'] };
-  const sev = sevMap[r.severity] || sevMap['none'];
+  let pillClass = 'unknown', pillText = 'ไม่ทราบแน่ชัด';
+  if(r.status === 'found'){ pillClass='found'; pillText='พบความผิดปกติ'; }
+  if(r.status === 'healthy'){ pillClass='healthy'; pillText='ดูปกติดี'; }
 
-  if(!r.matched){
-    document.getElementById('rName').textContent = 'ไม่พบข้อมูลที่ตรงกันในฐานข้อมูล';
-    document.getElementById('rLatin').textContent = '';
-    rBadge.textContent = 'ไม่ทราบ';
-    rBadge.className = 'badge none';
-    document.getElementById('rSymptoms').textContent = r.symptoms || 'ลักษณะในภาพไม่ตรงกับรายการโรค/ศัตรูพืชที่มีอยู่ในระบบ แนะนำให้ปรึกษานักวิชาการเกษตรในพื้นที่เพื่อวินิจฉัยเพิ่มเติม';
-    document.getElementById('rSteps').innerHTML = '';
-    document.getElementById('rDuration').textContent = '—';
-    document.getElementById('rMed').textContent = '—';
-    resultEl.classList.add('show');
-    return;
+  let html = `
+    <div class="result-header">
+      <span class="part-tag">${selectedPart} · วิเคราะห์แล้ว</span>
+      <span class="status-pill ${pillClass}">${pillText}</span>
+    </div>
+  `;
+
+  if(r.status === 'healthy'){
+    html += `
+      <div class="disease-name">ไม่พบอาการผิดปกติ</div>
+      <p class="body-text">${r.note || 'จากภาพที่ถ่าย ไม่พบร่องรอยของโรคหรือแมลงศัตรูพืชในฐานข้อมูล ดูแลรักษาตามปกติต่อไปได้'}</p>
+    `;
+  } else if(r.status === 'unknown'){
+    html += `
+      <div class="disease-name">ไม่พบข้อมูลที่ตรงกัน</div>
+      <p class="body-text">${r.symptoms_matched || 'พบลักษณะผิดปกติ แต่ยังไม่ตรงกับรายการในฐานข้อมูลปัจจุบัน'}</p>
+      <div class="source-note">💡 แนะนำให้ถ่ายภาพเพิ่มเติมในมุมอื่น หรือปรึกษาเจ้าหน้าที่เกษตรในพื้นที่เพื่อวินิจฉัยที่แม่นยำขึ้น</div>
+    `;
+  } else {
+    html += `
+      <div class="disease-name">${r.thai_name || 'ไม่ระบุชื่อ'}</div>
+      <div class="confidence-wrap">
+        ${confidenceDots(r.confidence)}
+        <span class="conf-label">${r.type || ''}</span>
+      </div>
+
+      <div class="section-label">อาการที่พบ</div>
+      <p class="body-text">${r.symptoms_matched || '-'}</p>
+
+      ${r.cause ? `<div class="section-label">สาเหตุ</div><p class="body-text">${r.cause}</p>` : ''}
+
+      <div class="section-label">วิธีป้องกันกำจัด</div>
+      <p class="body-text">${r.treatment_summary || '-'}</p>
+
+      ${(r.chemical_options && r.chemical_options.length) ? `
+        <table class="dose-table">
+          ${r.chemical_options.map(c=>`<tr><td>${c.name}</td><td>${c.dose}</td></tr>`).join('')}
+        </table>
+      ` : ''}
+
+      ${r.incomplete_warning ? `<div class="source-note" style="color:var(--alert); border-color:var(--alert);">⚠️ ${r.incomplete_warning}</div>` : ''}
+      ${r.note ? `<div class="source-note">${r.note}</div>` : ''}
+    `;
   }
 
-  document.getElementById('rName').textContent = r.name || '—';
-  document.getElementById('rLatin').textContent = r.latin || '';
-  rBadge.textContent = sev[0];
-  rBadge.className = 'badge ' + sev[1];
-  document.getElementById('rSymptoms').textContent = r.symptoms || '—';
-
-  const stepsEl = document.getElementById('rSteps');
-  stepsEl.innerHTML = '';
-  (r.steps || []).forEach(s=>{
-    const li = document.createElement('li');
-    li.textContent = s;
-    stepsEl.appendChild(li);
-  });
-
-  document.getElementById('rDuration').textContent = r.duration || '—';
-  document.getElementById('rMed').textContent = r.medicine || '—';
-
+  cardContent.innerHTML = html;
   resultEl.classList.add('show');
 }
 
-captureBtn.addEventListener('click', captureAndAnalyze);
+function renderError(){
+  cardContent.innerHTML = `
+    <div class="disease-name">เกิดข้อผิดพลาด</div>
+    <p class="body-text">ไม่สามารถวิเคราะห์ภาพได้ในขณะนี้ กรุณาลองถ่ายภาพใหม่อีกครั้ง</p>
+  `;
+  resultEl.classList.add('show');
+}
 
-window.addEventListener('beforeunload', ()=>{ if(stream) stream.getTracks().forEach(t=>t.stop()); });
+rescanBtn.addEventListener('click', ()=>{
+  resultEl.classList.remove('show');
+  preCaptureControls.style.display = 'flex';
+  video.style.display = 'block';
+  capturedImg.style.display = 'none';
+  pulseRing.classList.add('active');
+});
 </script>
 </body>
 </html>
