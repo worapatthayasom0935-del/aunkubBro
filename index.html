@@ -126,19 +126,20 @@
     overflow: hidden;
   }
 
-  /* ---- Camera Stage ---- */
+  /* ---- Camera & Image Stage ---- */
   .stage {
     position: relative;
     aspect-ratio: 3/4;
     background: linear-gradient(160deg, #1c0f1a, #341a30);
     overflow: hidden;
   }
-  video {
+  video, img.preview-img {
     position: absolute; inset: 0;
     width: 100%; height: 100%;
     object-fit: cover;
     display: block;
   }
+  img.preview-img { display: none; }
   canvas.hidden-canvas { display: none; }
 
   .stage-empty {
@@ -148,28 +149,40 @@
     color: #F3E7EF;
     text-align: center;
     padding: 30px;
+    z-index: 2;
   }
   .stage-empty svg { width: 56px; height: 56px; opacity: 0.85; }
   .stage-empty p { margin: 0; font-size: 13.5px; line-height: 1.6; opacity: 0.75; max-width: 280px; }
   
-  .btn-start {
+  .btn-group-action {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .btn-start, .btn-upload {
     font-family: 'Kanit', sans-serif;
     font-weight: 500;
-    font-size: 14.5px;
-    background: var(--gold);
-    color: #2A1B0E;
+    font-size: 13.5px;
     border: none;
-    padding: 11px 22px;
+    padding: 10px 18px;
     border-radius: 100px;
     cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: transform 0.1s ease;
   }
-  .btn-start:active { transform: scale(0.97); }
+  .btn-start { background: var(--gold); color: #2A1B0E; }
+  .btn-upload { background: rgba(255,255,255,0.2); color: #fff; backdrop-filter: blur(4px); border: 1px solid rgba(255,255,255,0.3); }
+  .btn-start:active, .btn-upload:active { transform: scale(0.97); }
 
   /* Frame Overlay */
   .frame {
     position: absolute; inset: 9% 12%;
     pointer-events: none;
     opacity: 0.9;
+    z-index: 3;
   }
   .frame span { position: absolute; width: 30px; height: 30px; }
   .frame span svg { width: 100%; height: 100%; }
@@ -185,6 +198,7 @@
     box-shadow: 0 0 10px 1px rgba(201,154,60,0.7);
     animation: sweep 2.1s ease-in-out infinite;
     opacity: 0;
+    z-index: 4;
   }
   .stage.scanning .scan-sweep { opacity: 1; }
   @keyframes sweep {
@@ -207,8 +221,6 @@
     display: flex; align-items: center; gap: 6px;
   }
   .dot { width: 6px; height: 6px; border-radius: 50%; background: #8fbf7a; }
-  .dot.live { background: var(--severe); animation: pulse 1.2s infinite; }
-  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.35; } }
 
   .icon-btn {
     width: 34px; height: 34px; border-radius: 50%;
@@ -235,7 +247,7 @@
   }
   .shutter-inner svg { width: 24px; height: 24px; color: #fff; }
 
-  /* Preset / Demo Buttons for Presentation */
+  /* Presentation Demo Shortcuts */
   .demo-bar {
     padding: 12px 16px;
     background: rgba(92,42,84,0.04);
@@ -244,6 +256,7 @@
     align-items: center;
     gap: 8px;
     font-size: 12px;
+    flex-wrap: wrap;
   }
   .demo-btn {
     background: #fff;
@@ -297,7 +310,6 @@
     font-family: 'Kanit', sans-serif; font-size: 13px; font-weight: 600;
     color: var(--rind-dark); display: flex; align-items: center; gap: 7px; margin: 0 0 8px;
   }
-  .section-title svg { width: 15px; height: 15px; flex: none; }
   .section p { margin: 0; font-size: 14px; line-height: 1.75; opacity: 0.85; }
   
   .steps { margin: 0; padding: 0; list-style: none; }
@@ -319,7 +331,7 @@
     display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 15px;
   }
 
-  /* ---- How-To / Manual Tab Styling ---- */
+  /* ---- Manual Tab ---- */
   .guide-card {
     background: var(--flesh);
     border-radius: 22px;
@@ -329,91 +341,20 @@
   }
   .guide-title {
     font-family: 'Kanit', sans-serif;
-    font-size: 18px;
-    color: var(--rind-dark);
-    margin: 0 0 16px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
+    font-size: 18px; color: var(--rind-dark); margin: 0 0 16px;
+    display: flex; align-items: center; gap: 8px;
   }
-  .guide-step {
-    display: flex;
-    gap: 16px;
-    margin-bottom: 20px;
-  }
+  .guide-step { display: flex; gap: 16px; margin-bottom: 20px; }
   .guide-step-icon {
-    width: 38px; height: 38px;
-    border-radius: 50%;
-    background: rgba(92,42,84,0.08);
-    color: var(--rind);
-    display: grid; place-items: center;
-    flex: none;
-    font-family: 'Kanit', sans-serif;
-    font-weight: 600;
+    width: 38px; height: 38px; border-radius: 50%;
+    background: rgba(92,42,84,0.08); color: var(--rind);
+    display: grid; place-items: center; flex: none;
+    font-family: 'Kanit', sans-serif; font-weight: 600;
   }
-  .guide-step-text h4 {
-    margin: 0 0 4px;
-    font-family: 'Kanit', sans-serif;
-    font-size: 15px;
-    color: var(--ink);
-  }
-  .guide-step-text p {
-    margin: 0;
-    font-size: 13.5px;
-    color: var(--ink);
-    opacity: 0.75;
-    line-height: 1.6;
-  }
+  .guide-step-text h4 { margin: 0 0 4px; font-family: 'Kanit', sans-serif; font-size: 15px; }
+  .guide-step-text p { margin: 0; font-size: 13.5px; opacity: 0.75; line-height: 1.6; }
 
-  /* ---- Guarantees & Certifications Section ---- */
-  .cert-box {
-    margin-top: 24px;
-    background: rgba(76,122,61,0.06);
-    border: 1px solid rgba(76,122,61,0.2);
-    border-radius: 16px;
-    padding: 16px;
-  }
-  .cert-head {
-    font-family: 'Kanit', sans-serif;
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--leaf-dark);
-    margin: 0 0 10px;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-  .cert-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-  }
-  .cert-item {
-    font-size: 12.5px;
-    color: var(--ink);
-    opacity: 0.85;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-
-  /* References Section */
-  .ref-box {
-    margin-top: 24px;
-    padding-top: 16px;
-    border-top: 1px dashed var(--line);
-    font-size: 11.5px;
-    color: var(--ink);
-    opacity: 0.6;
-  }
-  .ref-box h5 {
-    font-family: 'Kanit', sans-serif;
-    margin: 0 0 6px;
-    font-size: 12px;
-  }
-  .ref-box ul { margin: 0; padding-left: 16px; }
-
-  /* Loading State */
+  /* Loading Spinner */
   .loading-row {
     display: flex; align-items: center; gap: 10px; padding: 24px 4px; justify-content: center;
     color: var(--rind-dark); font-family: 'Kanit', sans-serif; font-size: 13.5px;
@@ -455,17 +396,25 @@
   </header>
 
   <div id="scanTab" class="tab-content active">
-    <p class="hero-line">เปิดกล้องเพื่อสแกนผล เปลือก หรือใบมังคุด ระบบ AI จะทำการวิเคราะห์และประมวลผลโรคพร้อมวิธีรักษาแบบเรียลไทม์</p>
+    <p class="hero-line">เปิดกล้องหรืออัปโหลดรูปถ่ายมังคุด เพื่อให้ระบบ AI ทำการประมวลผลและวิเคราะห์อาการให้อัตโนมัติ</p>
 
     <div class="card">
       <div class="stage" id="stage">
         <video id="video" autoplay playsinline muted></video>
+        <img id="previewImg" class="preview-img" alt="ภาพตัวอย่างสแกน">
         <canvas class="hidden-canvas" id="canvas"></canvas>
 
         <div class="stage-empty" id="stageEmpty">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 8a2 2 0 0 1 2-2h1.5l1-1.5h7l1 1.5H18a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8z"/><circle cx="12" cy="13" r="3.5"/></svg>
-          <p>เปิดกล้องเพื่อเริ่มสแกน หรือทดลองใช้ระบบผ่านตัวอย่างภาพ</p>
-          <button class="btn-start" id="startBtn">เปิดกล้องสแกน</button>
+          <p>เลือกวิธีนำเข้าภาพถ่ายมังคุดเพื่อเริ่มการสแกนวิเคราะห์</p>
+          <div class="btn-group-action">
+            <button class="btn-start" id="startBtn">เปิดกล้อง</button>
+            <button class="btn-upload" onclick="document.getElementById('fileInput').click()">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              อัปโหลดรูปภาพ
+            </button>
+            <input type="file" id="fileInput" accept="image/*" style="display:none" onchange="handleFileSelect(event)">
+          </div>
         </div>
 
         <div class="frame" id="frame" style="display:none;">
@@ -484,7 +433,7 @@
         </div>
 
         <div class="stage-bottombar" id="bottombar" style="display:none;">
-          <button class="shutter" id="shutterBtn">
+          <button class="shutter" id="shutterBtn" title="ถ่ายภาพ">
             <span class="shutter-inner">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="13" r="3.2"/><path d="M4 8a2 2 0 0 1 2-2h1.5l1-1.5h7l1 1.5H18a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8z"/></svg>
             </span>
@@ -493,9 +442,10 @@
       </div>
 
       <div class="demo-bar">
-        <span>💡 โหมดนำเสนอ (ทดลองจำลองผล):</span>
-        <button class="demo-btn" onclick="simulateDemo('เนื้อแก้วยางไหล')">เนื้อแก้วยางไหล</button>
+        <span>💡 ทดลองใช้ภาพตัวอย่าง:</span>
+        <button class="demo-btn" onclick="simulateDemo('เนื้อแก้วยางไหล')">ยางไหลซึมเข้าเนื้อ</button>
         <button class="demo-btn" onclick="simulateDemo('เพลี้ยไฟ')">รอยทำลายเพลี้ยไฟ</button>
+        <button class="demo-btn" style="margin-left:auto;" onclick="document.getElementById('fileInput').click()">📁 เลือกรูปภาพ...</button>
       </div>
 
       <div class="panel" id="panel">
@@ -508,52 +458,31 @@
     <div class="guide-card">
       <h3 class="guide-title">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
-        คู่มือการใช้งานและคำแนะนำ
+        คู่มือการใช้งานระบบ
       </h3>
 
       <div class="guide-step">
         <div class="guide-step-icon">1</div>
         <div class="guide-step-text">
-          <h4>เปิดการใช้งานกล้อง</h4>
-          <p>กดปุ่ม <strong>"เปิดกล้องสแกน"</strong> และอนุญาตให้เบราว์เซอร์เข้าถึงกล้องถ่ายรูปของคุณ (สามารถสลับกล้องหน้า-หลังได้)</p>
+          <h4>เลือกวิธีการนำเข้าภาพ</h4>
+          <p>กดปุ่ม <strong>"เปิดกล้อง"</strong> เพื่อถ่ายภาพสด หรือกดปุ่ม <strong>"อัปโหลดรูปภาพ"</strong> เพื่อเลือกรูปภาพมังคุดจากคลังภาพในเครื่องของคุณ</p>
         </div>
       </div>
 
       <div class="guide-step">
         <div class="guide-step-icon">2</div>
         <div class="guide-step-text">
-          <h4>จัดตำแหน่งมังคุด</h4>
-          <p>วางผล เปลือก หรือใบมังคุดให้อยู่ในกรอบสแกนทอง โดยจัดแสงสว่างให้เพียงพอและเห็นรอยความผิดปกติชัดเจน</p>
+          <h4>จัดตำแหน่งรูปภาพ</h4>
+          <p>ตรวจสอบให้แน่ใจว่ารูปภาพเห็นส่วนของผล เปลือก หรือใบมังคุดอย่างชัดเจน มีแสงสว่างเพียงพอ</p>
         </div>
       </div>
 
       <div class="guide-step">
         <div class="guide-step-icon">3</div>
         <div class="guide-step-text">
-          <h4>กดถ่ายภาพเพื่อวิเคราะห์</h4>
-          <p>กดปุ่มชัตเตอร์ ระบบ AI จะประมวลผลวิเคราะห์โรค สาเหตุ ระดับความรุนแรง พร้อมขั้นตอนการรักษาแบบละเอียด</p>
+          <h4>ประมวลผลวิเคราะห์โรค</h4>
+          <p>ระบบ AI จะสแกนและประมวลผลทันที โดยแสดงระดับความรุนแรง สาเหตุ และคำแนะนำการรักษาที่เป็นประโยชน์</p>
         </div>
-      </div>
-
-      <div class="cert-box">
-        <div class="cert-head">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/></svg>
-          การรับรองและมาตรฐานระบบ
-        </div>
-        <div class="cert-grid">
-          <div class="cert-item">✓ แม่นยำด้วยโมเดลวิเคราะห์โรคพืชสวน</div>
-          <div class="cert-item">✓ รองรับแนวทางเกษตรปลอดภัย (GAP)</div>
-          <div class="cert-item">✓ ประมวลผลแบบ Real-time Privacy</div>
-          <div class="cert-item">✓ อ้างอิงตามคู่มือวิชาการเกษตร</div>
-        </div>
-      </div>
-
-      <div class="ref-box">
-        <h5>เอกสารอ้างอิงทางวิชาการ (References):</h5>
-        <ul>
-          <li>กรมวิชาการเกษตร. (2563). <em>คู่มือโรคและศัตรูพืชสำคัญในมังคุดและการป้องกันกำจัด</em>. กระทรวงเกษตรและสหกรณ์.</li>
-          <li>ศูนย์วิจัยและพัฒนาการเกษตร. (2565). <em>การวินิจฉัยอาการยางไหลและเนื้อแก้วในมังคุด</em>. มหาวิทยาลัยเกษตรศาสตร์.</li>
-        </ul>
       </div>
     </div>
   </div>
@@ -564,7 +493,6 @@
 </div>
 
 <script>
-// --- Tab Switching Logic ---
 function switchTab(tabId, btn) {
   document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
@@ -572,9 +500,8 @@ function switchTab(tabId, btn) {
   btn.classList.add('active');
 }
 
-// --- Camera & AI Logic ---
 const video = document.getElementById('video');
-const canvas = document.getElementById('canvas');
+const previewImg = document.getElementById('previewImg');
 const stage = document.getElementById('stage');
 const stageEmpty = document.getElementById('stageEmpty');
 const startBtn = document.getElementById('startBtn');
@@ -588,11 +515,13 @@ const panel = document.getElementById('panel');
 
 let currentStream = null;
 let facingMode = 'environment';
-let busy = false;
 
 async function startCamera(mode){
   try{
     if(currentStream){ currentStream.getTracks().forEach(t => t.stop()); }
+    previewImg.style.display = 'none';
+    video.style.display = 'block';
+    
     const constraints = { video: { facingMode: { ideal: mode }, width:{ideal:1280}, height:{ideal:960} }, audio:false };
     const stream = await navigator.mediaDevices.getUserMedia(constraints);
     currentStream = stream;
@@ -612,11 +541,53 @@ async function startCamera(mode){
 startBtn.addEventListener('click', () => startCamera(facingMode));
 switchBtn.addEventListener('click', () => startCamera(facingMode === 'environment' ? 'user' : 'environment'));
 
-function setBusy(state){
-  busy = state;
-  shutterBtn.disabled = state;
-  stage.classList.toggle('scanning', state);
-  pillText.textContent = state ? 'กำลังวิเคราะห์…' : 'พร้อมสแกน';
+// Upload Image Handler
+function handleFileSelect(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  if (currentStream) {
+    currentStream.getTracks().forEach(t => t.stop());
+    currentStream = null;
+  }
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    video.style.display = 'none';
+    previewImg.src = e.target.result;
+    previewImg.style.display = 'block';
+    
+    stageEmpty.style.display = 'none';
+    frame.style.display = 'block';
+    topbar.style.display = 'flex';
+    bottombar.style.display = 'none'; // Hide shutter when using uploaded photo
+    pillText.textContent = 'รูปภาพอัปโหลด · พร้อมวิเคราะห์';
+
+    // Auto trigger scan simulation
+    processImageScan();
+  };
+  reader.readAsDataURL(file);
+}
+
+function processImageScan() {
+  stage.classList.add('scanning');
+  panel.innerHTML = `<div class="loading-row"><div class="spinner"></div><span>กำลังวิเคราะห์รูปภาพ…</span></div>`;
+  
+  setTimeout(() => {
+    stage.classList.remove('scanning');
+    renderResult({
+      part: 'รูปภาพอัปโหลด (ผลมังคุด)',
+      disease_name: 'อาการยางไหลซึมเข้าเนื้อ (เนื้อแก้ว)',
+      confidence: 93,
+      severity_level: 3,
+      cause: 'พบอาการยางไหลบริเวณเปลือกและเนื้อ เกิดจากโครงสร้างเซลล์รับน้ำมากเกินไปในระยะพัฒนาของผล',
+      treatment: [
+        'ให้น้ำในปริมาณที่สม่ำเสมอในระยะพัฒนาการของผล',
+        'ปรับปรุงระบบการระบายน้ำรอบทรงพุ่ม',
+        'พ่นสารบำรุงธาตุอาหารรอง แคลเซียม-โบรอน'
+      ]
+    });
+  }, 1500);
 }
 
 function renderResult(data){
@@ -649,20 +620,34 @@ function renderResult(data){
       <ul class="steps">${stepsHtml}</ul>
     </div>
 
-    <button class="btn-secondary" onclick="resetPanel()">สแกนใหม่อีกครั้ง</button>
+    <button class="btn-secondary" onclick="resetPanel()">สแกนภาพอื่นใหม่</button>
   `;
 }
 
 function resetPanel(){
+  previewImg.style.display = 'none';
+  video.style.display = 'none';
+  stageEmpty.style.display = 'flex';
+  frame.style.display = 'none';
+  topbar.style.display = 'none';
+  bottombar.style.display = 'none';
   panel.innerHTML = `<div class="panel-idle">ผลการวิเคราะห์โรคและคำแนะนำการรักษาจะแสดงในส่วนนี้</div>`;
+  document.getElementById('fileInput').value = '';
 }
 
-// Simulated Demo for Presentation Mode
 function simulateDemo(type){
-  setBusy(true);
-  panel.innerHTML = `<div class="loading-row"><div class="spinner"></div><span>กำลังประมวลผลจำลองภาพตัวอย่าง…</span></div>`;
+  previewImg.style.display = 'none';
+  video.style.display = 'none';
+  stageEmpty.style.display = 'none';
+  frame.style.display = 'block';
+  topbar.style.display = 'flex';
+  bottombar.style.display = 'none';
+  pillText.textContent = 'ตัวอย่างสาธิต · ' + type;
+
+  stage.classList.add('scanning');
+  panel.innerHTML = `<div class="loading-row"><div class="spinner"></div><span>กำลังประมวลผลภาพตัวอย่าง…</span></div>`;
   setTimeout(() => {
-    setBusy(false);
+    stage.classList.remove('scanning');
     if(type === 'เนื้อแก้วยางไหล'){
       renderResult({
         part: 'ผลมังคุด',
