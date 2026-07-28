@@ -2,1045 +2,696 @@
 <html lang="th">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>หมอมังคุด AI | ตรวจโรคมังคุด</title>
-
-<link rel="stylesheet" href="style.css">
-
-</head>
-
-<body>
-
-<header>
-<div class="logo">
-🍈 หมอมังคุด AI
-</div>
-
-<button onclick="scrollScanner()">
-เริ่มสแกน
-</button>
-
-</header>
-
-
-<main>
-
-<section class="hero">
-
-<div class="badge">
-AI Plant Vision
-</div>
-
-<h1>
-ตรวจโรคมังคุด<br>
-ด้วย AI
-</h1>
-
-<p>
-ถ่ายภาพผล ใบ ดอก หรือลำต้น
-ให้ระบบช่วยวิเคราะห์อาการจากฐานข้อมูลโรคมังคุด
-</p>
-
-
-<button class="main-btn" onclick="scrollScanner()">
-📷 เปิดกล้องตรวจ
-</button>
-
-
-</section>
-
-
-
-<section id="scanner">
-
-<h2>
-สแกนมังคุด
-</h2>
-
-
-<div class="select">
-
-<button class="active">
-🍈 ผล
-</button>
-
-<button>
-🍃 ใบ
-</button>
-
-<button>
-🌸 ดอก
-</button>
-
-<button>
-🌳 กิ่ง
-</button>
-
-</div>
-
-
-
-<div class="camera-box">
-
-<video id="video"
-autoplay
-playsinline>
-</video>
-
-
-<img id="photo">
-
-
-</div>
-
-
-<div class="buttons">
-
-<button id="start">
-เปิดกล้อง
-</button>
-
-
-<button id="capture">
-ถ่ายภาพ
-</button>
-
-
-</div>
-
-
-<div id="loading">
-กำลังวิเคราะห์...
-</div>
-
-
-<div id="result">
-
-</div>
-
-
-</section>
-
-
-</main>
-
-
-
-<footer>
-
-หมอมังคุด AI  
-<br>
-ระบบช่วยวิเคราะห์เบื้องต้น ไม่แทนคำวินิจฉัยผู้เชี่ยวชาญ
-
-</footer>
-
-
-<script src="app.js"></script>
-
-</body>
-</html>
-*{
-    box-sizing:border-box;
-    margin:0;
-    padding:0;
-}
-
-
-body{
-    font-family:
-    "Noto Sans Thai",
-    Arial,
-    sans-serif;
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>มังคุดสแกน — ตรวจโรคมังคุดด้วยกล้อง</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#2A1B2E;
+    --rind:#5C2A54;
+    --rind-dark:#3A1836;
+    --rind-soft:#7A3E6E;
+    --leaf:#4C7A3D;
+    --leaf-dark:#345228;
+    --cream:#FBF7F1;
+    --flesh:#FFFDF9;
+    --gold:#C99A3C;
+    --severe:#B23A48;
+    --mid:#C97D3C;
+    --mild:#5F8F52;
+    --line:rgba(42,27,46,0.10);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
     background:
-    linear-gradient(
-        160deg,
-        #241027,
-        #4d1d3b
-    );
-
-    color:white;
+      radial-gradient(1200px 600px at 15% -10%, rgba(92,42,84,0.10), transparent 60%),
+      radial-gradient(900px 500px at 100% 0%, rgba(76,122,61,0.10), transparent 55%),
+      var(--cream);
+    color:var(--ink);
+    font-family:'Sarabun',sans-serif;
     min-height:100vh;
-}
-
-
-header{
-
-    position:sticky;
-    top:0;
-
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{
+    max-width:760px;
+    margin:0 auto;
+    padding:28px 18px 60px;
+  }
+  header.app-head{
     display:flex;
-    justify-content:space-between;
     align-items:center;
-
-    padding:18px 25px;
-
-    background:
-    rgba(30,10,35,.8);
-
-    backdrop-filter:blur(10px);
-
-    z-index:10;
-}
-
-
-
-.logo{
-
-    font-size:22px;
-    font-weight:800;
-
-}
-
-
-header button{
-
-    border:0;
-
-    padding:10px 20px;
-
-    border-radius:30px;
-
-    background:#c24b86;
-
-    color:white;
-
-    font-weight:bold;
-
-    cursor:pointer;
-
-}
-
-
-
-main{
-
-    max-width:800px;
-
-    margin:auto;
-
-    padding:20px;
-
-}
-
-
-
-.hero{
-
-    text-align:center;
-
-    padding:70px 20px 50px;
-
-}
-
-
-.badge{
-
-    display:inline-block;
-
-    padding:7px 15px;
-
-    border-radius:30px;
-
-    background:
-    rgba(255,255,255,.1);
-
-    color:#ffd68a;
-
-    font-size:13px;
-
-}
-
-
-
-h1{
-
-    margin-top:25px;
-
-    font-size:45px;
-
-    line-height:1.3;
-
-}
-
-
-.hero p{
-
-    margin:20px auto;
-
-    max-width:500px;
-
-    color:#eee;
-
-    line-height:1.8;
-
-}
-
-
-
-.main-btn{
-
-    margin-top:20px;
-
-    padding:16px 35px;
-
-    border:0;
-
-    border-radius:50px;
-
-    background:
-
-    linear-gradient(
-    135deg,
-    #c24b86,
-    #6b2050
-    );
-
-    color:white;
-
-    font-size:17px;
-
-    font-weight:bold;
-
-    cursor:pointer;
-
-    box-shadow:
-    0 10px 30px
-    rgba(194,75,134,.4);
-
-}
-
-
-
-#scanner{
-
-    background:
-
-    rgba(255,255,255,.06);
-
-    border:
-
-    1px solid rgba(255,255,255,.15);
-
-    border-radius:30px;
-
-    padding:30px;
-
-    text-align:center;
-
-}
-
-
-
-h2{
-
-    font-size:30px;
-
-    margin-bottom:20px;
-
-}
-
-
-
-.select{
-
-    display:flex;
-
-    justify-content:center;
-
-    gap:10px;
-
-    flex-wrap:wrap;
-
-}
-
-
-
-.select button{
-
-    padding:10px 18px;
-
-    border-radius:30px;
-
-    border:
-
-    1px solid rgba(255,255,255,.2);
-
-    background:
-    rgba(255,255,255,.08);
-
-    color:white;
-
-}
-
-
-
-.select .active{
-
-    background:#c24b86;
-
-}
-
-
-
-.camera-box{
-
-    width:300px;
-
-    height:300px;
-
-    margin:30px auto;
-
-    border-radius:50%;
-
+    gap:12px;
+    margin-bottom:22px;
+  }
+  .mark{
+    width:40px;height:40px;flex:none;
+    display:grid;place-items:center;
+  }
+  .mark svg{width:100%;height:100%;}
+  .brand-text h1{
+    font-family:'Kanit',sans-serif;
+    font-weight:600;
+    font-size:20px;
+    margin:0;
+    letter-spacing:0.2px;
+    color:var(--rind-dark);
+  }
+  .brand-text p{
+    margin:1px 0 0;
+    font-size:12.5px;
+    color:var(--ink);
+    opacity:0.55;
+  }
+
+  .hero-line{
+    font-family:'Kanit',sans-serif;
+    font-weight:500;
+    font-size:15.5px;
+    line-height:1.55;
+    color:var(--ink);
+    opacity:0.85;
+    margin:0 0 22px;
+    padding-left:14px;
+    border-left:3px solid var(--gold);
+  }
+
+  .card{
+    background:var(--flesh);
+    border-radius:22px;
+    border:1px solid var(--line);
+    box-shadow:0 1px 2px rgba(42,27,46,0.04), 0 12px 30px -18px rgba(42,27,46,0.25);
     overflow:hidden;
+  }
 
-    border:
-
-    4px solid #c9a15a;
-
-    background:#111;
-
-}
-
-
-
-video,
-#photo{
-
-    width:100%;
-
-    height:100%;
-
+  /* ---- Camera stage ---- */
+  .stage{
+    position:relative;
+    aspect-ratio:3/4;
+    background:linear-gradient(160deg,#1c0f1a,#341a30);
+    overflow:hidden;
+  }
+  video{
+    position:absolute; inset:0;
+    width:100%; height:100%;
     object-fit:cover;
+    display:block;
+  }
+  canvas.hidden-canvas{display:none;}
 
-}
-
-
-
-#photo{
-
-    display:none;
-
-}
-
-
-
-.buttons{
-
-    display:flex;
-
-    justify-content:center;
-
-    gap:15px;
-
-}
-
-
-
-.buttons button{
-
-    padding:13px 25px;
-
-    border-radius:30px;
-
-    border:0;
-
-    background:#c24b86;
-
-    color:white;
-
-    font-weight:bold;
-
-    cursor:pointer;
-
-}
-
-
-
-#loading{
-
-    display:none;
-
-    margin-top:20px;
-
-    color:#ffd68a;
-
-}
-
-
-
-#result{
-
-    margin-top:25px;
-
-    background:#fff;
-
-    color:#32182d;
-
-    border-radius:20px;
-
-    padding:25px;
-
-    text-align:left;
-
-}
-
-
-
-footer{
-
+  .stage-empty{
+    position:absolute; inset:0;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap:14px;
+    color:#F3E7EF;
     text-align:center;
+    padding:30px;
+  }
+  .stage-empty svg{width:56px;height:56px;opacity:0.85;}
+  .stage-empty p{margin:0;font-size:13.5px;line-height:1.6;opacity:0.75;max-width:280px;font-family:'Sarabun';}
+  .btn-start{
+    font-family:'Kanit',sans-serif;
+    font-weight:500;
+    font-size:14.5px;
+    background:var(--gold);
+    color:#2A1B0E;
+    border:none;
+    padding:11px 22px;
+    border-radius:100px;
+    cursor:pointer;
+    letter-spacing:0.2px;
+  }
+  .btn-start:active{transform:scale(0.97);}
 
-    padding:40px 20px;
+  /* calyx corner brackets = signature scan frame */
+  .frame{
+    position:absolute; inset:9% 12%;
+    pointer-events:none;
+    opacity:0.9;
+  }
+  .frame span{
+    position:absolute;
+    width:30px;height:30px;
+  }
+  .frame span svg{width:100%;height:100%;}
+  .frame .tl{top:-6px;left:-6px;}
+  .frame .tr{top:-6px;right:-6px;transform:scaleX(-1);}
+  .frame .bl{bottom:-6px;left:-6px;transform:scaleY(-1);}
+  .frame .br{bottom:-6px;right:-6px;transform:scale(-1,-1);}
 
-    opacity:.6;
+  .scan-sweep{
+    position:absolute; left:12%; right:12%; top:9%;
+    height:2px;
+    background:linear-gradient(90deg, transparent, var(--gold) 20%, var(--gold) 80%, transparent);
+    box-shadow:0 0 10px 1px rgba(201,154,60,0.7);
+    animation:sweep 2.1s ease-in-out infinite;
+    opacity:0;
+  }
+  .stage.scanning .scan-sweep{opacity:1;}
+  @keyframes sweep{
+    0%{ top:9%; opacity:0;}
+    10%{opacity:1;}
+    90%{opacity:1;}
+    100%{ top:88%; opacity:0;}
+  }
 
+  .stage-topbar{
+    position:absolute; top:0; left:0; right:0;
+    display:flex; justify-content:space-between; align-items:flex-start;
+    padding:14px;
+    z-index:5;
+  }
+  .pill{
+    font-family:'Kanit',sans-serif;
+    font-size:11.5px;
+    font-weight:500;
+    color:#fff;
+    background:rgba(0,0,0,0.32);
+    backdrop-filter:blur(6px);
+    padding:6px 12px;
+    border-radius:100px;
+    display:flex; align-items:center; gap:6px;
+  }
+  .dot{width:6px;height:6px;border-radius:50%;background:#8fbf7a;}
+  .dot.live{background:var(--severe);animation:pulse 1.2s infinite;}
+  @keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.35;}}
+
+  .icon-btn{
+    width:34px;height:34px;border-radius:50%;
+    background:rgba(0,0,0,0.32);
+    backdrop-filter:blur(6px);
+    border:none;
+    display:grid;place-items:center;
+    cursor:pointer;
+    color:#fff;
+  }
+  .icon-btn svg{width:17px;height:17px;}
+  .icon-btn:active{transform:scale(0.92);}
+
+  .stage-bottombar{
+    position:absolute; left:0; right:0; bottom:0;
+    display:flex; justify-content:center; align-items:center;
+    padding:18px 16px 20px;
+    z-index:5;
+    background:linear-gradient(to top, rgba(0,0,0,0.4), transparent);
+  }
+  .shutter{
+    width:66px;height:66px;
+    border-radius:50%;
+    background:#fff;
+    border:4px solid rgba(255,255,255,0.35);
+    display:grid;place-items:center;
+    cursor:pointer;
+    padding:0;
+  }
+  .shutter-inner{
+    width:100%;height:100%;
+    border-radius:50%;
+    background:var(--rind);
+    display:grid;place-items:center;
+    transition:transform 0.15s;
+  }
+  .shutter-inner svg{width:24px;height:24px;color:#fff;}
+  .shutter:active .shutter-inner{transform:scale(0.88);}
+  .shutter:disabled{opacity:0.5;pointer-events:none;}
+
+  /* ---- Result panel ---- */
+  .panel{padding:22px 20px 24px;}
+  .panel-idle{
+    text-align:center;
+    padding:18px 10px 6px;
+    color:var(--ink);
+    opacity:0.55;
+    font-size:13.5px;
+    line-height:1.7;
+  }
+
+  .result-head{
+    display:flex; align-items:flex-start; justify-content:space-between; gap:12px;
+    margin-bottom:16px;
+  }
+  .result-title-group{flex:1;min-width:0;}
+  .eyebrow{
+    font-family:'Kanit',sans-serif;
+    font-size:11px;
+    letter-spacing:1.2px;
+    text-transform:uppercase;
+    color:var(--gold);
+    font-weight:600;
+    margin:0 0 4px;
+  }
+  .disease-name{
+    font-family:'Kanit',sans-serif;
+    font-size:21px;
+    font-weight:600;
+    margin:0;
+    color:var(--rind-dark);
+    line-height:1.3;
+  }
+  .confidence-line{
+    font-size:12.5px;
+    color:var(--ink);
+    opacity:0.5;
+    margin:4px 0 0;
+  }
+
+  .severity-badge{
+    flex:none;
+    font-family:'Kanit',sans-serif;
+    font-weight:600;
+    font-size:12.5px;
+    padding:7px 13px;
+    border-radius:100px;
+    display:flex; align-items:center; gap:6px;
+    white-space:nowrap;
+  }
+  .sev-mild{background:rgba(95,143,82,0.13); color:var(--mild);}
+  .sev-mid{background:rgba(201,125,60,0.14); color:var(--mid);}
+  .sev-severe{background:rgba(178,58,72,0.13); color:var(--severe);}
+  .sev-dot{width:7px;height:7px;border-radius:50%;background:currentColor;}
+
+  .severity-meter{
+    display:flex; gap:4px; margin:14px 0 18px;
+  }
+  .severity-meter i{
+    flex:1; height:5px; border-radius:3px;
+    background:var(--line);
+  }
+  .severity-meter i.on{background:currentColor;}
+
+  .section{margin-bottom:18px;}
+  .section:last-child{margin-bottom:0;}
+  .section-title{
+    font-family:'Kanit',sans-serif;
     font-size:13px;
+    font-weight:600;
+    color:var(--rind-dark);
+    display:flex; align-items:center; gap:7px;
+    margin:0 0 8px;
+  }
+  .section-title svg{width:15px;height:15px;flex:none;}
+  .section p{
+    margin:0;
+    font-size:14px;
+    line-height:1.75;
+    color:var(--ink);
+    opacity:0.85;
+  }
+  .steps{margin:0;padding:0;list-style:none;}
+  .steps li{
+    display:flex; gap:10px;
+    font-size:14px;
+    line-height:1.7;
+    color:var(--ink);
+    opacity:0.88;
+    padding:7px 0;
+    border-top:1px solid var(--line);
+  }
+  .steps li:first-child{border-top:none;padding-top:0;}
+  .step-num{
+    font-family:'Kanit',sans-serif;
+    font-weight:600;
+    font-size:12px;
+    color:var(--leaf-dark);
+    background:rgba(76,122,61,0.12);
+    width:20px;height:20px;border-radius:50%;
+    display:grid;place-items:center;
+    flex:none;
+    margin-top:1px;
+  }
 
-}
+  .divider{height:1px;background:var(--line);margin:18px 0;}
 
+  .actions-row{
+    display:flex; gap:10px; margin-top:20px;
+  }
+  .btn-secondary, .btn-primary{
+    font-family:'Kanit',sans-serif;
+    font-weight:500;
+    font-size:13.5px;
+    border-radius:12px;
+    padding:11px 16px;
+    cursor:pointer;
+    border:none;
+    flex:1;
+    display:flex;align-items:center;justify-content:center;gap:6px;
+  }
+  .btn-primary{background:var(--rind);color:#fff;}
+  .btn-secondary{background:transparent;color:var(--rind-dark);border:1px solid var(--line);}
+  .btn-primary:active,.btn-secondary:active{transform:scale(0.98);}
+  .btn-primary svg,.btn-secondary svg{width:15px;height:15px;}
 
+  .error-box{
+    margin-top:14px;
+    background:rgba(178,58,72,0.08);
+    border:1px solid rgba(178,58,72,0.2);
+    color:var(--severe);
+    font-size:13px;
+    line-height:1.6;
+    padding:12px 14px;
+    border-radius:12px;
+  }
 
+  .loading-row{
+    display:flex; align-items:center; gap:10px;
+    padding:24px 4px;
+    justify-content:center;
+    color:var(--rind-dark);
+    font-family:'Kanit',sans-serif;
+    font-size:13.5px;
+  }
+  .spinner{
+    width:18px;height:18px;
+    border-radius:50%;
+    border:2.5px solid rgba(92,42,84,0.15);
+    border-top-color:var(--rind);
+    animation:spin 0.8s linear infinite;
+  }
+  @keyframes spin{to{transform:rotate(360deg);}}
 
-@media(max-width:600px){
+  footer.note{
+    text-align:center;
+    font-size:11.5px;
+    color:var(--ink);
+    opacity:0.4;
+    margin-top:20px;
+    line-height:1.6;
+    padding:0 20px;
+  }
 
-h1{
+  @media (max-width:420px){
+    .disease-name{font-size:19px;}
+    .stage{aspect-ratio:3/4.3;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
 
-    font-size:34px;
+  <header class="app-head">
+    <div class="mark">
+      <svg viewBox="0 0 40 40" fill="none">
+        <circle cx="20" cy="22" r="15" fill="#5C2A54"/>
+        <path d="M20 7C20 7 16 3 12 4C13 8 17 10 20 10C23 10 27 8 28 4C24 3 20 7 20 7Z" fill="#4C7A3D"/>
+        <path d="M20 7C20 7 15 5 11 8C13 12 18 12 20 10" stroke="#345228" stroke-width="0" fill="#4C7A3D"/>
+      </svg>
+    </div>
+    <div class="brand-text">
+      <h1>มังคุดสแกน</h1>
+      <p>ตรวจโรคมังคุดจากภาพถ่ายกล้องแบบเรียลไทม์</p>
+    </div>
+  </header>
 
-}
+  <p class="hero-line">เปิดกล้องส่องผล เปลือก หรือใบมังคุดที่สงสัย แล้วกดปุ่มถ่ายเพื่อวิเคราะห์ — ระบบจะบอกชื่อโรค สาเหตุ ความรุนแรง และวิธีรักษาให้ทันที</p>
 
+  <div class="card">
+    <div class="stage" id="stage">
+      <video id="video" autoplay playsinline muted></video>
+      <canvas class="hidden-canvas" id="canvas"></canvas>
 
-.camera-box{
+      <div class="stage-empty" id="stageEmpty">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 8a2 2 0 0 1 2-2h1.5l1-1.5h7l1 1.5H18a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8z"/><circle cx="12" cy="13" r="3.5"/></svg>
+        <p>เปิดกล้องเพื่อเริ่มสแกน — ระบบขออนุญาตใช้กล้องจากเบราว์เซอร์</p>
+        <button class="btn-start" id="startBtn">เปิดกล้อง</button>
+      </div>
 
-    width:240px;
+      <div class="frame" id="frame" style="display:none;">
+        <span class="tl"><svg viewBox="0 0 30 30"><path d="M2 30 L2 10 Q2 2 10 2 L30 2" stroke="#C99A3C" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg></span>
+        <span class="tr"><svg viewBox="0 0 30 30"><path d="M2 30 L2 10 Q2 2 10 2 L30 2" stroke="#C99A3C" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg></span>
+        <span class="bl"><svg viewBox="0 0 30 30"><path d="M2 30 L2 10 Q2 2 10 2 L30 2" stroke="#C99A3C" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg></span>
+        <span class="br"><svg viewBox="0 0 30 30"><path d="M2 30 L2 10 Q2 2 10 2 L30 2" stroke="#C99A3C" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg></span>
+      </div>
+      <div class="scan-sweep" id="sweep"></div>
 
-    height:240px;
+      <div class="stage-topbar" id="topbar" style="display:none;">
+        <div class="pill"><span class="dot live" id="liveDot"></span><span id="pillText">พร้อมสแกน</span></div>
+        <button class="icon-btn" id="switchBtn" title="สลับกล้องหน้า/หลัง">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 2l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 22l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+        </button>
+      </div>
 
-}
+      <div class="stage-bottombar" id="bottombar" style="display:none;">
+        <button class="shutter" id="shutterBtn">
+          <span class="shutter-inner">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8a2 2 0 0 1 2-2h1.5l1-1.5h7l1 1.5H18a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8z"/><circle cx="12" cy="13" r="3.2"/></svg>
+          </span>
+        </button>
+      </div>
+    </div>
 
-}
-const video = document.getElementById("video");
-const photo = document.getElementById("photo");
+    <div class="panel" id="panel">
+      <div class="panel-idle" id="panelIdle">ผลการวิเคราะห์จะปรากฏที่นี่หลังจากถ่ายภาพ</div>
+    </div>
+  </div>
 
-const startBtn = document.getElementById("start");
-const captureBtn = document.getElementById("capture");
+  <footer class="note">ผลวิเคราะห์จาก AI ใช้เป็นข้อมูลประกอบการตัดสินใจเบื้องต้น หากอาการรุนแรงหรือไม่แน่ใจ ควรปรึกษานักวิชาการเกษตรหรือเกษตรอำเภอในพื้นที่</footer>
+</div>
 
-const loading = document.getElementById("loading");
-const result = document.getElementById("result");
+<script>
+const video = document.getElementById('video');
+const canvas = document.getElementById('canvas');
+const stage = document.getElementById('stage');
+const stageEmpty = document.getElementById('stageEmpty');
+const startBtn = document.getElementById('startBtn');
+const switchBtn = document.getElementById('switchBtn');
+const shutterBtn = document.getElementById('shutterBtn');
+const topbar = document.getElementById('topbar');
+const bottombar = document.getElementById('bottombar');
+const frame = document.getElementById('frame');
+const sweep = document.getElementById('sweep');
+const pillText = document.getElementById('pillText');
+const liveDot = document.getElementById('liveDot');
+const panel = document.getElementById('panel');
+const panelIdle = document.getElementById('panelIdle');
 
+let currentStream = null;
+let facingMode = 'environment'; // back camera default
+let busy = false;
 
-let stream = null;
-
-
-
-// เลื่อนลงไปส่วนกล้อง
-function scrollScanner(){
-
-    document
-    .getElementById("scanner")
-    .scrollIntoView({
-        behavior:"smooth"
-    });
-
-}
-
-
-
-
-// เปิดกล้อง
-
-startBtn.onclick = async()=>{
-
-    try{
-
-        stream =
-        await navigator.mediaDevices.getUserMedia({
-
-            video:{
-                facingMode:"environment",
-                width:{
-                    ideal:720
-                },
-                height:{
-                    ideal:720
-                }
-            },
-
-            audio:false
-
-        });
-
-
-        video.srcObject = stream;
-
-
-        result.innerHTML =
-        "✅ กล้องพร้อมใช้งาน";
-
-
+async function startCamera(mode){
+  try{
+    if(currentStream){
+      currentStream.getTracks().forEach(t => t.stop());
     }
-
-    catch(error){
-
-        alert(
-        "ไม่สามารถเปิดกล้องได้ กรุณาอนุญาตกล้อง และเปิดเว็บผ่าน HTTPS"
-        );
-
-        console.log(error);
-
-    }
-
-};
-
-
-
-
-// ถ่ายภาพ
-
-captureBtn.onclick = async()=>{
-
-
-    if(!stream){
-
-        alert(
-        "กรุณาเปิดกล้องก่อน"
-        );
-
-        return;
-
-    }
-
-
-
-    const canvas =
-    document.createElement("canvas");
-
-
-    canvas.width=640;
-    canvas.height=640;
-
-
-    const ctx =
-    canvas.getContext("2d");
-
-
-
-    ctx.drawImage(
-        video,
-        0,
-        0,
-        640,
-        640
-    );
-
-
-
-    const image =
-    canvas.toDataURL(
-        "image/jpeg",
-        .85
-    );
-
-
-
-    photo.src=image;
-
-    photo.style.display="block";
-
-    video.style.display="none";
-
-
-
-    loading.style.display="block";
-
-    result.innerHTML="";
-
-
-
-    try{
-
-
-        const response =
-        await fetch(
-            "/api/analyze",
-            {
-
-                method:"POST",
-
-                headers:{
-                    "Content-Type":
-                    "application/json"
-                },
-
-
-                body:
-                JSON.stringify({
-
-                    image:image
-
-                })
-
-            }
-        );
-
-
-
-        const data =
-        await response.json();
-
-
-
-        showResult(data);
-
-
-    }
-
-
-    catch(error){
-
-
-        result.innerHTML=
-        `
-        <h3>เกิดข้อผิดพลาด</h3>
-
-        <p>
-        ไม่สามารถเชื่อมต่อระบบวิเคราะห์ได้
-        </p>
-        `;
-
-
-        console.log(error);
-
-    }
-
-
-
-    loading.style.display="none";
-
-
-};
-
-
-
-
-
-function showResult(data){
-
-
-result.innerHTML=
-`
-
-<h2>
-${data.name || "ผลวิเคราะห์"}
-</h2>
-
-
-<p>
-<b>สถานะ:</b>
-${data.status || "-"}
-</p>
-
-
-<p>
-<b>อาการ:</b><br>
-${data.symptom || "-"}
-</p>
-
-
-<p>
-<b>คำแนะนำ:</b><br>
-${data.treatment || "-"}
-</p>
-
-
-`;
-
-
-
-}
-const express = require("express");
-const cors = require("cors");
-const path = require("path");
-
-require("dotenv").config();
-
-
-const app = express();
-
-
-app.use(cors());
-
-app.use(express.json({
-    limit:"10mb"
-}));
-
-
-// เปิดหน้าเว็บ
-
-app.use(express.static(
-    path.join(__dirname,".")
-));
-
-
-
-
-// ฐานข้อมูลมังคุด
-
-const DATABASE = `
-
-โรคใบจุดมังคุด
-
-สาเหตุ:
-เชื้อรา Pestalotiopsis flagisettula
-
-อาการ:
-ใบ กิ่ง ผล มีจุดแผล
-ระบาดช่วงความชื้นสูง
-
-
-การป้องกัน:
-ตัดแต่งกิ่ง
-ทำลายส่วนที่เป็นโรค
-
-
-เพลี้ยไฟ
-
-อาการ:
-ใบหงิก
-ผลเป็นรอยสีน้ำตาล
-
-
-การควบคุม:
-สำรวจสวน
-ใช้วิธีควบคุมตามคำแนะนำเกษตร
-
-
-หนอนกินใบอ่อน
-
-อาการ:
-ใบอ่อนถูกกัด
-เหลือแต่เส้นกลางใบ
-
-
-`;
-
-
-
-
-
-app.post(
-"/api/analyze",
-async(req,res)=>{
-
-
-try{
-
-
-const image =
-req.body.image;
-
-
-
-// จุดนี้เชื่อม AI จริงภายหลัง
-// ตอนนี้คืนค่าทดสอบก่อน
-
-
-const result={
-
-status:"unknown",
-
-name:
-"ยังไม่ได้เชื่อม AI",
-
-symptom:
-"ระบบได้รับภาพเรียบร้อย",
-
-treatment:
-"เตรียมเชื่อมโมเดล AI วิเคราะห์โรคมังคุด"
-
-
-};
-
-
-
-res.json(result);
-
-
-
-}
-
-catch(error){
-
-
-res.status(500).json({
-
-error:
-"server error"
-
-});
-
-
-}
-
-
-
-});
-
-
-
-
-
-const PORT =
-process.env.PORT || 3000;
-
-
-
-app.listen(
-PORT,
-()=>{
-
-console.log(
-`Server running : ${PORT}`
-);
-
-});
-{
-  "name": "momangkhud-ai",
-  "version": "1.0.0",
-  "description": "AI mangosteen disease scanner",
-  "main": "server.js",
-  "scripts": {
-    "start": "node server.js"
-  },
-  "dependencies": {
-    "cors": "^2.8.5",
-    "dotenv": "^16.4.5",
-    "express": "^4.19.2"
+    const constraints = {
+      video: { facingMode: { ideal: mode }, width:{ideal:1280}, height:{ideal:960} },
+      audio:false
+    };
+    const stream = await navigator.mediaDevices.getUserMedia(constraints);
+    currentStream = stream;
+    video.srcObject = stream;
+    facingMode = mode;
+    stageEmpty.style.display = 'none';
+    frame.style.display = 'block';
+    topbar.style.display = 'flex';
+    bottombar.style.display = 'flex';
+    pillText.textContent = mode === 'environment' ? 'กล้องหลัง · พร้อมสแกน' : 'กล้องหน้า · พร้อมสแกน';
+  }catch(err){
+    stageEmpty.style.display = 'flex';
+    stageEmpty.querySelector('p').textContent = 'ไม่สามารถเข้าถึงกล้องได้ — กรุณาอนุญาตการใช้กล้องในเบราว์เซอร์แล้วลองใหม่ (' + (err.message || err.name) + ')';
   }
 }
-const base64 =
-image.replace(
-"data:image/jpeg;base64,",
-""
-);
 
+startBtn.addEventListener('click', () => startCamera(facingMode));
 
-const prompt = `
-
-คุณคือผู้เชี่ยวชาญโรคมังคุด
-
-วิเคราะห์ภาพนี้เท่านั้น
-
-ใช้ข้อมูล:
-
-${DATABASE}
-
-กฎ:
-- ห้ามสร้างโรคใหม่
-- ถ้าไม่ตรงฐานข้อมูลให้ตอบ unknown
-- ถ้าปกติให้ตอบ healthy
-
-
-ตอบ JSON เท่านั้น:
-
-{
-"status":"",
-"name":"",
-"symptom":"",
-"treatment":""
-}
-
-`;
-
-
-
-const aiResponse =
-await fetch(
-"https://api.openai.com/v1/chat/completions",
-{
-
-method:"POST",
-
-headers:{
-
-"Content-Type":
-"application/json",
-
-"Authorization":
-`Bearer ${process.env.AI_API_KEY}`
-
-},
-
-
-body:JSON.stringify({
-
-model:
-"gpt-4.1-mini",
-
-messages:[
-
-{
-role:"system",
-content:prompt
-},
-
-{
-
-role:"user",
-
-content:[
-
-{
-
-type:"text",
-
-text:
-"วิเคราะห์ภาพมังคุดนี้"
-
-},
-
-{
-
-type:"image_url",
-
-image_url:{
-
-url:
-`data:image/jpeg;base64,${base64}`
-
-}
-
-}
-
-]
-
-}
-
-],
-
-temperature:0.1
-
-})
-
+switchBtn.addEventListener('click', () => {
+  const next = facingMode === 'environment' ? 'user' : 'environment';
+  startCamera(next);
 });
 
+function setBusy(state){
+  busy = state;
+  shutterBtn.disabled = state;
+  stage.classList.toggle('scanning', state);
+  pillText.textContent = state ? 'กำลังวิเคราะห์…' : (facingMode === 'environment' ? 'กล้องหลัง · พร้อมสแกน' : 'กล้องหน้า · พร้อมสแกน');
+}
 
+function severityInfo(level){
+  // level: 1-5
+  const l = Math.max(1, Math.min(5, Number(level) || 1));
+  let cls = 'sev-mild', label = 'ความรุนแรงน้อย';
+  if(l >= 4){ cls = 'sev-severe'; label = 'ความรุนแรงสูง'; }
+  else if(l >= 2.5){ cls = 'sev-mid'; label = 'ความรุนแรงปานกลาง'; }
+  return { level:l, cls, label };
+}
 
-const aiData =
-await aiResponse.json();
+function renderLoading(){
+  panel.innerHTML = `<div class="loading-row"><div class="spinner"></div><span>กำลังวิเคราะห์ภาพ…</span></div>`;
+}
 
+function renderError(msg){
+  panel.innerHTML = `
+    <div class="panel-idle" style="opacity:0.7;">ผลการวิเคราะห์จะปรากฏที่นี่หลังจากถ่ายภาพ</div>
+    <div class="error-box">เกิดข้อผิดพลาด: ${escapeHtml(msg)}</div>
+  `;
+}
 
+function escapeHtml(str){
+  const d = document.createElement('div');
+  d.textContent = str;
+  return d.innerHTML;
+}
 
-const text =
-aiData.choices[0]
-.message
-.content;
+function renderNotMangosteen(reason){
+  panel.innerHTML = `
+    <div class="error-box" style="background:rgba(201,154,60,0.1);border-color:rgba(201,154,60,0.3);color:#8a6a1f;">
+      ไม่พบมังคุดในภาพที่ชัดเจนพอสำหรับวิเคราะห์ — ${escapeHtml(reason || 'กรุณาถ่ายให้เห็นผล เปลือก หรือใบมังคุดชัดเจน โดยให้แสงสว่างเพียงพอ')}
+    </div>
+  `;
+}
 
+function renderResult(data){
+  const sev = severityInfo(data.severity_level);
+  const stepsHtml = (data.treatment || []).map((t,i) => `
+    <li><span class="step-num">${i+1}</span><span>${escapeHtml(t)}</span></li>
+  `).join('');
 
+  const meterBars = Array.from({length:5}).map((_,i) => `<i class="${i < sev.level ? 'on' : ''}"></i>`).join('');
 
-res.json(
-JSON.parse(text)
-);
+  panel.innerHTML = `
+    <div class="result-head">
+      <div class="result-title-group">
+        <p class="eyebrow">${escapeHtml(data.part || 'ผลการวิเคราะห์')}</p>
+        <h2 class="disease-name">${escapeHtml(data.disease_name || 'ไม่ทราบชื่อโรคแน่ชัด')}</h2>
+        ${data.confidence ? `<p class="confidence-line">ความมั่นใจของระบบ ~${escapeHtml(String(data.confidence))}%</p>` : ''}
+      </div>
+      <div class="severity-badge ${sev.cls}"><span class="sev-dot"></span>${sev.label}</div>
+    </div>
+
+    <div class="severity-meter ${sev.cls}">${meterBars}</div>
+
+    <div class="section">
+      <p class="section-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+        สาเหตุ
+      </p>
+      <p>${escapeHtml(data.cause || '-')}</p>
+    </div>
+
+    ${data.symptoms ? `
+    <div class="section">
+      <p class="section-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4v16h16v-7"/><path d="M17.5 3.5a2.1 2.1 0 1 1 3 3L12 15l-4 1 1-4z"/></svg>
+        ลักษณะอาการที่พบ
+      </p>
+      <p>${escapeHtml(data.symptoms)}</p>
+    </div>` : ''}
+
+    <div class="section">
+      <p class="section-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.29 1.51 4.04 3 5.5l7 7Z"/></svg>
+        วิธีรักษา / จัดการ
+      </p>
+      <ul class="steps">${stepsHtml || '<li><span></span><span>ไม่มีข้อมูล</span></li>'}</ul>
+    </div>
+
+    ${data.prevention ? `
+    <div class="section">
+      <p class="section-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/></svg>
+        การป้องกัน
+      </p>
+      <p>${escapeHtml(data.prevention)}</p>
+    </div>` : ''}
+
+    <div class="actions-row">
+      <button class="btn-secondary" id="scanAgainBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+        สแกนใหม่
+      </button>
+    </div>
+  `;
+
+  document.getElementById('scanAgainBtn').addEventListener('click', () => {
+    panel.innerHTML = `<div class="panel-idle">ผลการวิเคราะห์จะปรากฏที่นี่หลังจากถ่ายภาพ</div>`;
+  });
+}
+
+function captureFrame(){
+  const w = video.videoWidth, h = video.videoHeight;
+  canvas.width = w;
+  canvas.height = h;
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(video, 0, 0, w, h);
+  return canvas.toDataURL('image/jpeg', 0.85).split(',')[1];
+}
+
+async function analyzeImage(base64Data){
+  const systemPrompt = `คุณคือผู้เชี่ยวชาญโรคพืชสวนของมังคุด (Garcinia mangostana) ในประเทศไทย มีหน้าที่วิเคราะห์ภาพถ่ายผล เปลือก ก้าน หรือใบมังคุด แล้วระบุโรคหรือความผิดปกติที่พบ
+
+ตอบกลับเป็น JSON เท่านั้น ห้ามมีข้อความอื่นนอก JSON ห้ามใช้ markdown code block ใช้โครงสร้างนี้เท่านั้น:
+
+{
+  "is_mangosteen": true หรือ false,
+  "reason_if_not_mangosteen": "ระบุเหตุผลถ้าไม่ใช่มังคุดหรือภาพไม่ชัดพอ ไม่งั้นเว้นว่าง",
+  "part": "ส่วนที่วิเคราะห์ เช่น ผลมังคุด, เปลือกมังคุด, ใบมังคุด",
+  "disease_name": "ชื่อโรค/ความผิดปกติภาษาไทย เช่น เนื้อแก้วยางไหล, ผลแตก, โรคใบจุด, ราดำ, เพลี้ยไฟทำลายผิว หรือ 'ผลปกติดี ไม่พบความผิดปกติ' ถ้าไม่พบโรค",
+  "confidence": ตัวเลข 0-100 ความมั่นใจ,
+  "cause": "สาเหตุของโรคหรืออาการนี้ อธิบายกระชับ 1-3 ประโยค",
+  "symptoms": "ลักษณะอาการที่สังเกตเห็นในภาพนี้โดยเฉพาะ",
+  "treatment": ["ขั้นตอนการรักษาแบบสั้นกระชับ ข้อที่ 1", "ข้อที่ 2", "ข้อที่ 3"],
+  "prevention": "แนวทางป้องกันไม่ให้เกิดซ้ำ",
+  "severity_level": ตัวเลข 1-5 (1=เล็กน้อยไม่กระทบผลผลิต, 3=ปานกลาง ต้องจัดการ, 5=รุนแรงเสียหายมาก/ลามเร็ว)
+}
+
+ถ้าภาพไม่ใช่มังคุดเลย หรือไม่ชัดเจนจนวิเคราะห์ไม่ได้ ให้ is_mangosteen เป็น false และอธิบายใน reason_if_not_mangosteen ส่วนฟิลด์อื่นเว้นว่างหรือใส่ null ได้`;
+
+  const response = await fetch("https://api.anthropic.com/v1/messages", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      model: "claude-sonnet-4-6",
+      max_tokens: 1000,
+      system: systemPrompt,
+      messages: [{
+        role: "user",
+        content: [
+          { type: "image", source: { type: "base64", media_type: "image/jpeg", data: base64Data } },
+          { type: "text", text: "วิเคราะห์ภาพมังคุดนี้ตามโครงสร้าง JSON ที่กำหนด" }
+        ]
+      }]
+    })
+  });
+
+  if(!response.ok){
+    throw new Error("การเชื่อมต่อ API ล้มเหลว (" + response.status + ")");
+  }
+  const data = await response.json();
+  const textBlock = (data.content || []).find(b => b.type === 'text');
+  if(!textBlock) throw new Error("ไม่ได้รับข้อความตอบกลับจากระบบ");
+  let clean = textBlock.text.trim().replace(/^```json/i,'').replace(/^```/,'').replace(/```$/,'').trim();
+  let parsed;
+  try{
+    parsed = JSON.parse(clean);
+  }catch(e){
+    throw new Error("ไม่สามารถอ่านผลลัพธ์จากระบบได้ กรุณาลองถ่ายใหม่");
+  }
+  return parsed;
+}
+
+shutterBtn.addEventListener('click', async () => {
+  if(busy || !currentStream) return;
+  setBusy(true);
+  renderLoading();
+  try{
+    const base64 = captureFrame();
+    const result = await analyzeImage(base64);
+    if(result.is_mangosteen === false){
+      renderNotMangosteen(result.reason_if_not_mangosteen);
+    }else{
+      renderResult(result);
+    }
+  }catch(err){
+    renderError(err.message || String(err));
+  }finally{
+    setBusy(false);
+  }
+});
+
+window.addEventListener('beforeunload', () => {
+  if(currentStream) currentStream.getTracks().forEach(t => t.stop());
+});
+</script>
+</body>
+</html>
