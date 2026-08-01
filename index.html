@@ -1,569 +1,175 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0">
-<title>มังคุดซีเล็ค — เครื่องสแกนโรคมังคุดภาคสนาม</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --void: #0B0710;
-    --void-2: #150C1C;
-    --rind: #7A2C63;
-    --rind-bright: #D9679F;
-    --rind-glow: #F08FC4;
-    --calyx: #58A15C;
-    --calyx-glow: #7FCB83;
-    --flesh: #F3E9DD;
-    --gold: #D6A441;
-    --alert: #D1495B;
-    --line: rgba(243,233,221,0.14);
-    --text: #F3E9DD;
-    --text-dim: rgba(243,233,221,0.56);
-    --surface: rgba(243,233,221,0.045);
-    --surface-2: rgba(243,233,221,0.09);
-  }
-  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-  html, body {
-    margin: 0; padding: 0; height: 100%; overscroll-behavior: none;
-  }
-  body {
-    background: var(--void);
-    color: var(--text);
-    font-family: 'IBM Plex Sans Thai', sans-serif;
-    position: fixed; inset: 0;
-    display: flex; flex-direction: column;
-  }
-  .mono { font-family: 'Chakra Petch', sans-serif; }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>หน้าเว็บของฉัน</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap" rel="stylesheet">
+    
+    <style>
+        /* ตั้งค่าพื้นฐาน */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Kanit', sans-serif;
+        }
 
-  /* ===== Top bar ===== */
-  .topbar {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: max(12px, env(safe-area-inset-top)) 16px 10px;
-    z-index: 20; position: relative;
-    background: linear-gradient(to bottom, rgba(11,7,16,0.9), rgba(11,7,16,0));
-  }
-  .brand { display: flex; flex-direction: column; }
-  .brand .mark { display:flex; align-items:center; gap:8px; }
-  .brand .dot { width:7px; height:7px; border-radius:50%; background: var(--calyx-glow); box-shadow: 0 0 8px var(--calyx-glow); animation: pulse-dot 2s ease-in-out infinite; }
-  @keyframes pulse-dot { 0%,100%{opacity:1} 50%{opacity:.35} }
-  .brand h1 { font-family: 'Chakra Petch', sans-serif; font-weight: 700; font-size: 16px; letter-spacing: 0.03em; margin: 0; color: var(--text); }
-  .brand p { margin: 2px 0 0 15px; font-size: 10.5px; color: var(--text-dim); letter-spacing: 0.02em; }
+        body {
+            background-color: #f4f7f6;
+            color: #333;
+            line-height: 1.6;
+        }
 
-  .key-chip { font-family:'Chakra Petch',sans-serif; font-size:10.5px; font-weight:600; border:1px solid var(--line); background: var(--surface); color: var(--text-dim); padding: 7px 11px; border-radius: 100px; cursor:pointer; white-space:nowrap; }
-  .key-chip.set { color: var(--calyx-glow); border-color: rgba(127,203,131,0.35); }
+        /* ส่วน Header / Navbar */
+        header {
+            background: #ffffff;
+            padding: 20px 8%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
 
-  /* ===== Viewfinder stage ===== */
-  .viewfinder-stage {
-    position: relative; flex: 1; min-height: 0; overflow: hidden;
-    background: radial-gradient(ellipse at 50% 30%, #1c1024, var(--void) 75%);
-  }
-  #camVideo, #capturedImg {
-    position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
-  }
-  #capturedImg { display: none; }
-  #camVideo.hidden { display: none; }
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #4A90E2;
+        }
 
-  .capture-flash { position:absolute; inset:0; background:#fff; opacity:0; pointer-events:none; z-index:15; }
-  .capture-flash.fire { animation: flash-pop 0.35s ease-out; }
-  @keyframes flash-pop { 0%{opacity:0.85} 100%{opacity:0} }
+        nav a {
+            margin-left: 20px;
+            text-decoration: none;
+            color: #555;
+            font-weight: 400;
+            transition: color 0.3s;
+        }
 
-  /* HUD frame */
-  .hud-frame { position:absolute; inset: 22px; pointer-events:none; z-index: 10; }
-  .corner { position:absolute; width: 26px; height: 26px; border: 2.5px solid var(--rind-bright); opacity: 0.85; transition: border-color .4s ease, opacity .4s ease, box-shadow .4s ease; filter: drop-shadow(0 0 6px rgba(217,103,159,0.5)); }
-  .corner.tl { top:0; left:0; border-right:none; border-bottom:none; border-radius: 6px 0 0 0; }
-  .corner.tr { top:0; right:0; border-left:none; border-bottom:none; border-radius: 0 6px 0 0; }
-  .corner.bl { bottom:0; left:0; border-right:none; border-top:none; border-radius: 0 0 0 6px; }
-  .corner.br { bottom:0; right:0; border-left:none; border-top:none; border-radius: 0 0 6px 0; }
-  .hud-frame.locked .corner { border-color: var(--calyx-glow); box-shadow: 0 0 12px rgba(127,203,131,0.65); opacity: 1; }
+        nav a:hover {
+            color: #4A90E2;
+        }
 
-  .scan-line { position:absolute; left:2%; right:2%; height: 2px; top:0; background: linear-gradient(90deg, transparent, var(--rind-glow), transparent); box-shadow: 0 0 12px 2px var(--rind-glow); animation: scan-move 3.6s ease-in-out infinite; opacity: 0.75; }
-  @keyframes scan-move { 0%{ top:4%; opacity:0 } 10%{opacity:.8} 50%{ top:94%; opacity:.8 } 60%{opacity:0} 100%{ top:4%; opacity:0 } }
-  .viewfinder-stage.analyzing .scan-line { animation-duration: 1.05s; background: linear-gradient(90deg, transparent, var(--gold), transparent); box-shadow: 0 0 16px 3px var(--gold); }
-  .viewfinder-stage.analyzing .hud-frame .corner { border-color: var(--gold); box-shadow: 0 0 12px rgba(214,164,65,0.6); }
+        /* ส่วน Hero (ข้อความต้อนรับด้านบน) */
+        .hero {
+            text-align: center;
+            padding: 100px 20px;
+            background: linear-gradient(135deg, #6B73FF 0%, #000DFF 100%);
+            color: white;
+        }
 
-  .grid-overlay { position:absolute; inset:0; z-index:9; pointer-events:none; opacity:0;
-    background-image: linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px);
-    background-size: 34px 34px; transition: opacity .4s ease; }
-  .viewfinder-stage.analyzing .grid-overlay { opacity: 0.35; animation: grid-pulse 1.6s ease-in-out infinite; }
-  @keyframes grid-pulse { 0%,100%{opacity:.2} 50%{opacity:.4} }
+        .hero h1 {
+            font-size: 2.8rem;
+            margin-bottom: 15px;
+        }
 
-  .hud-status { position:absolute; left:0; right:0; bottom: 14px; text-align:center; z-index:11; font-family:'Chakra Petch',sans-serif; font-size: 11.5px; letter-spacing:0.04em; color: var(--text); text-shadow: 0 1px 6px rgba(0,0,0,0.8); padding: 0 20px; transition: opacity .3s ease; }
-  .hud-status .sub { display:block; font-size: 10px; color: var(--text-dim); margin-top:3px; font-family:'IBM Plex Sans Thai',sans-serif; }
+        .hero p {
+            font-size: 1.2rem;
+            margin-bottom: 25px;
+            opacity: 0.9;
+        }
 
-  .camera-fallback { position:absolute; inset:0; display:none; flex-direction:column; align-items:center; justify-content:center; gap:14px; text-align:center; padding: 30px; z-index: 14; background: var(--void-2); }
-  .camera-fallback.show { display:flex; }
-  .camera-fallback p { margin:0; font-size: 13px; color: var(--text-dim); line-height:1.7; max-width: 280px; }
-  .camera-fallback .icon-warn { font-family:'Chakra Petch',sans-serif; font-size: 12px; font-weight:700; color: var(--alert); letter-spacing: 0.05em; }
+        .btn {
+            display: inline-block;
+            background: #ffffff;
+            color: #000DFF;
+            padding: 12px 30px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
 
-  /* ===== Controls ===== */
-  .control-bar { position:relative; z-index: 20; display:flex; align-items:center; justify-content:center; gap: 30px; padding: 18px 20px calc(16px + env(safe-area-inset-bottom)); background: linear-gradient(to top, rgba(11,7,16,0.95), rgba(11,7,16,0.5) 70%, transparent); }
-  .ctrl-btn { font-family:'Chakra Petch',sans-serif; font-size: 10.5px; font-weight:600; background: var(--surface-2); border: 1px solid var(--line); color: var(--text); width: 52px; height: 52px; border-radius: 50%; display:flex; align-items:center; justify-content:center; cursor:pointer; }
-  .ctrl-btn svg { width:20px; height:20px; }
-  .shutter-btn { width: 74px; height: 74px; border-radius: 50%; border: 3px solid var(--flesh); background: transparent; padding: 4px; cursor: pointer; display:flex; align-items:center; justify-content:center; transition: transform .12s ease; }
-  .shutter-btn:active { transform: scale(0.92); }
-  .shutter-inner { width:100%; height:100%; border-radius:50%; background: radial-gradient(circle at 35% 30%, var(--rind-glow), var(--rind) 70%); box-shadow: 0 0 18px rgba(217,103,159,0.55); }
-  .shutter-btn:disabled { opacity: 0.4; pointer-events:none; }
-  .shutter-btn.retake .shutter-inner { background: radial-gradient(circle at 35% 30%, var(--calyx-glow), var(--calyx) 70%); box-shadow: 0 0 18px rgba(127,203,131,0.5); }
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
 
-  /* ===== History strip ===== */
-  .history-strip { position:relative; z-index:20; display:flex; gap:8px; padding: 0 16px 14px; overflow-x:auto; background: var(--void); }
-  .history-strip:empty { display:none; }
-  .hist-thumb { flex:none; width:46px; height:46px; border-radius:10px; overflow:hidden; border: 1.5px solid var(--line); cursor:pointer; position:relative; }
-  .hist-thumb img { width:100%; height:100%; object-fit:cover; display:block; }
-  .hist-thumb .sev-dot { position:absolute; top:3px; right:3px; width:7px; height:7px; border-radius:50%; box-shadow: 0 0 4px rgba(0,0,0,0.8); }
+        /* ส่วนเนื้อหา / Cards */
+        .container {
+            max-width: 1100px;
+            margin: 60px auto;
+            padding: 0 20px;
+        }
 
-  /* ===== Result drawer ===== */
-  .drawer-backdrop { position:fixed; inset:0; background: rgba(5,3,8,0.6); backdrop-filter: blur(2px); opacity:0; pointer-events:none; transition: opacity .35s ease; z-index: 29; }
-  .drawer-backdrop.open { opacity:1; pointer-events:auto; }
+        .section-title {
+            text-align: center;
+            font-size: 2rem;
+            margin-bottom: 40px;
+        }
 
-  .result-drawer { position:fixed; left:0; right:0; bottom:0; max-height: 86vh; background: var(--void-2); border-radius: 26px 26px 0 0; border-top: 1px solid var(--line); z-index: 30; transform: translateY(102%); transition: transform .42s cubic-bezier(.2,.8,.2,1); display:flex; flex-direction:column; box-shadow: 0 -20px 60px -20px rgba(0,0,0,0.8); }
-  .result-drawer.open { transform: translateY(0); }
-  .drawer-handle { display:flex; justify-content:center; padding: 10px 0 4px; flex:none; }
-  .drawer-handle span { width: 38px; height: 4px; border-radius: 4px; background: var(--line); }
-  .drawer-scroll { overflow-y: auto; padding: 6px 20px calc(26px + env(safe-area-inset-bottom)); }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+        }
 
-  .dw-loading { display:flex; flex-direction:column; align-items:center; gap: 16px; padding: 40px 10px 30px; }
-  .dw-spinner { width: 40px; height: 40px; border-radius: 50%; border: 3px solid rgba(243,233,221,0.12); border-top-color: var(--gold); animation: spin 0.85s linear infinite; }
-  @keyframes spin { to { transform: rotate(360deg); } }
-  .dw-loading p { margin:0; font-family:'Chakra Petch',sans-serif; font-size: 12.5px; color: var(--text-dim); letter-spacing: 0.03em; }
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            transition: transform 0.3s;
+        }
 
-  .dw-error { text-align:center; padding: 30px 10px; }
-  .dw-error p { color: var(--alert); font-size: 13px; margin: 0 0 14px; line-height:1.7; }
+        .card:hover {
+            transform: translateY(-5px);
+        }
 
-  .result-top { display:flex; align-items:flex-start; gap: 14px; padding: 8px 0 6px; }
-  .result-icon { flex:none; width: 52px; height:52px; border-radius: 16px; display:flex; align-items:center; justify-content:center; background: var(--surface-2); }
-  .result-icon svg { width: 28px; height:28px; }
-  .eyebrow { font-family:'Chakra Petch',sans-serif; font-size: 10px; font-weight:700; letter-spacing: 0.08em; color: var(--gold); margin: 0 0 3px; text-transform: uppercase; }
-  .disease-name { font-family:'Chakra Petch',sans-serif; font-size: 19px; font-weight: 700; margin: 0; line-height:1.25; }
-  .conf-row { display:flex; align-items:center; gap:8px; margin-top:6px; }
-  .conf-track { flex:1; max-width: 130px; height: 4px; border-radius:4px; background: var(--surface-2); overflow:hidden; }
-  .conf-fill { height:100%; border-radius:4px; background: linear-gradient(90deg, var(--rind), var(--rind-bright)); width:0%; transition: width 1s cubic-bezier(.2,.8,.2,1); }
-  .conf-label { font-family:'Chakra Petch',sans-serif; font-size: 10.5px; color: var(--text-dim); }
+        .card h3 {
+            color: #4A90E2;
+            margin-bottom: 10px;
+        }
 
-  .sev-gauge { flex:none; text-align:center; }
-  .sev-gauge svg { width: 54px; height: 54px; display:block; }
-  .sev-gauge .sev-num { font-family:'Chakra Petch',sans-serif; font-size: 15px; font-weight:700; }
-  .sev-gauge .sev-label { font-size: 8.5px; color: var(--text-dim); margin-top:1px; }
-
-  .section { margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--line); }
-  .section-title { font-family:'Chakra Petch',sans-serif; font-size: 11px; font-weight:700; letter-spacing:0.05em; margin: 0 0 9px; display:flex; align-items:center; gap:7px; }
-  .section-title svg { width:14px; height:14px; opacity:0.8; }
-  .section p.body-text { margin:0; font-size: 13.5px; line-height: 1.75; color: var(--text-dim); }
-
-  .step-list { margin:0; padding:0; list-style:none; display:flex; flex-direction:column; gap:10px; }
-  .step-list li { display:flex; gap:10px; font-size: 13.5px; line-height:1.6; color: var(--text); }
-  .step-list .num { flex:none; width:20px; height:20px; border-radius:6px; background: var(--surface-2); display:flex; align-items:center; justify-content:center; font-family:'Chakra Petch',sans-serif; font-size: 10.5px; font-weight:700; color: var(--gold); margin-top:1px; }
-
-  .chem-chips { display:flex; flex-wrap:wrap; gap:7px; }
-  .chem-chip { font-family:'Chakra Petch',sans-serif; font-size: 11px; font-weight:600; background: rgba(209,73,91,0.12); color: #E8919C; border: 1px solid rgba(209,73,91,0.3); padding: 6px 11px; border-radius: 100px; }
-
-  .dw-actions { display:flex; gap: 10px; margin-top: 22px; }
-  .btn-primary, .btn-secondary { flex:1; font-family:'Chakra Petch',sans-serif; font-weight:700; font-size: 13px; padding: 13px; border-radius: 14px; border:none; cursor:pointer; letter-spacing:0.02em; }
-  .btn-primary { background: linear-gradient(135deg, var(--rind), var(--rind-bright)); color:#fff; }
-  .btn-secondary { background: var(--surface-2); color: var(--text); border: 1px solid var(--line); }
-
-  .safety-note { margin-top: 16px; font-size: 10.5px; line-height:1.7; color: var(--text-dim); opacity: 0.75; text-align:center; }
-
-  ::-webkit-scrollbar { width: 0; height: 0; }
-</style>
+        /* ส่วน Footer */
+        footer {
+            text-align: center;
+            padding: 20px;
+            background: #e9ecef;
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+    </style>
 </head>
 <body>
 
-<div class="topbar">
-  <div class="brand">
-    <div class="mark"><span class="dot"></span><h1>มังคุดซีเล็ค</h1></div>
-    <p>เครื่องสแกนโรคมังคุดภาคสนาม</p>
-  </div>
-  <button class="key-chip" id="keyBtn" onclick="promptForKey()">ตั้งค่า API Key</button>
-</div>
+    <header>
+        <div class="logo">MyWebsite</div>
+        <nav>
+            <a href="#">หน้าแรก</a>
+            <a href="#">เกี่ยวกับเรา</a>
+            <a href="#">บริการ</a>
+            <a href="#">ติดต่อ</a>
+        </nav>
+    </header>
 
-<main class="viewfinder-stage" id="stage">
-  <video id="camVideo" autoplay playsinline muted></video>
-  <img id="capturedImg" alt="ภาพที่สแกน">
-  <div class="grid-overlay"></div>
-  <div class="hud-frame" id="hudFrame">
-    <span class="corner tl"></span><span class="corner tr"></span>
-    <span class="corner bl"></span><span class="corner br"></span>
-    <div class="scan-line"></div>
-  </div>
-  <div class="capture-flash" id="captureFlash"></div>
-  <div class="hud-status" id="hudStatus">กำลังขอสิทธิ์เข้าถึงกล้อง<span class="sub">อนุญาตการใช้กล้องเพื่อเริ่มสแกน</span></div>
+    <section class="hero">
+        <h1>ยินดีต้อนรับสู่เว็บรูปแบบใหม่</h1>
+        <p>ดีไซน์เรียบง่าย สะอาดตา และใช้งานง่ายบนทุกอุปกรณ์</p>
+        <a href="#" class="btn">เริ่มต้นใช้งาน</a>
+    </section>
 
-  <div class="camera-fallback" id="cameraFallback">
-    <div class="icon-warn">ไม่พบสัญญาณกล้อง</div>
-    <p id="fallbackMsg">ไม่สามารถเข้าถึงกล้องได้ กรุณาอนุญาตการใช้งานกล้องในเบราว์เซอร์ หรือเลือกภาพจากคลังแทน</p>
-  </div>
-</main>
-
-<div class="control-bar">
-  <button class="ctrl-btn" id="uploadBtn" title="เลือกจากคลังภาพ">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="15" rx="2.5"/><circle cx="8.5" cy="10.5" r="1.6" fill="currentColor" stroke="none"/><path d="M21 16l-5.5-5.5a2 2 0 0 0-2.8 0L4 19"/></svg>
-  </button>
-  <button class="shutter-btn" id="shutterBtn" disabled><span class="shutter-inner"></span></button>
-  <button class="ctrl-btn" id="switchCamBtn" title="สลับกล้อง">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 2l4 4-4 4"/><path d="M21 6H8a5 5 0 0 0-5 5"/><path d="M7 22l-4-4 4-4"/><path d="M3 18h13a5 5 0 0 0 5-5"/></svg>
-  </button>
-</div>
-<div class="history-strip" id="historyStrip"></div>
-<input type="file" id="fileInput" accept="image/*" capture="environment" style="display:none">
-
-<div class="drawer-backdrop" id="drawerBackdrop"></div>
-<div class="result-drawer" id="resultDrawer">
-  <div class="drawer-handle"><span></span></div>
-  <div class="drawer-scroll" id="drawerScroll"></div>
-</div>
-
-<script>
-/* ============ Elements ============ */
-const stage = document.getElementById('stage');
-const camVideo = document.getElementById('camVideo');
-const capturedImg = document.getElementById('capturedImg');
-const hudStatus = document.getElementById('hudStatus');
-const hudFrame = document.getElementById('hudFrame');
-const cameraFallback = document.getElementById('cameraFallback');
-const fallbackMsg = document.getElementById('fallbackMsg');
-const captureFlash = document.getElementById('captureFlash');
-const shutterBtn = document.getElementById('shutterBtn');
-const uploadBtn = document.getElementById('uploadBtn');
-const switchCamBtn = document.getElementById('switchCamBtn');
-const fileInput = document.getElementById('fileInput');
-const historyStrip = document.getElementById('historyStrip');
-const drawerBackdrop = document.getElementById('drawerBackdrop');
-const resultDrawer = document.getElementById('resultDrawer');
-const drawerScroll = document.getElementById('drawerScroll');
-const keyBtn = document.getElementById('keyBtn');
-
-const STORAGE_KEY = 'mangkud_claude_api_key';
-let currentStream = null;
-let facingMode = 'environment';
-let history = [];
-
-/* ============ API key ============ */
-function getApiKey() { return localStorage.getItem(STORAGE_KEY) || ''; }
-function updateKeyBtn() {
-  keyBtn.textContent = getApiKey() ? 'API Key ✓' : 'ตั้งค่า API Key';
-  keyBtn.classList.toggle('set', !!getApiKey());
-}
-function promptForKey() {
-  const current = getApiKey();
-  const key = prompt('วาง Anthropic API Key ของคุณ (ขึ้นต้นด้วย sk-ant-...)\nคีย์นี้จะถูกเก็บไว้ในเบราว์เซอร์ของคุณเท่านั้น', current || '');
-  if (key !== null) {
-    if (key.trim()) localStorage.setItem(STORAGE_KEY, key.trim());
-    else localStorage.removeItem(STORAGE_KEY);
-    updateKeyBtn();
-  }
-}
-updateKeyBtn();
-
-/* ============ Camera ============ */
-async function initCamera(mode) {
-  facingMode = mode || facingMode;
-  hudStatus.style.opacity = '1';
-  hudStatus.innerHTML = 'กำลังขอสิทธิ์เข้าถึงกล้อง<span class="sub">อนุญาตการใช้กล้องเพื่อเริ่มสแกน</span>';
-  cameraFallback.classList.remove('show');
-
-  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-    showCameraFallback('เบราว์เซอร์นี้ไม่รองรับการเข้าถึงกล้อง');
-    return;
-  }
-  try {
-    if (currentStream) currentStream.getTracks().forEach(t => t.stop());
-    currentStream = await navigator.mediaDevices.getUserMedia({
-      video: { facingMode: { ideal: facingMode }, width: { ideal: 1280 }, height: { ideal: 1280 } },
-      audio: false
-    });
-    camVideo.srcObject = currentStream;
-    camVideo.classList.remove('hidden');
-    capturedImg.style.display = 'none';
-    shutterBtn.disabled = false;
-    shutterBtn.classList.remove('retake');
-    hudStatus.innerHTML = 'พร้อมสแกน<span class="sub">จ่อกล้องไปที่ใบ ผล หรือลำต้นมังคุด</span>';
-    setTimeout(() => { if (!resultDrawer.classList.contains('open')) hudStatus.style.opacity = '0.55'; }, 2600);
-  } catch (err) {
-    console.error('Camera error:', err);
-    let msg = 'ไม่สามารถเข้าถึงกล้องได้ กรุณาอนุญาตการใช้งานกล้องในเบราว์เซอร์ หรือเลือกภาพจากคลังแทน';
-    if (err.name === 'NotAllowedError') msg = 'คุณปฏิเสธการขอสิทธิ์กล้อง กรุณาอนุญาตในการตั้งค่าเบราว์เซอร์ แล้วโหลดหน้านี้ใหม่ หรือเลือกภาพจากคลังแทน';
-    if (err.name === 'NotFoundError') msg = 'ไม่พบกล้องบนอุปกรณ์นี้ กรุณาเลือกภาพจากคลังแทน';
-    showCameraFallback(msg);
-  }
-}
-function showCameraFallback(msg) {
-  fallbackMsg.textContent = msg;
-  cameraFallback.classList.add('show');
-  hudStatus.style.opacity = '0';
-  shutterBtn.disabled = true;
-}
-switchCamBtn.addEventListener('click', () => {
-  initCamera(facingMode === 'environment' ? 'user' : 'environment');
-});
-window.addEventListener('load', () => initCamera('environment'));
-stage.addEventListener('click', () => { hudStatus.style.opacity = '1'; });
-
-/* ============ Capture / Upload ============ */
-shutterBtn.addEventListener('click', () => {
-  if (shutterBtn.classList.contains('retake')) { resetToCamera(); return; }
-  if (!currentStream) return;
-  const track = currentStream.getVideoTracks()[0];
-  const settings = track.getSettings ? track.getSettings() : {};
-  const w = settings.width || camVideo.videoWidth;
-  const h = settings.height || camVideo.videoHeight;
-  const canvas = document.createElement('canvas');
-  canvas.width = w; canvas.height = h;
-  canvas.getContext('2d').drawImage(camVideo, 0, 0, w, h);
-  fireCaptureFx();
-  const dataUrl = canvas.toDataURL('image/jpeg', 0.92);
-  useImage(dataUrl);
-});
-
-uploadBtn.addEventListener('click', () => fileInput.click());
-fileInput.addEventListener('change', (e) => {
-  if (!e.target.files.length) return;
-  const file = e.target.files[0];
-  const reader = new FileReader();
-  reader.onload = (evt) => useImage(evt.target.result);
-  reader.readAsDataURL(file);
-  fileInput.value = '';
-});
-
-function fireCaptureFx() {
-  captureFlash.classList.remove('fire'); void captureFlash.offsetWidth;
-  captureFlash.classList.add('fire');
-  hudFrame.classList.add('locked');
-  if (navigator.vibrate) navigator.vibrate(45);
-}
-
-function useImage(dataUrl) {
-  resizeImage(dataUrl, 1400, 0.85, (resized) => {
-    capturedImg.src = resized;
-    capturedImg.style.display = 'block';
-    camVideo.classList.add('hidden');
-    shutterBtn.classList.add('retake');
-    hudStatus.style.opacity = '0';
-    openDrawerLoading();
-    analyzeImageWithClaude(resized, 'image/jpeg');
-  });
-}
-
-function resetToCamera() {
-  closeDrawer();
-  hudFrame.classList.remove('locked');
-  initCamera(facingMode);
-}
-
-function resizeImage(dataUrl, maxDim, quality, callback) {
-  const img = new Image();
-  img.onload = function() {
-    let { width, height } = img;
-    if (width > maxDim || height > maxDim) {
-      if (width > height) { height = Math.round(height * (maxDim / width)); width = maxDim; }
-      else { width = Math.round(width * (maxDim / height)); height = maxDim; }
-    }
-    const canvas = document.createElement('canvas');
-    canvas.width = width; canvas.height = height;
-    canvas.getContext('2d').drawImage(img, 0, 0, width, height);
-    callback(canvas.toDataURL('image/jpeg', quality));
-  };
-  img.onerror = () => callback(dataUrl);
-  img.src = dataUrl;
-}
-
-/* ============ Claude Vision analysis ============ */
-const SYSTEM_PROMPT = `คุณคือผู้เชี่ยวชาญโรคพืชและศัตรูพืชของมังคุด วิเคราะห์ภาพถ่าย (ใบ ผล ลำต้น หรือโคนต้น) แล้ววินิจฉัยโดยอ้างอิงฐานความรู้ต่อไปนี้เท่านั้น:
-
-1) id: "thrips" — เพลี้ยไฟ (Mangosteen Thrips). ระบาดหนักช่วงอากาศร้อนแห้งแล้ง/ฝนทิ้งช่วง ระยะแตกใบอ่อน-ดอกบาน-ผลอ่อน. อาการ: ใบอ่อนหงิกงอขอบม้วนมีรอยสีน้ำตาลสาก, ช่อดอกแห้งร่วง, ผิวผลอ่อนเป็นรอยแผลลายจุดสีน้ำตาลขรุขระ ("ผิวขี้กลาก"). ป้องกัน: ให้น้ำ/พ่นฝอยสม่ำเสมอเพิ่มความชื้น, ติดกับดักกาวเหนียวสีเหลือง. สารเคมี: สปิเนโทแรม, อิมิดาโคลพริด, อะบาเมกติน, ฟิโพรนิล (ควรสลับกลุ่มสารทุกครั้งกันดื้อยา).
-
-2) id: "leafminer" — หนอนชอนใบ (Mangosteen Leafminer, เป็นแมลงศัตรูพืชไม่ใช่เชื้อโรค). เข้าทำลายช่วงแตกใบอ่อน. อาการ: รอยทางเดินคดเคี้ยวสีขาวเงิน/น้ำตาลใต้ผิวใบอ่อน, ใบหงิกงอบิดเบี้ยวขอบม้วน แห้งร่วงก่อนกำหนด, ต้นชะงักการเติบโต. ป้องกัน: ตัดแต่งกิ่ง/ใส่ปุ๋ยบังคับแตกใบพร้อมกันทั้งสวน, หมั่นตรวจช่วงใบหางปลาถึงใบกล้วยหอม. สารเคมี: อะบาเมกติน, อิมิดาโคลพริด, ฟิโพรนิล (ฉีด 1-2 ครั้งห่างกัน 7-10 วัน).
-
-3) id: "rootrot" — โรครากเน่าโคนเน่า (เชื้อรา Phytophthora spp.). เกิดจากน้ำท่วมขัง ดินระบายน้ำไม่ดี ความชื้นสูง. อาการ: โคนต้นฉ่ำน้ำปริแตกมียางเหลืองอมน้ำตาล เนื้อไม้ข้างในเน่าสีน้ำตาล, รากฝอยเน่าดำเปลือกล่อน, ใบเหลืองร่วงยอดแห้งตายจากบนลงล่าง (Dieback). ป้องกัน: ทำระบบระบายน้ำ ยกร่อง, ตัดแต่งกิ่งล่างให้โคนต้นโปร่ง, ระวังไม่ให้เกิดแผลที่โคน/ราก. รักษา: ใส่เชื้อราไตรโคเดอร์มารอบโคนต้น, ถากแผลทายาเมทาแลกซิลหรือคอปเปอร์ออกซีคลอไรด์, ฉีดพ่น/ราดโคนด้วยฟอสอีทิล-อลูมิเนียม หรือกรดฟอสโฟนิก.
-
-4) id: "pink" — โรคราสีชมพู (เชื้อรา Erythricium salmonicolor). ชอบความชื้นสูง ทรงพุ่มทึบ ระบาดผ่านลมฝน. อาการ: เส้นใยราสีชมพูอ่อนคล้ายใยแมงมุมตามง่ามกิ่ง ขยายเป็นแผ่นสปอร์สีชมพูสดรัดรอบกิ่ง ทำลายท่อน้ำท่ออาหาร ใบเหี่ยวน้ำตาล กิ่งแห้งตาย. ป้องกัน: ตัดแต่งทรงพุ่มให้โปร่งแสงแดดส่องถึง. รักษา: กิ่งใหญ่ถากเปลือกทาสารคอปเปอร์/ปูนแดงผสมสารกำจัดเชื้อรา, กิ่งเล็กตัดต่ำกว่าแผล 20-30 ซม. แล้วเผาทำลายนอกสวน. สารเคมี: ไตรโคเดอร์มาป้องกันก่อนฤดูฝน, คอปเปอร์ออกซีคลอไรด์, เฮกซาโคนาโซล.
-
-5) id: "leafspot" — โรคใบจุด แผลแตกยางไหล ผลเน่า (เชื้อรา Pestalotiopsis flagisettula). ระบาดตามลมในฤดูฝน. อาการ: แผลจุดสีน้ำตาล/น้ำตาลปนเทาบนใบขนาดไม่แน่นอน ขอบแผลสีม่วงเข้ม กลางแผลมีจุดดำเล็กๆ กระจาย (ส่วนขยายพันธุ์เชื้อรา), ใบร่วง, ผลที่อยู่ในช่อเดียวกันผิวกร้านแดดไม่มัน, เชื้อลุกลามเข้าทำลายผลและลำต้นกล้าได้. ป้องกัน: ทำความสะอาดแปลง กำจัดวัชพืชแหล่งสะสมโรค, กำจัดหนอนชอนใบเพื่อลดแผลที่เป็นช่องทางเชื้อเข้า. สารเคมี: คอปเปอร์ออกซีคลอไรด์ 85% WP, คาร์เบนดาซิม 50% WP, แมนโคเซบ 80% WP พ่นช่วงแตกใบอ่อน 1-2 ครั้ง.
-
-6) id: "healthy" — ต้น/ใบ/ผลดูปกติดี ไม่พบร่องรอยความผิดปกติที่ตรงกับฐานความรู้ข้างต้น.
-7) id: "unknown" — ภาพไม่ใช่ต้นมังคุด หรือไม่สามารถระบุความผิดปกติได้ชัดเจนจากภาพ.
-
-ตอบกลับเป็น JSON เท่านั้น ห้ามมีข้อความอื่นใดนอกเหนือจาก JSON และห้ามใช้ markdown code fence รูปแบบที่ต้องการ:
-{
-  "disease_id": "thrips|leafminer|rootrot|pink|leafspot|healthy|unknown",
-  "disease_name": "ชื่อโรค/อาการเป็นภาษาไทย",
-  "part": "ส่วนของต้นที่เห็นในภาพ",
-  "confidence": ตัวเลข 0-100,
-  "severity_level": ตัวเลข 1-5 (1=เล็กน้อย 5=รุนแรงมาก, ให้ 0 ถ้า healthy),
-  "symptoms_observed": "อาการที่สังเกตเห็นได้จริงในภาพนี้โดยเฉพาะ 1-2 ประโยค",
-  "cause": "สาเหตุของโรค/อาการ 1-2 ประโยค",
-  "treatment": ["ขั้นตอนการรักษา/แก้ไข อย่างน้อย 2 ข้อ"],
-  "prevention": ["แนวทางป้องกันไม่ให้เกิดซ้ำ อย่างน้อย 2 ข้อ"],
-  "chemicals": ["ชื่อสารเคมีที่เกี่ยวข้อง ถ้ามี ใส่ array ว่างถ้าไม่มี"]
-}
-ถ้า disease_id เป็น healthy หรือ unknown ให้ treatment/prevention/chemicals เป็น array ว่างหรือคำแนะนำทั่วไปสั้นๆ ได้`;
-
-async function analyzeImageWithClaude(dataUrl, mimeType) {
-  const apiKey = getApiKey();
-  if (!apiKey) {
-    renderDrawerError('ยังไม่ได้ตั้งค่า API Key', true);
-    return;
-  }
-  const base64Data = dataUrl.split(',')[1];
-  stage.classList.add('analyzing');
-
-  try {
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': apiKey,
-        'anthropic-version': '2023-06-01',
-        'anthropic-dangerous-direct-browser-access': 'true'
-      },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-6',
-        max_tokens: 1200,
-        system: SYSTEM_PROMPT,
-        messages: [{
-          role: 'user',
-          content: [
-            { type: 'image', source: { type: 'base64', media_type: mimeType, data: base64Data } },
-            { type: 'text', text: 'วิเคราะห์ภาพมังคุดนี้และตอบกลับเป็น JSON ตามรูปแบบที่กำหนด' }
-          ]
-        }]
-      })
-    });
-
-    if (!response.ok) {
-      const errText = await response.text();
-      throw new Error(`API error ${response.status}: ${errText.slice(0, 200)}`);
-    }
-
-    const data = await response.json();
-    const rawText = data.content.map(b => b.text || '').join('').trim();
-    console.log('Claude raw response:', rawText);
-
-    let cleaned = rawText.replace(/```json|```/g, '').trim();
-    const jsonMatch = cleaned.match(/\{[\s\S]*\}/);
-    if (jsonMatch) cleaned = jsonMatch[0];
-    const parsed = JSON.parse(cleaned);
-
-    stage.classList.remove('analyzing');
-    renderDrawerResult(parsed);
-    pushHistory(dataUrl, parsed);
-  } catch (err) {
-    console.error('Claude API error:', err);
-    stage.classList.remove('analyzing');
-    renderDrawerError('เกิดข้อผิดพลาดในการวิเคราะห์ภาพ: ' + escapeHtml(err.message), false);
-  }
-}
-
-/* ============ Icons per disease ============ */
-const ICONS = {
-  thrips: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><ellipse cx="12" cy="13" rx="4" ry="6"/><path d="M12 7V3M9 4l1.5 2.2M15 4l-1.5 2.2M6 10l-3-1.5M6 16l-3 1.5M18 10l3-1.5M18 16l3 1.5"/></svg>',
-  leafminer: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 18c6-1 8-9 16-11-2 6-2 12-10 14-3 .7-5-1-6-3z"/><path d="M6 16c2-3 3-6 8-9"/></svg>',
-  rootrot: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 3v9"/><path d="M12 12c-2 1-3 3-3 6M12 12c2 1 3 3 3 6M12 12c-3 0-5 2-6 5M12 12c3 0 5 2 6 5"/><circle cx="12" cy="4" r="1.4" fill="currentColor" stroke="none"/></svg>',
-  pink: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 14c4-6 12-6 16-10"/><circle cx="8" cy="12" r="1.3" fill="currentColor" stroke="none"/><circle cx="12" cy="9" r="1.3" fill="currentColor" stroke="none"/><circle cx="16" cy="6.5" r="1.3" fill="currentColor" stroke="none"/></svg>',
-  leafspot: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 18c6-1 8-9 16-11-2 6-2 12-10 14-3 .7-5-1-6-3z"/><circle cx="11" cy="13" r="1.2" fill="currentColor" stroke="none"/><circle cx="14.5" cy="9.5" r="1.2" fill="currentColor" stroke="none"/></svg>',
-  healthy: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 18c6-1 8-9 16-11-2 6-2 12-10 14-3 .7-5-1-6-3z"/><path d="M8 15l2 2 6-6"/></svg>',
-  unknown: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 0 1 5 0c0 1.7-2 1.8-2 3.6"/><circle cx="12" cy="16.5" r="0.9" fill="currentColor" stroke="none"/></svg>'
-};
-const SEV_COLOR = ['#58A15C','#58A15C','#D6A441','#D6A441','#D1495B','#D1495B'];
-
-/* ============ Drawer rendering ============ */
-function openDrawerLoading() {
-  drawerScroll.innerHTML = `<div class="dw-loading"><div class="dw-spinner"></div><p>กำลังวิเคราะห์ภาพด้วย Claude AI...</p></div>`;
-  openDrawer();
-}
-function renderDrawerError(msg, needsKey) {
-  drawerScroll.innerHTML = `
-    <div class="dw-error">
-      <p>${msg}</p>
-      ${needsKey ? '<button class="btn-primary" onclick="promptForKey()">ตั้งค่า API Key</button>' : '<button class="btn-secondary" onclick="resetToCamera()">ลองใหม่อีกครั้ง</button>'}
-    </div>`;
-  openDrawer();
-}
-function renderDrawerResult(d) {
-  const sev = Math.max(0, Math.min(5, Number(d.severity_level) || 0));
-  const conf = Math.max(0, Math.min(100, Number(d.confidence) || 0));
-  const color = SEV_COLOR[sev];
-  const icon = ICONS[d.disease_id] || ICONS.unknown;
-  const circ = 2 * Math.PI * 20;
-  const dash = circ * (sev / 5);
-
-  const treatHtml = (d.treatment || []).map((t,i) => `<li><span class="num">${i+1}</span><span>${escapeHtml(t)}</span></li>`).join('');
-  const prevHtml = (d.prevention || []).map((t,i) => `<li><span class="num">${i+1}</span><span>${escapeHtml(t)}</span></li>`).join('');
-  const chemHtml = (d.chemicals || []).map(c => `<span class="chem-chip">${escapeHtml(c)}</span>`).join('');
-
-  drawerScroll.innerHTML = `
-    <div class="result-top">
-      <div class="result-icon" style="color:${color}">${icon}</div>
-      <div style="flex:1">
-        <p class="eyebrow">${escapeHtml(d.part || 'มังคุด')}</p>
-        <h2 class="disease-name">${escapeHtml(d.disease_name || 'ไม่ระบุ')}</h2>
-        <div class="conf-row">
-          <span class="conf-label">ความมั่นใจ ${conf}%</span>
-          <div class="conf-track"><div class="conf-fill" style="width:${conf}%"></div></div>
+    <div class="container">
+        <h2 class="section-title">จุดเด่นของเรา</h2>
+        <div class="grid">
+            <div class="card">
+                <h3>🚀 รวดเร็ว</h3>
+                <p>โหลดหน้าเว็บได้ไว ปรับแต่งโค้ดมาอย่างดีเพื่อประสบการณ์ที่ดีของผู้ใช้</p>
+            </div>
+            <div class="card">
+                <h3>🎨 สวยงาม</h3>
+                <p>การจัดวางองค์ประกอบและโทนสีที่สบายตา ดึงดูดสายตาผู้เข้าชม</p>
+            </div>
+            <div class="card">
+                <h3>📱 รองรับมือถือ</h3>
+                <p>แสดงผลได้สมบูรณ์แบบทั้งบนคอมพิวเตอร์ แท็บเล็ต และสมาร์ทโฟน</p>
+            </div>
         </div>
-      </div>
-      ${sev > 0 ? `
-      <div class="sev-gauge">
-        <svg viewBox="0 0 48 48">
-          <circle cx="24" cy="24" r="20" fill="none" stroke="var(--surface-2)" stroke-width="5"/>
-          <circle cx="24" cy="24" r="20" fill="none" stroke="${color}" stroke-width="5" stroke-linecap="round"
-            stroke-dasharray="${dash} ${circ}" transform="rotate(-90 24 24)"/>
-        </svg>
-        <div class="sev-num" style="color:${color}">${sev}/5</div>
-        <div class="sev-label">รุนแรง</div>
-      </div>` : ''}
     </div>
 
-    ${d.symptoms_observed ? `<div class="section"><p class="section-title">🔎 อาการที่พบในภาพ</p><p class="body-text">${escapeHtml(d.symptoms_observed)}</p></div>` : ''}
-    ${d.cause ? `<div class="section"><p class="section-title">สาเหตุ</p><p class="body-text">${escapeHtml(d.cause)}</p></div>` : ''}
-    ${treatHtml ? `<div class="section"><p class="section-title">แนวทางแก้ไข</p><ul class="step-list">${treatHtml}</ul></div>` : ''}
-    ${prevHtml ? `<div class="section"><p class="section-title">การป้องกันในอนาคต</p><ul class="step-list">${prevHtml}</ul></div>` : ''}
-    ${chemHtml ? `<div class="section"><p class="section-title">สารที่เกี่ยวข้อง</p><div class="chem-chips">${chemHtml}</div></div>` : ''}
+    <footer>
+        <p>&copy; 2026 MyWebsite. All rights reserved.</p>
+    </footer>
 
-    <div class="dw-actions">
-      <button class="btn-secondary" onclick="resetToCamera()">สแกนใหม่</button>
-      <button class="btn-primary" onclick="closeDrawer()">ดูภาพ</button>
-    </div>
-    <p class="safety-note">ผลวิเคราะห์จาก AI เป็นการประเมินเบื้องต้น ควรให้ผู้เชี่ยวชาญตรวจสอบซ้ำก่อนตัดสินใจใช้สารเคมี</p>
-  `;
-  openDrawer();
-}
-
-function openDrawer() { resultDrawer.classList.add('open'); drawerBackdrop.classList.add('open'); }
-function closeDrawer() { resultDrawer.classList.remove('open'); drawerBackdrop.classList.remove('open'); }
-drawerBackdrop.addEventListener('click', closeDrawer);
-
-/* ============ History strip ============ */
-function pushHistory(thumbUrl, data) {
-  history.unshift({ thumb: thumbUrl, data });
-  if (history.length > 10) history.pop();
-  renderHistory();
-}
-function renderHistory() {
-  historyStrip.innerHTML = history.map((h, i) => {
-    const sev = Math.max(0, Math.min(5, Number(h.data.severity_level) || 0));
-    return `<div class="hist-thumb" onclick="reopenHistory(${i})">
-      <img src="${h.thumb}"><span class="sev-dot" style="background:${SEV_COLOR[sev]}"></span>
-    </div>`;
-  }).join('');
-}
-function reopenHistory(i) {
-  const h = history[i];
-  capturedImg.src = h.thumb;
-  capturedImg.style.display = 'block';
-  camVideo.classList.add('hidden');
-  shutterBtn.classList.add('retake');
-  renderDrawerResult(h.data);
-}
-
-/* ============ Utils ============ */
-function escapeHtml(str) {
-  const div = document.createElement('div');
-  div.textContent = str == null ? '' : String(str);
-  return div.innerHTML;
-}
-</script>
 </body>
 </html>
